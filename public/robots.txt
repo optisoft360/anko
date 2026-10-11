@@ -8,5 +8,12 @@ Disallow: /sign-up
 Disallow: /forgot-password
 Disallow: /reset-password
 Disallow: /verify-email
+Disallow: /auth/
+Disallow: /enterprise/
+Disallow: /platform-admin/
+Disallow: /sin-empresa
+Disallow: /waiting
+Disallow: /access/
+Disallow: /join
 
 Sitemap: https://ankard.com/sitemap.xml

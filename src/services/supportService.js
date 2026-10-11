@@ -1,4 +1,5 @@
-import api from "./api";
+import axios from "axios";
+import api, { API_BASE } from "./api";
 
 const BASE = "/support-requests/";
 
@@ -17,6 +18,23 @@ const supportService = {
             return res.data;
         } catch (err) {
             throw err?.response?.data || { error: "Failed to send support request" };
+        }
+    },
+
+    /**
+     * Sends a lead from the public landing page (demo / pilot requests).
+     * Goes without the Authorization header so a stale token in localStorage
+     * can't turn an anonymous submission into a 401.
+     * @returns {Promise<Object>} the created request; on failure throws { status, data }.
+     */
+    async sendPublicLead(data, language = "en") {
+        try {
+            const res = await axios.post(`${API_BASE}${BASE}`, data, {
+                headers: { "Content-Type": "application/json", "Accept-Language": language },
+            });
+            return res.data;
+        } catch (err) {
+            throw { status: err?.response?.status, data: err?.response?.data };
         }
     },
 };

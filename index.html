@@ -1,44 +1,45 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!-- ===== PRIMARY META ===== -->
-  <title>Ankard – Convierte Documentos en Flashcards y Cuestionarios con IA</title>
-  <meta name="description" content="Ankard transforma tus PDFs y apuntes en flashcards, cuestionarios y simulacros de examen con inteligencia artificial. Estudia de forma activa, sigue tu progreso y domina cualquier materia." />
-  <meta name="keywords" content="flashcards IA, generador de flashcards, herramienta de estudio, generador de cuestionarios, simulacro de examen, PDF a flashcards, aprendizaje activo, repetición espaciada, alternativa a anki, app de estudio, inteligencia artificial, aprendizaje con IA" />
+  <!-- The landing page (src/pages/landing-page.jsx) swaps these per language at runtime (?lang=es). -->
+  <title>AI Employee Training &amp; Knowledge Management | Ankard</title>
+  <meta name="description" content="Turn company manuals and documents into employee training, assessments, and measurable learning. Try Ankard's 30-day business pilot for $99." />
+  <meta name="keywords" content="employee training software, AI employee training platform, business knowledge management software, employee onboarding software, corporate training software, training management software, software de capacitación empresarial, capacitación de empleados, gestión del conocimiento empresarial" />
   <meta name="author" content="Ankard" />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="https://ankard.com/" />
 
   <!-- ===== HREFLANG ===== -->
-  <link rel="alternate" hreflang="es" href="https://ankard.com/" />
-  <link rel="alternate" hreflang="en" href="https://ankard.com/en" />
+  <link rel="alternate" hreflang="en" href="https://ankard.com/" />
+  <link rel="alternate" hreflang="es" href="https://ankard.com/?lang=es" />
   <link rel="alternate" hreflang="x-default" href="https://ankard.com/" />
 
   <!-- ===== OPEN GRAPH (Facebook / LinkedIn) ===== -->
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://ankard.com/" />
   <meta property="og:site_name" content="Ankard" />
-  <meta property="og:title" content="Ankard – Convierte Documentos en Flashcards y Cuestionarios con IA" />
-  <meta property="og:description" content="Sube tus PDFs o apuntes y Ankard genera flashcards, baterías de preguntas y simulacros de examen automáticamente con IA. Aprende activamente, sigue tu progreso y mejora cada día." />
+  <meta property="og:title" content="AI Employee Training &amp; Knowledge Management | Ankard" />
+  <meta property="og:description" content="Turn company manuals and documents into employee training, assessments, and measurable learning. Try Ankard's 30-day business pilot for $99." />
   <meta property="og:image" content="https://ankard.com/img/anko-hero.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
-  <meta property="og:image:alt" content="Ankard — Plataforma de estudio con inteligencia artificial" />
-  <meta property="og:locale" content="es_ES" />
-  <meta property="og:locale:alternate" content="en_US" />
+  <meta property="og:image:alt" content="Ankard — AI-powered employee training and knowledge management platform" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:locale:alternate" content="es_ES" />
 
   <!-- ===== TWITTER CARD ===== -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:site" content="@ankardapp" />
   <meta name="twitter:creator" content="@ankardapp" />
-  <meta name="twitter:title" content="Ankard – Flashcards y Cuestionarios con IA" />
-  <meta name="twitter:description" content="Convierte cualquier documento en flashcards y cuestionarios con inteligencia artificial. Estudia mejor, no más duro." />
+  <meta name="twitter:title" content="AI Employee Training &amp; Knowledge Management | Ankard" />
+  <meta name="twitter:description" content="Turn company manuals and documents into employee training, assessments, and measurable learning. Try Ankard's 30-day business pilot for $99." />
   <meta name="twitter:image" content="https://ankard.com/img/anko-hero.png" />
-  <meta name="twitter:image:alt" content="Ankard — Plataforma de estudio con inteligencia artificial" />
+  <meta name="twitter:image:alt" content="Ankard — AI-powered employee training and knowledge management platform" />
 
   <!-- ===== FAVICON ===== -->
   <link rel="icon" type="image/png" sizes="32x32" href="/img/logoanko.png" />
@@ -50,40 +51,61 @@
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
     "name": "Ankard",
-    "url": "https://ankard.com",
+    "url": "https://ankard.com/",
     "logo": "https://ankard.com/img/logoanko.png",
-    "description": "Ankard es una herramienta de estudio con inteligencia artificial que transforma tus documentos en flashcards, cuestionarios y simulacros de examen para que aprendas de forma activa y midas tu progreso real.",
-    "applicationCategory": "EducationalApplication",
+    "description": "Ankard is an AI-powered employee training and knowledge management platform. Companies turn manuals, policies, and procedures into structured training, learning paths, and assessments, and track employee progress.",
+    "applicationCategory": "BusinessApplication",
     "operatingSystem": "Web",
-    "inLanguage": ["es", "en"],
-    "offers": {
-      "@type": "Offer",
-      "price": "0",
-      "priceCurrency": "EUR",
-      "description": "Plan gratuito disponible"
-    },
+    "inLanguage": [
+      "en",
+      "es"
+    ],
+    "offers": [
+      {
+        "@type": "Offer",
+        "name": "Ankard Business Pilot",
+        "price": "99",
+        "priceCurrency": "USD",
+        "description": "30-day business pilot for up to 5 employees, with a 30-day satisfaction guarantee."
+      },
+      {
+        "@type": "Offer",
+        "name": "Ankard Business",
+        "price": "149",
+        "priceCurrency": "USD",
+        "description": "Monthly subscription.",
+        "priceSpecification": {
+          "@type": "UnitPriceSpecification",
+          "price": "149",
+          "priceCurrency": "USD",
+          "unitCode": "MON"
+        }
+      }
+    ],
     "featureList": [
-      "Generación de flashcards con IA a partir de PDFs",
-      "Generador de baterías de preguntas por tema",
-      "Modo de estudio con repetición espaciada",
-      "Seguimiento de progreso por tema",
-      "Soporte multilingüe (ES / EN)",
-      "Simulacro de examen personalizado"
+      "Turn business documents into employee training with AI assistance",
+      "Learning paths by department, role, or responsibility",
+      "Employee invitations and training assignments",
+      "Assessments to verify understanding",
+      "Training progress and assessment results",
+      "Document version history and procedure updates",
+      "Internal completion certificates with verification link",
+      "Private company workspaces with roles and permissions"
     ],
     "screenshot": "https://ankard.com/img/anko-hero.png",
     "publisher": {
       "@type": "Organization",
       "name": "Ankard",
-      "url": "https://ankard.com",
-      "logo": "https://ankard.com/img/logoanko.png"
-    },
-    "sameAs": [
-      "https://twitter.com/ankardapp"
-    ]
+      "url": "https://ankard.com/",
+      "logo": "https://ankard.com/img/logoanko.png",
+      "sameAs": [
+        "https://twitter.com/ankardapp"
+      ]
+    }
   }
   </script>
 
-  <!-- ===== STRUCTURED DATA: FAQPage ===== -->
+  <!-- ===== STRUCTURED DATA: FAQPage (mirrors the landing FAQ, English) ===== -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -91,42 +113,82 @@
     "mainEntity": [
       {
         "@type": "Question",
-        "name": "¿Qué tipos de archivos puedo subir a Ankard?",
+        "name": "What is Ankard Enterprise?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Ankard admite PDFs, documentos de texto y apuntes. Puedes organizarlos en proyectos y temas para generar preguntas específicas por cada área."
+          "text": "Ankard is an AI-assisted business knowledge management and employee training platform. It helps companies organize documents, create learning materials, assign training, and monitor learning progress."
         }
       },
       {
         "@type": "Question",
-        "name": "¿Cómo genera Ankard las preguntas con IA?",
+        "name": "Can Ankard turn business documents into employee training?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Ankard analiza el contenido de tus documentos y genera automáticamente preguntas de opción múltiple, verdadero/falso y flashcards usando inteligencia artificial, adaptadas al tema y nivel de dificultad que configures."
+          "text": "Yes. Ankard helps transform manuals, policies, and procedures into structured learning content, questions, and assessments. Your team can review and adjust the content before assigning it."
         }
       },
       {
         "@type": "Question",
-        "name": "¿Es gratuito Ankard?",
+        "name": "Can I assign different training to different employees?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Sí, Ankard tiene un plan gratuito que incluye proyectos básicos y preguntas de práctica diaria. Los planes Premium y Pro Team ofrecen proyectos ilimitados, práctica sin límite y funciones avanzadas."
+          "text": "Yes. You can organize learning paths and assign training based on each employee's role and responsibilities."
         }
       },
       {
         "@type": "Question",
-        "name": "¿Puedo simular un examen real con Ankard?",
+        "name": "Can I monitor employee training progress?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Sí. Ankard incluye un simulador de examen que replica las condiciones reales: tiempo limitado, puntuación y revisión detallada de resultados por tema."
+          "text": "Yes. Authorized administrators can review participation, progress, and assessment results."
         }
       },
       {
         "@type": "Question",
-        "name": "¿En qué idiomas está disponible Ankard?",
+        "name": "Are my company documents private?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Ankard está disponible en español e inglés. Puedes cambiar el idioma desde tu perfil en cualquier momento."
+          "text": "Each company works in its own private workspace. Only people your company invites can access it, and administrators control what each person can do through roles and permissions. If you have specific data-handling questions, our team will walk you through them."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does Ankard issue certificates?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Ankard provides internal completion and assessment records, including certificates that can be checked with a verification link. They do not replace professional licenses or regulated certifications."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How much does Ankard cost?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The 30-day business pilot costs $99 for up to five employees. After that, the Ankard Business subscription is $149 per month."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I start the pilot?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Fill out the pilot request form. Our team will contact you to confirm the details, set up your workspace, and arrange payment."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is there a money-back guarantee?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. The pilot includes a 30-day satisfaction guarantee with a full refund."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can Ankard work for my industry?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Ankard is designed for organizations across industries that need to organize knowledge and train employees."
         }
       }
     ]

@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
+  DocumentTextIcon,
   DocumentArrowUpIcon,
   SparklesIcon,
   AcademicCapIcon,
@@ -19,16 +20,196 @@ import {
   XMarkIcon,
   CheckBadgeIcon,
   EnvelopeIcon,
+  ArrowPathIcon,
+  FolderOpenIcon,
+  EyeSlashIcon,
+  ArrowsRightLeftIcon,
+  ClipboardDocumentCheckIcon,
+  MapIcon,
+  UserPlusIcon,
+  KeyIcon,
+  DocumentDuplicateIcon,
+  GiftIcon,
+  BriefcaseIcon,
+  WrenchScrewdriverIcon,
+  TruckIcon,
+  HeartIcon,
+  CogIcon,
+  ChatBubbleLeftRightIcon,
+  UsersIcon,
+  MapPinIcon,
+  ChevronDownIcon,
+  LifebuoyIcon,
+  PresentationChartLineIcon,
+  IdentificationIcon,
+  ArchiveBoxIcon,
+  BuildingStorefrontIcon,
+  ArrowTrendingUpIcon,
 } from "@heroicons/react/24/outline";
 import supportService from "@/services/supportService";
+import { useLanguage } from "@/context/language-context";
+import { dictionaryList } from "@/locales";
 
-// ─── Demo / Contact Modal ─────────────────────────────────────────────────────
+const SITE_URL = "https://ankard.com/";
+const GRADIENT = "linear-gradient(135deg, #6366F1, #818CF8)";
+const TEXT_GRADIENT = { background: "linear-gradient(135deg, #6366F1, #C084FC)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" };
+const SECTION_SCROLL = { scrollMarginTop: 72 };
 
-function DemoModal({ onClose }) {
-  const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
+// ─── Shared building blocks ──────────────────────────────────────────────────
+
+function Eyebrow({ children }) {
+  return (
+    <p style={{ fontSize: 11, fontWeight: 700, color: "#818CF8", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 10 }}>
+      {children}
+    </p>
+  );
+}
+
+function SectionHeader({ eyebrow, title, intro, center = true }) {
+  return (
+    <div className={center ? "text-center mb-14 max-w-3xl mx-auto" : "mb-8"}>
+      <Eyebrow>{eyebrow}</Eyebrow>
+      <h2 style={{ fontSize: "clamp(24px, 4vw, 38px)", fontWeight: 800, color: "#F1F5F9", lineHeight: 1.18, letterSpacing: "-0.02em" }}>
+        {title}
+      </h2>
+      {intro && <p style={{ fontSize: 15, color: "#94A3B8", lineHeight: 1.75, marginTop: 16 }}>{intro}</p>}
+    </div>
+  );
+}
+
+function PrimaryButton({ children, onClick, size = "md", full = false }) {
+  const pad = size === "lg" ? "14px 28px" : "11px 22px";
+  return (
+    <button type="button" onClick={onClick}
+      style={{ fontSize: size === "lg" ? 15 : 14, fontWeight: 700, color: "#fff", background: GRADIENT, border: "none", borderRadius: size === "lg" ? 12 : 10, padding: pad, cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8, boxShadow: "0 0 32px rgba(99,102,241,0.32)", transition: "all 0.2s", width: full ? "100%" : undefined }}
+      onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 0 44px rgba(99,102,241,0.48)"; }}
+      onMouseLeave={(e) => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = "0 0 32px rgba(99,102,241,0.32)"; }}>
+      {children}
+      <ArrowRightIcon className="h-4 w-4" aria-hidden="true" />
+    </button>
+  );
+}
+
+function SecondaryButton({ children, onClick, href, full = false }) {
+  const style = { fontSize: 14, fontWeight: 600, color: "#94A3B8", background: "none", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 10, padding: "11px 22px", cursor: "pointer", transition: "all 0.15s", textDecoration: "none", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, width: full ? "100%" : undefined };
+  const enter = (e) => { e.currentTarget.style.color = "#F1F5F9"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.28)"; };
+  const leave = (e) => { e.currentTarget.style.color = "#94A3B8"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)"; };
+  if (href) return <a href={href} style={style} onMouseEnter={enter} onMouseLeave={leave}>{children}</a>;
+  return <button type="button" onClick={onClick} style={style} onMouseEnter={enter} onMouseLeave={leave}>{children}</button>;
+}
+
+function IconBadge({ icon: Icon, color, size = 40 }) {
+  return (
+    <div style={{ width: size, height: size, borderRadius: 11, background: `${color}18`, border: `1px solid ${color}28`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+      <Icon className="h-5 w-5" style={{ color }} aria-hidden="true" />
+    </div>
+  );
+}
+
+function GuaranteeNote({ children, center = false }) {
+  return (
+    <p className={center ? "justify-center" : ""} style={{ display: "flex", alignItems: "center", gap: 7, fontSize: 13, fontWeight: 600, color: "#22C55E" }}>
+      <ShieldCheckIcon className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
+      {children}
+    </p>
+  );
+}
+
+// ─── Language + SEO ──────────────────────────────────────────────────────────
+
+/** Picks the landing language from ?lang=, falling back to the browser language. */
+function useLandingLanguage() {
+  const { language, changeLanguage } = useLanguage();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  useEffect(() => {
+    const param = searchParams.get("lang");
+    const browser = (navigator.language || "").toLowerCase().startsWith("es") ? "es" : "en";
+    const initial = param === "es" || param === "en" ? param : browser;
+    if (initial !== language) changeLanguage(initial);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const setLanguage = (lang) => {
+    changeLanguage(lang);
+    setSearchParams((params) => {
+      if (lang === "en") params.delete("lang");
+      else params.set("lang", lang);
+      return params;
+    }, { replace: true });
+  };
+
+  return [language === "es" ? "es" : "en", setLanguage];
+}
+
+function setMeta(selector, attr, value) {
+  const el = document.head.querySelector(selector);
+  if (!el) return null;
+  const previous = el.getAttribute(attr);
+  el.setAttribute(attr, value);
+  return () => el.setAttribute(attr, previous);
+}
+
+/** Keeps <title>, description, canonical and social tags in sync with the landing language. */
+function useLandingSeo(lang, L) {
+  useEffect(() => {
+    const url = lang === "es" ? `${SITE_URL}?lang=es` : SITE_URL;
+    const prevTitle = document.title;
+    const prevLang = document.documentElement.lang;
+    document.title = L.meta.title;
+    document.documentElement.lang = lang;
+    const restores = [
+      setMeta('meta[name="description"]', "content", L.meta.description),
+      setMeta('link[rel="canonical"]', "href", url),
+      setMeta('meta[property="og:url"]', "content", url),
+      setMeta('meta[property="og:title"]', "content", L.meta.title),
+      setMeta('meta[property="og:description"]', "content", L.meta.description),
+      setMeta('meta[property="og:locale"]', "content", L.meta.og_locale),
+      setMeta('meta[name="twitter:title"]', "content", L.meta.title),
+      setMeta('meta[name="twitter:description"]', "content", L.meta.description),
+    ];
+    return () => {
+      document.title = prevTitle;
+      document.documentElement.lang = prevLang;
+      restores.forEach((restore) => restore && restore());
+    };
+  }, [lang, L]);
+}
+
+// ─── Lead Modal (pilot / demo / services / business / security / launch) ────
+
+const LEAD_SOURCES = {
+  pilot: "business_pilot_request",
+  demo: "enterprise_demo_request",
+  services: "professional_services_request",
+  business: "business_plan_inquiry",
+  security: "security_inquiry",
+  launch: "launch_program_application",
+};
+
+const FIELD_STYLE = { width: "100%", background: "#1E293B", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "10px 12px", fontSize: 13, color: "#F1F5F9", outline: "none", transition: "border-color 0.15s", boxSizing: "border-box", fontFamily: "inherit" };
+const LABEL_STYLE = { fontSize: 11, fontWeight: 600, color: "#94A3B8", display: "block", marginBottom: 6 };
+const focusOn = (e) => (e.target.style.borderColor = "rgba(99,102,241,0.6)");
+const focusOff = (e) => (e.target.style.borderColor = "rgba(255,255,255,0.1)");
+
+function LeadModal({ mode, lang, L, onClose }) {
+  const M = L.modal;
+  const copy = M.modes[mode];
+  const emptyForm = { company: "", name: "", email: "", phone: "", team_size: "", notes: "" };
+  const [form, setForm] = useState(emptyForm);
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState(null); // "success" | "error"
   const [errorMsg, setErrorMsg] = useState("");
+  const firstFieldRef = useRef(null);
+
+  useEffect(() => {
+    firstFieldRef.current?.focus();
+    const onKey = (e) => { if (e.key === "Escape") onClose(); };
+    document.addEventListener("keydown", onKey);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.removeEventListener("keydown", onKey); document.body.style.overflow = prevOverflow; };
+  }, [onClose]);
 
   const handleChange = (e) => setForm((p) => ({ ...p, [e.target.name]: e.target.value }));
 
@@ -36,109 +217,121 @@ function DemoModal({ onClose }) {
     e.preventDefault();
     setLoading(true);
     setStatus(null);
+    // The support-request model has no company / team-size fields, so they travel in the message.
+    const message = [
+      `[${LEAD_SOURCES[mode]}]`,
+      `Company: ${form.company.trim()}`,
+      form.team_size && `Employees: ${form.team_size}`,
+      `Language: ${lang}`,
+      form.notes.trim() && `\n${form.notes.trim()}`,
+    ].filter(Boolean).join("\n");
     try {
-      await supportService.sendSupportRequest({ ...form, source: "enterprise_demo_request" });
+      await supportService.sendPublicLead({
+        name: form.name.trim(),
+        email: form.email.trim(),
+        phone: form.phone.trim(),
+        message,
+        source: LEAD_SOURCES[mode],
+      }, lang);
       setStatus("success");
-      setForm({ name: "", email: "", phone: "", message: "" });
+      setForm(emptyForm);
     } catch (err) {
-      let msg = "Ocurrió un error. Por favor intenta de nuevo.";
-      try {
-        const raw = Array.isArray(err) ? err[0] : (err?.message?.[0] ?? err?.non_field_errors?.[0] ?? null);
-        if (raw) { const p = JSON.parse(raw); msg = p.es ?? p.en ?? msg; }
-      } catch (_) {}
-      setErrorMsg(msg);
+      if (err?.status === 429) setErrorMsg(M.errors.rate);
+      else if (err?.data?.email) setErrorMsg(M.errors.email);
+      else setErrorMsg(M.errors.generic);
       setStatus("error");
     } finally {
       setLoading(false);
     }
   };
 
-  // Close on backdrop click
   const handleBackdrop = (e) => { if (e.target === e.currentTarget) onClose(); };
 
   return (
-    <div onClick={handleBackdrop} style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(0,0,0,0.72)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
-      <div style={{ background: "#0F172A", border: "1px solid rgba(99,102,241,0.25)", borderRadius: 18, padding: "32px 28px", maxWidth: 520, width: "100%", boxShadow: "0 30px 80px rgba(0,0,0,0.7)", position: "relative" }}>
-        {/* Close */}
-        <button onClick={onClose} style={{ position: "absolute", top: 14, right: 14, background: "rgba(255,255,255,0.05)", border: "none", borderRadius: 7, padding: 6, cursor: "pointer", color: "#64748B", transition: "color 0.15s" }}
+    <div onClick={handleBackdrop} style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(0,0,0,0.72)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
+      <div role="dialog" aria-modal="true" aria-labelledby="lead-modal-title"
+        style={{ background: "#0F172A", border: "1px solid rgba(99,102,241,0.25)", borderRadius: 18, padding: "28px 24px", maxWidth: 540, width: "100%", maxHeight: "92vh", overflowY: "auto", boxShadow: "0 30px 80px rgba(0,0,0,0.7)", position: "relative" }}>
+        <button type="button" onClick={onClose} aria-label={M.close}
+          style={{ position: "absolute", top: 14, right: 14, background: "rgba(255,255,255,0.05)", border: "none", borderRadius: 7, padding: 6, cursor: "pointer", color: "#64748B", transition: "color 0.15s" }}
           onMouseEnter={(e) => (e.currentTarget.style.color = "#F1F5F9")}
           onMouseLeave={(e) => (e.currentTarget.style.color = "#64748B")}>
           <XMarkIcon className="h-5 w-5" />
         </button>
 
-        {/* Header */}
-        <div className="flex items-center gap-3 mb-6">
-          <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(99,102,241,0.15)", border: "1px solid rgba(99,102,241,0.28)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <EnvelopeIcon className="h-5 w-5" style={{ color: "#818CF8" }} />
-          </div>
+        <div className="flex items-center gap-3 mb-6 pr-8">
+          <IconBadge icon={mode === "pilot" || mode === "launch" ? RocketLaunchIcon : EnvelopeIcon} color="#818CF8" />
           <div>
-            <p style={{ fontSize: 16, fontWeight: 800, color: "#F1F5F9" }}>Solicitar demo de Ankard</p>
-            <p style={{ fontSize: 12, color: "#64748B", marginTop: 1 }}>Te contactamos en menos de 24 horas</p>
+            <p id="lead-modal-title" style={{ fontSize: 16, fontWeight: 800, color: "#F1F5F9" }}>{copy.title}</p>
+            <p style={{ fontSize: 12, color: "#94A3B8", marginTop: 2 }}>{copy.subtitle}</p>
           </div>
         </div>
 
-        {/* Success state */}
         {status === "success" ? (
-          <div style={{ background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.28)", borderRadius: 12, padding: "24px", textAlign: "center" }}>
-            <CheckCircleIcon className="h-10 w-10 mx-auto mb-3" style={{ color: "#22C55E" }} />
-            <p style={{ fontSize: 15, fontWeight: 700, color: "#F1F5F9", marginBottom: 6 }}>Mensaje enviado</p>
-            <p style={{ fontSize: 13, color: "#64748B", lineHeight: 1.6 }}>Recibimos tu solicitud. Nuestro equipo te escribirá pronto para agendar una demo personalizada.</p>
-            <button onClick={onClose} style={{ marginTop: 18, fontSize: 13, fontWeight: 700, color: "#22C55E", background: "none", border: "1px solid rgba(34,197,94,0.3)", borderRadius: 8, padding: "9px 20px", cursor: "pointer" }}>
-              Cerrar
+          <div role="status" style={{ background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.28)", borderRadius: 12, padding: 24, textAlign: "center" }}>
+            <CheckCircleIcon className="h-10 w-10 mx-auto mb-3" style={{ color: "#22C55E" }} aria-hidden="true" />
+            <p style={{ fontSize: 15, fontWeight: 700, color: "#F1F5F9", marginBottom: 6 }}>{copy.success_title}</p>
+            <p style={{ fontSize: 13, color: "#94A3B8", lineHeight: 1.6 }}>{copy.success_text}</p>
+            <button type="button" onClick={onClose} style={{ marginTop: 18, fontSize: 13, fontWeight: 700, color: "#22C55E", background: "none", border: "1px solid rgba(34,197,94,0.3)", borderRadius: 8, padding: "9px 20px", cursor: "pointer" }}>
+              {M.close}
             </button>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             {status === "error" && (
-              <div style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.22)", borderRadius: 8, padding: "10px 14px", fontSize: 12, color: "#EF4444" }}>
+              <div role="alert" style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.22)", borderRadius: 8, padding: "10px 14px", fontSize: 12, color: "#F87171" }}>
                 {errorMsg}
               </div>
             )}
 
+            <div>
+              <label htmlFor="lead-company" style={LABEL_STYLE}>{M.fields.company} *</label>
+              <input id="lead-company" ref={firstFieldRef} name="company" value={form.company} onChange={handleChange} required maxLength={120} autoComplete="organization"
+                style={FIELD_STYLE} onFocus={focusOn} onBlur={focusOff} />
+            </div>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label style={{ fontSize: 11, fontWeight: 600, color: "#94A3B8", display: "block", marginBottom: 6 }}>Nombre completo *</label>
-                <input name="name" value={form.name} onChange={handleChange} required
-                  style={{ width: "100%", background: "#1E293B", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "10px 12px", fontSize: 13, color: "#F1F5F9", outline: "none", transition: "border-color 0.15s", boxSizing: "border-box" }}
-                  onFocus={(e) => (e.target.style.borderColor = "rgba(99,102,241,0.6)")}
-                  onBlur={(e) => (e.target.style.borderColor = "rgba(255,255,255,0.1)")}
-                  placeholder="Juan García" />
+                <label htmlFor="lead-name" style={LABEL_STYLE}>{M.fields.name} *</label>
+                <input id="lead-name" name="name" value={form.name} onChange={handleChange} required maxLength={120} autoComplete="name"
+                  style={FIELD_STYLE} onFocus={focusOn} onBlur={focusOff} />
               </div>
               <div>
-                <label style={{ fontSize: 11, fontWeight: 600, color: "#94A3B8", display: "block", marginBottom: 6 }}>Correo electrónico *</label>
-                <input name="email" type="email" value={form.email} onChange={handleChange} required
-                  style={{ width: "100%", background: "#1E293B", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "10px 12px", fontSize: 13, color: "#F1F5F9", outline: "none", transition: "border-color 0.15s", boxSizing: "border-box" }}
-                  onFocus={(e) => (e.target.style.borderColor = "rgba(99,102,241,0.6)")}
-                  onBlur={(e) => (e.target.style.borderColor = "rgba(255,255,255,0.1)")}
-                  placeholder="juan@empresa.com" />
+                <label htmlFor="lead-email" style={LABEL_STYLE}>{M.fields.email} *</label>
+                <input id="lead-email" name="email" type="email" value={form.email} onChange={handleChange} required autoComplete="email"
+                  style={FIELD_STYLE} onFocus={focusOn} onBlur={focusOff} />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="lead-phone" style={LABEL_STYLE}>{M.fields.phone}</label>
+                <input id="lead-phone" name="phone" type="tel" value={form.phone} onChange={handleChange} maxLength={40} autoComplete="tel"
+                  style={FIELD_STYLE} onFocus={focusOn} onBlur={focusOff} />
+              </div>
+              <div>
+                <label htmlFor="lead-team" style={LABEL_STYLE}>{M.fields.team_size}</label>
+                <select id="lead-team" name="team_size" value={form.team_size} onChange={handleChange}
+                  style={{ ...FIELD_STYLE, cursor: "pointer" }} onFocus={focusOn} onBlur={focusOff}>
+                  <option value="">{M.fields.team_size_placeholder}</option>
+                  {M.team_sizes.map((s) => <option key={s} value={s}>{s}</option>)}
+                </select>
               </div>
             </div>
 
             <div>
-              <label style={{ fontSize: 11, fontWeight: 600, color: "#94A3B8", display: "block", marginBottom: 6 }}>Teléfono / WhatsApp</label>
-              <input name="phone" value={form.phone} onChange={handleChange}
-                style={{ width: "100%", background: "#1E293B", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "10px 12px", fontSize: 13, color: "#F1F5F9", outline: "none", transition: "border-color 0.15s", boxSizing: "border-box" }}
-                onFocus={(e) => (e.target.style.borderColor = "rgba(99,102,241,0.6)")}
-                onBlur={(e) => (e.target.style.borderColor = "rgba(255,255,255,0.1)")}
-                placeholder="+52 55 1234 5678" />
-            </div>
-
-            <div>
-              <label style={{ fontSize: 11, fontWeight: 600, color: "#94A3B8", display: "block", marginBottom: 6 }}>Cuéntanos sobre tu empresa *</label>
-              <textarea name="message" value={form.message} onChange={handleChange} required rows={4}
-                style={{ width: "100%", background: "#1E293B", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "10px 12px", fontSize: 13, color: "#F1F5F9", outline: "none", transition: "border-color 0.15s", resize: "vertical", fontFamily: "inherit", boxSizing: "border-box" }}
-                onFocus={(e) => (e.target.style.borderColor = "rgba(99,102,241,0.6)")}
-                onBlur={(e) => (e.target.style.borderColor = "rgba(255,255,255,0.1)")}
-                placeholder="¿Cuántos empleados? ¿Qué tipo de capacitación necesitan? ¿Tienen documentos listos?" />
+              <label htmlFor="lead-notes" style={LABEL_STYLE}>{M.fields.message}</label>
+              <textarea id="lead-notes" name="notes" value={form.notes} onChange={handleChange} rows={3} maxLength={2000}
+                placeholder={copy.message_placeholder}
+                style={{ ...FIELD_STYLE, resize: "vertical" }} onFocus={focusOn} onBlur={focusOff} />
             </div>
 
             <button type="submit" disabled={loading}
-              style={{ width: "100%", fontSize: 14, fontWeight: 700, color: "#fff", background: loading ? "rgba(99,102,241,0.5)" : "linear-gradient(135deg, #6366F1, #818CF8)", border: "none", borderRadius: 10, padding: "13px", cursor: loading ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, transition: "opacity 0.15s" }}
+              style={{ width: "100%", fontSize: 14, fontWeight: 700, color: "#fff", background: loading ? "rgba(99,102,241,0.5)" : GRADIENT, border: "none", borderRadius: 10, padding: 13, cursor: loading ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, transition: "opacity 0.15s" }}
               onMouseEnter={(e) => { if (!loading) e.currentTarget.style.opacity = "0.88"; }}
               onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}>
               {loading
-                ? <><div style={{ width: 14, height: 14, borderRadius: "50%", border: "2px solid rgba(255,255,255,0.3)", borderTopColor: "#fff" }} className="animate-spin" />Enviando...</>
-                : <>Enviar solicitud de demo <ArrowRightIcon className="h-4 w-4" /></>
+                ? <><div style={{ width: 14, height: 14, borderRadius: "50%", border: "2px solid rgba(255,255,255,0.3)", borderTopColor: "#fff" }} className="animate-spin" />{M.sending}</>
+                : <>{copy.submit} <ArrowRightIcon className="h-4 w-4" aria-hidden="true" /></>
               }
             </button>
           </form>
@@ -150,7 +343,20 @@ function DemoModal({ onClose }) {
 
 // ─── Navbar ───────────────────────────────────────────────────────────────────
 
-function Navbar({ onDemoOpen }) {
+function LanguageToggle({ lang, onChange, label }) {
+  return (
+    <div role="group" aria-label={label} style={{ display: "inline-flex", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: 2 }}>
+      {["en", "es"].map((l) => (
+        <button key={l} type="button" onClick={() => onChange(l)} aria-pressed={lang === l}
+          style={{ fontSize: 11, fontWeight: 700, padding: "4px 9px", borderRadius: 6, border: "none", cursor: "pointer", background: lang === l ? "rgba(99,102,241,0.25)" : "transparent", color: lang === l ? "#F1F5F9" : "#64748B", transition: "all 0.15s" }}>
+          {l.toUpperCase()}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function Navbar({ L, lang, onLanguage, onLead }) {
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -162,32 +368,34 @@ function Navbar({ onDemoOpen }) {
   }, []);
 
   const links = [
-    { label: "Producto", href: "#features" },
-    { label: "Cómo funciona", href: "#how" },
-    { label: "Casos de uso", href: "#roles" },
-    { label: "Seguridad", href: "#security" },
+    { label: L.nav.product, href: "#solution" },
+    { label: L.nav.how, href: "#how" },
+    { label: L.nav.pricing, href: "#pricing" },
+    { label: L.nav.security, href: "#security" },
+    { label: L.nav.faq, href: "#faq" },
   ];
+  const solid = scrolled || mobileOpen;
 
   return (
-    <nav style={{
+    <header style={{
       position: "fixed", top: 0, left: 0, right: 0, zIndex: 50,
-      background: scrolled ? "rgba(2,6,23,0.95)" : "transparent",
-      backdropFilter: scrolled ? "blur(12px)" : "none",
-      borderBottom: scrolled ? "1px solid rgba(255,255,255,0.06)" : "none",
+      background: solid ? "rgba(2,6,23,0.95)" : "transparent",
+      backdropFilter: solid ? "blur(12px)" : "none",
+      borderBottom: solid ? "1px solid rgba(255,255,255,0.06)" : "none",
       transition: "all 0.25s ease",
     }}>
-      <div className="max-w-7xl mx-auto px-4 md:px-8 flex items-center justify-between h-16">
+      <nav className="max-w-7xl mx-auto px-4 md:px-8 flex items-center justify-between h-16" aria-label="Main">
         <a href="/" className="flex items-center gap-2.5" style={{ textDecoration: "none" }}>
-          <div style={{ width: 32, height: 32, borderRadius: 8, background: "linear-gradient(135deg, #6366F1, #818CF8)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-            <BoltIcon className="h-5 w-5 text-white" />
+          <div style={{ width: 32, height: 32, borderRadius: 8, background: GRADIENT, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+            <BoltIcon className="h-5 w-5 text-white" aria-hidden="true" />
           </div>
           <span style={{ fontSize: 18, fontWeight: 800, color: "#F1F5F9", letterSpacing: "-0.02em" }}>Ankard</span>
-          <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 7px", borderRadius: 4, background: "rgba(99,102,241,0.18)", color: "#818CF8", letterSpacing: "0.05em" }}>
+          <span className="hidden sm:inline" style={{ fontSize: 10, fontWeight: 700, padding: "2px 7px", borderRadius: 4, background: "rgba(99,102,241,0.18)", color: "#818CF8", letterSpacing: "0.05em" }}>
             ENTERPRISE
           </span>
         </a>
 
-        <div className="hidden md:flex items-center gap-8">
+        <div className="hidden lg:flex items-center gap-7">
           {links.map(({ label, href }) => (
             <a key={href} href={href}
               style={{ fontSize: 13, fontWeight: 500, color: "#94A3B8", textDecoration: "none", transition: "color 0.15s" }}
@@ -198,168 +406,193 @@ function Navbar({ onDemoOpen }) {
           ))}
         </div>
 
-        <div className="hidden md:flex items-center gap-3">
-          <button onClick={() => navigate("/auth/sign-in")}
+        <div className="hidden lg:flex items-center gap-3">
+          <LanguageToggle lang={lang} onChange={onLanguage} label={L.nav.language} />
+          <button type="button" onClick={() => navigate("/auth/sign-in")}
             style={{ fontSize: 13, fontWeight: 600, color: "#94A3B8", background: "none", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 8, padding: "7px 16px", cursor: "pointer", transition: "all 0.15s" }}
             onMouseEnter={(e) => { e.currentTarget.style.color = "#F1F5F9"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.28)"; }}
             onMouseLeave={(e) => { e.currentTarget.style.color = "#94A3B8"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)"; }}>
-            Iniciar sesión
+            {L.nav.sign_in}
           </button>
-          <button onClick={onDemoOpen}
-            style={{ fontSize: 13, fontWeight: 700, color: "#fff", background: "linear-gradient(135deg, #6366F1, #818CF8)", border: "none", borderRadius: 8, padding: "8px 18px", cursor: "pointer", transition: "opacity 0.15s" }}
+          <button type="button" onClick={() => onLead("demo")}
+            style={{ fontSize: 13, fontWeight: 700, color: "#fff", background: GRADIENT, border: "none", borderRadius: 8, padding: "8px 18px", cursor: "pointer", transition: "opacity 0.15s" }}
             onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.88")}
             onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}>
-            Solicitar demo
+            {L.nav.demo}
           </button>
         </div>
 
-        <button className="md:hidden" onClick={() => setMobileOpen((p) => !p)}
-          style={{ background: "none", border: "none", cursor: "pointer", color: "#94A3B8", padding: 6 }}>
-          {mobileOpen ? <XMarkIcon className="h-6 w-6" /> : <Bars3Icon className="h-6 w-6" />}
-        </button>
-      </div>
+        <div className="flex lg:hidden items-center gap-2">
+          <LanguageToggle lang={lang} onChange={onLanguage} label={L.nav.language} />
+          <button type="button" onClick={() => setMobileOpen((p) => !p)} aria-label={L.nav.menu} aria-expanded={mobileOpen}
+            style={{ background: "none", border: "none", cursor: "pointer", color: "#94A3B8", padding: 6 }}>
+            {mobileOpen ? <XMarkIcon className="h-6 w-6" /> : <Bars3Icon className="h-6 w-6" />}
+          </button>
+        </div>
+      </nav>
 
       {mobileOpen && (
-        <div style={{ background: "rgba(2,6,23,0.98)", borderTop: "1px solid rgba(255,255,255,0.06)", padding: "16px 20px 24px" }}>
+        <div className="lg:hidden" style={{ background: "rgba(2,6,23,0.98)", borderTop: "1px solid rgba(255,255,255,0.06)", padding: "12px 20px 24px" }}>
           {links.map(({ label, href }) => (
             <a key={href} href={href} onClick={() => setMobileOpen(false)}
-              style={{ display: "block", fontSize: 14, fontWeight: 500, color: "#94A3B8", textDecoration: "none", padding: "10px 0", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+              style={{ display: "block", fontSize: 14, fontWeight: 500, color: "#94A3B8", textDecoration: "none", padding: "11px 0", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
               {label}
             </a>
           ))}
           <div className="flex flex-col gap-3 mt-5">
-            <button onClick={() => { navigate("/auth/sign-in"); setMobileOpen(false); }}
-              style={{ fontSize: 14, fontWeight: 600, color: "#94A3B8", background: "none", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 8, padding: "12px", cursor: "pointer" }}>
-              Iniciar sesión
+            <button type="button" onClick={() => { navigate("/auth/sign-in"); setMobileOpen(false); }}
+              style={{ fontSize: 14, fontWeight: 600, color: "#94A3B8", background: "none", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 8, padding: 12, cursor: "pointer" }}>
+              {L.nav.sign_in}
             </button>
-            <button onClick={() => { onDemoOpen(); setMobileOpen(false); }}
-              style={{ fontSize: 14, fontWeight: 700, color: "#fff", background: "linear-gradient(135deg, #6366F1, #818CF8)", border: "none", borderRadius: 8, padding: "12px", cursor: "pointer" }}>
-              Solicitar demo
+            <button type="button" onClick={() => { onLead("demo"); setMobileOpen(false); }}
+              style={{ fontSize: 14, fontWeight: 700, color: "#fff", background: GRADIENT, border: "none", borderRadius: 8, padding: 12, cursor: "pointer" }}>
+              {L.nav.demo}
             </button>
           </div>
         </div>
       )}
-    </nav>
+    </header>
   );
 }
 
 // ─── Hero ─────────────────────────────────────────────────────────────────────
 
-function Hero({ onDemoOpen }) {
-  const navigate = useNavigate();
+const FLOW_ICONS = [
+  { icon: DocumentTextIcon, color: "#6366F1" },
+  { icon: SparklesIcon, color: "#818CF8" },
+  { icon: UserGroupIcon, color: "#38BDF8" },
+  { icon: ClipboardDocumentCheckIcon, color: "#C084FC" },
+  { icon: ChartBarIcon, color: "#22C55E" },
+];
 
+function Hero({ L, onLead }) {
+  const H = L.hero;
   return (
-    <section style={{ background: "linear-gradient(180deg, #020617 0%, #0F172A 60%, #020617 100%)", paddingTop: 120, paddingBottom: 80, position: "relative", overflow: "hidden" }}>
-      <div style={{ position: "absolute", top: "10%", left: "50%", transform: "translateX(-50%)", width: 800, height: 400, background: "radial-gradient(ellipse, rgba(99,102,241,0.14) 0%, transparent 70%)", pointerEvents: "none" }} />
+    <section style={{ background: "linear-gradient(180deg, #020617 0%, #0F172A 60%, #020617 100%)", paddingTop: 128, paddingBottom: 88, position: "relative", overflow: "hidden" }}>
+      <div style={{ position: "absolute", top: "8%", left: "50%", transform: "translateX(-50%)", width: 800, maxWidth: "100%", height: 400, background: "radial-gradient(ellipse, rgba(99,102,241,0.14) 0%, transparent 70%)", pointerEvents: "none" }} />
 
       <div className="max-w-6xl mx-auto px-4 md:px-8 text-center relative">
-        {/* Badge */}
         <div className="inline-flex items-center gap-2 mb-6"
           style={{ background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.28)", borderRadius: 999, padding: "6px 14px" }}>
-          <SparklesIcon className="h-3.5 w-3.5" style={{ color: "#818CF8" }} />
-          <span style={{ fontSize: 12, fontWeight: 700, color: "#818CF8", letterSpacing: "0.04em" }}>
-            IA para Capacitación Corporativa
-          </span>
+          <SparklesIcon className="h-3.5 w-3.5" style={{ color: "#818CF8" }} aria-hidden="true" />
+          <span style={{ fontSize: 12, fontWeight: 700, color: "#818CF8", letterSpacing: "0.04em" }}>{H.badge}</span>
         </div>
 
-        <h1 style={{ fontSize: "clamp(30px, 5.5vw, 58px)", fontWeight: 900, color: "#F1F5F9", lineHeight: 1.08, letterSpacing: "-0.03em", maxWidth: 860, margin: "0 auto 20px" }}>
-          Convierte tus documentos internos{" "}
-          <span style={{ background: "linear-gradient(135deg, #6366F1, #C084FC)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-            en programas de capacitación
-          </span>
-          , en minutos
+        <h1 style={{ fontSize: "clamp(30px, 5.2vw, 56px)", fontWeight: 900, color: "#F1F5F9", lineHeight: 1.1, letterSpacing: "-0.03em", maxWidth: 940, margin: "0 auto 22px" }}>
+          {H.title_before}
+          <span style={TEXT_GRADIENT}>{H.title_highlight}</span>
+          {H.title_after}
         </h1>
 
-        <p style={{ fontSize: "clamp(14px, 2vw, 18px)", color: "#94A3B8", lineHeight: 1.75, maxWidth: 660, margin: "0 auto 36px", fontWeight: 400 }}>
-          Sube tus PDFs, manuales y políticas internas. La IA de Ankard genera automáticamente flashcards y quizzes listos para asignar a tu equipo — sin intervención manual, sin semanas de trabajo.
+        <p style={{ fontSize: "clamp(15px, 2vw, 18px)", color: "#94A3B8", lineHeight: 1.75, maxWidth: 720, margin: "0 auto 34px" }}>
+          {H.subtitle}
         </p>
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
-          <button onClick={onDemoOpen}
-            style={{ fontSize: 15, fontWeight: 700, color: "#fff", background: "linear-gradient(135deg, #6366F1, #818CF8)", border: "none", borderRadius: 12, padding: "14px 28px", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, boxShadow: "0 0 32px rgba(99,102,241,0.35)", transition: "all 0.2s" }}
-            onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 0 48px rgba(99,102,241,0.5)"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = "0 0 32px rgba(99,102,241,0.35)"; }}>
-            Solicitar demo gratuita
-            <ArrowRightIcon className="h-4 w-4" />
-          </button>
-          <a href="#how"
-            style={{ fontSize: 14, fontWeight: 600, color: "#94A3B8", textDecoration: "none", display: "flex", alignItems: "center", gap: 6, transition: "color 0.15s" }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = "#F1F5F9")}
-            onMouseLeave={(e) => (e.currentTarget.style.color = "#94A3B8")}>
-            Ver cómo funciona
-            <ArrowRightIcon className="h-4 w-4" />
-          </a>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-7">
+          <PrimaryButton size="lg" onClick={() => onLead("pilot")}>{H.cta_primary}</PrimaryButton>
+          <SecondaryButton href="#how">{H.cta_secondary}</SecondaryButton>
         </div>
 
-        {/* Dashboard mockup */}
-        <div style={{ maxWidth: 880, margin: "0 auto", borderRadius: 16, overflow: "hidden", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 40px 100px rgba(0,0,0,0.55)", background: "#0F172A" }}>
-          <div style={{ background: "#1E293B", borderBottom: "1px solid rgba(255,255,255,0.06)", padding: "10px 16px", display: "flex", alignItems: "center", gap: 8 }}>
-            <div style={{ display: "flex", gap: 6 }}>
-              {["#EF4444","#F59E0B","#22C55E"].map((c) => <div key={c} style={{ width: 10, height: 10, borderRadius: "50%", background: c }} />)}
-            </div>
-            <div style={{ flex: 1, background: "rgba(255,255,255,0.05)", borderRadius: 5, padding: "4px 12px", fontSize: 11, color: "#64748B", textAlign: "center" }}>
-              app.ankard.com/enterprise/dashboard
-            </div>
-          </div>
-          <div style={{ padding: 20, display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10 }}>
-            {[
-              { label: "Procesos", value: "12", icon: BookOpenIcon, color: "#6366F1" },
-              { label: "Empleados", value: "148", icon: UserGroupIcon, color: "#22C55E" },
-              { label: "Completados", value: "89%", icon: CheckBadgeIcon, color: "#F59E0B" },
-              { label: "En progreso", value: "34", icon: ChartBarIcon, color: "#C084FC" },
-            ].map(({ label, value, icon: Icon, color }) => (
-              <div key={label} style={{ background: "#1E293B", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 10, padding: "14px 12px" }}>
-                <div style={{ width: 26, height: 26, borderRadius: 7, background: `${color}1A`, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 10 }}>
-                  <Icon className="h-3.5 w-3.5" style={{ color }} />
-                </div>
-                <p style={{ fontSize: 20, fontWeight: 800, color: "#F1F5F9", lineHeight: 1 }}>{value}</p>
-                <p style={{ fontSize: 10, color: "#64748B", marginTop: 4 }}>{label}</p>
-              </div>
-            ))}
-          </div>
-          <div style={{ padding: "0 20px 20px", display: "grid", gridTemplateColumns: "2fr 1fr", gap: 10 }}>
-            <div style={{ background: "#1E293B", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 10, padding: 14 }}>
-              <p style={{ fontSize: 10, fontWeight: 700, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 10 }}>Procesos recientes</p>
-              {["Manual de Onboarding", "Política de Seguridad IT", "Procedimiento de Ventas"].map((name, i) => (
-                <div key={name} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "7px 0", borderBottom: i < 2 ? "1px solid rgba(255,255,255,0.04)" : "none" }}>
-                  <span style={{ fontSize: 11, color: "#94A3B8" }}>{name}</span>
-                  <span style={{ fontSize: 9, fontWeight: 700, padding: "2px 6px", borderRadius: 4, background: "rgba(34,197,94,0.1)", color: "#22C55E" }}>Listo</span>
-                </div>
-              ))}
-            </div>
-            <div style={{ background: "linear-gradient(135deg, rgba(99,102,241,0.14), rgba(192,132,252,0.08))", border: "1px solid rgba(99,102,241,0.22)", borderRadius: 10, padding: 16, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textAlign: "center", gap: 8 }}>
-              <SparklesIcon className="h-6 w-6" style={{ color: "#818CF8" }} />
-              <p style={{ fontSize: 12, fontWeight: 700, color: "#F1F5F9" }}>IA generando</p>
-              <p style={{ fontSize: 10, color: "#818CF8" }}>Compliance 2025.pdf</p>
-              <div style={{ width: "100%", height: 4, background: "rgba(255,255,255,0.07)", borderRadius: 2 }}>
-                <div style={{ height: "100%", width: "68%", background: "linear-gradient(90deg, #6366F1, #818CF8)", borderRadius: 2 }} />
-              </div>
-            </div>
-          </div>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-x-6 gap-y-2 mb-16">
+          <p style={{ display: "flex", alignItems: "center", gap: 7, fontSize: 13, color: "#94A3B8" }}>
+            <BuildingOffice2Icon className="h-4 w-4" style={{ color: "#818CF8" }} aria-hidden="true" />
+            {H.trust_industries}
+          </p>
+          <GuaranteeNote>{H.trust_guarantee}</GuaranteeNote>
         </div>
+
+        {/* Flow illustration: documents → training → employees → assessments → results */}
+        <figure style={{ maxWidth: 960, margin: "0 auto", borderRadius: 18, border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 40px 100px rgba(0,0,0,0.5)", background: "#0F172A", padding: "22px 18px" }}>
+          <figcaption style={{ fontSize: 11, fontWeight: 700, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 16 }}>
+            {H.flow_label}
+          </figcaption>
+          <ol className="grid grid-cols-1 sm:grid-cols-5 gap-3" style={{ listStyle: "none", margin: 0, padding: 0 }}>
+            {H.flow.map((step, i) => {
+              const { icon: Icon, color } = FLOW_ICONS[i];
+              return (
+                <li key={step.title} className="relative flex sm:flex-col items-center gap-3 sm:gap-2 text-left sm:text-center"
+                  style={{ background: "#1E293B", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 12, padding: "14px 12px" }}>
+                  <IconBadge icon={Icon} color={color} size={38} />
+                  <div>
+                    <p style={{ fontSize: 13, fontWeight: 700, color: "#F1F5F9" }}>{step.title}</p>
+                    <p style={{ fontSize: 11, color: "#64748B", marginTop: 2, lineHeight: 1.4 }}>{step.desc}</p>
+                  </div>
+                  {i < H.flow.length - 1 && (
+                    <ArrowRightIcon className="hidden sm:block absolute h-4 w-4" aria-hidden="true"
+                      style={{ color: "#475569", right: -14, top: "50%", transform: "translateY(-50%)", zIndex: 1 }} />
+                  )}
+                </li>
+              );
+            })}
+          </ol>
+        </figure>
       </div>
     </section>
   );
 }
 
-// ─── Stats ────────────────────────────────────────────────────────────────────
+// ─── Problem ──────────────────────────────────────────────────────────────────
 
-function Stats() {
-  const stats = [
-    { value: "3 min", label: "Para convertir un documento en curso completo" },
-    { value: "100%", label: "Privado — los datos de tu empresa nunca se comparten" },
-    { value: "10×", label: "Más rápido que crear contenido manualmente" },
-    { value: "0", label: "Horas de trabajo manual de contenido requeridas" },
-  ];
+const PROBLEM_ICONS = [ArrowPathIcon, FolderOpenIcon, ArrowsRightLeftIcon, EyeSlashIcon, ClockIcon];
+
+function Problem({ L }) {
+  const P = L.problem;
   return (
-    <section style={{ background: "#0F172A", borderTop: "1px solid rgba(255,255,255,0.05)", borderBottom: "1px solid rgba(255,255,255,0.05)", padding: "44px 0" }}>
-      <div className="max-w-6xl mx-auto px-4 md:px-8 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-        {stats.map(({ value, label }) => (
-          <div key={value}>
-            <p style={{ fontSize: "clamp(26px, 4vw, 38px)", fontWeight: 900, lineHeight: 1, marginBottom: 8, background: "linear-gradient(135deg, #6366F1, #C084FC)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>{value}</p>
-            <p style={{ fontSize: 12, color: "#64748B", lineHeight: 1.5, maxWidth: 160, margin: "0 auto" }}>{label}</p>
-          </div>
-        ))}
+    <section id="problem" style={{ background: "#020617", padding: "96px 0", ...SECTION_SCROLL }}>
+      <div className="max-w-6xl mx-auto px-4 md:px-8">
+        <SectionHeader eyebrow={P.eyebrow} title={P.title} intro={P.intro} />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          {P.items.map(({ title, desc }, i) => (
+            <div key={title} style={{ background: "#0F172A", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 14, padding: 20 }}>
+              <IconBadge icon={PROBLEM_ICONS[i]} color="#F59E0B" size={36} />
+              <h3 style={{ fontSize: 14, fontWeight: 700, color: "#F1F5F9", margin: "14px 0 8px" }}>{title}</h3>
+              <p style={{ fontSize: 13, color: "#94A3B8", lineHeight: 1.65 }}>{desc}</p>
+            </div>
+          ))}
+        </div>
+        <p className="text-center" style={{ fontSize: "clamp(16px, 2.2vw, 20px)", fontWeight: 700, color: "#F1F5F9", marginTop: 44 }}>
+          <span style={TEXT_GRADIENT}>{P.closing}</span>
+        </p>
+      </div>
+    </section>
+  );
+}
+
+// ─── Solution ─────────────────────────────────────────────────────────────────
+
+const SOLUTION_ICONS = [
+  { icon: SparklesIcon, color: "#818CF8" },
+  { icon: MapIcon, color: "#22C55E" },
+  { icon: UserPlusIcon, color: "#38BDF8" },
+  { icon: ClipboardDocumentCheckIcon, color: "#F59E0B" },
+  { icon: ChartBarIcon, color: "#C084FC" },
+  { icon: DocumentDuplicateIcon, color: "#6366F1" },
+];
+
+function Solution({ L }) {
+  const S = L.solution;
+  return (
+    <section id="solution" style={{ background: "#0F172A", padding: "96px 0", ...SECTION_SCROLL }}>
+      <div className="max-w-6xl mx-auto px-4 md:px-8">
+        <SectionHeader eyebrow={S.eyebrow} title={S.title} intro={S.intro} />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {S.items.map(({ title, desc, benefit }, i) => {
+            const { icon, color } = SOLUTION_ICONS[i];
+            return (
+              <div key={title}
+                style={{ background: "#162032", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 14, padding: 22, transition: "border-color 0.2s, transform 0.2s", display: "flex", flexDirection: "column" }}
+                onMouseEnter={(e) => { e.currentTarget.style.borderColor = `${color}38`; e.currentTarget.style.transform = "translateY(-2px)"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)"; e.currentTarget.style.transform = ""; }}>
+                <IconBadge icon={icon} color={color} size={38} />
+                <h3 style={{ fontSize: 15, fontWeight: 700, color: "#F1F5F9", margin: "14px 0 8px" }}>{title}</h3>
+                <p style={{ fontSize: 13, color: "#94A3B8", lineHeight: 1.7, flex: 1 }}>{desc}</p>
+                <p style={{ fontSize: 12, color: "#CBD5E1", lineHeight: 1.6, marginTop: 14, paddingTop: 12, borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+                  <span style={{ color, fontWeight: 700 }}>{S.benefit_label}: </span>{benefit}
+                </p>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </section>
   );
@@ -367,33 +600,63 @@ function Stats() {
 
 // ─── How it works ─────────────────────────────────────────────────────────────
 
-function HowItWorks() {
-  const steps = [
-    { n: "01", icon: DocumentArrowUpIcon, color: "#6366F1", title: "Sube tus documentos", desc: "PDFs, manuales, políticas, procedimientos internos — cualquier documento que tu empresa ya tiene. Sin formatos especiales ni configuración." },
-    { n: "02", icon: SparklesIcon, color: "#818CF8", title: "La IA genera el contenido", desc: "Ankard analiza el documento y genera automáticamente flashcards para repasar y quizzes de evaluación. Sin trabajo manual de ningún tipo." },
-    { n: "03", icon: UserGroupIcon, color: "#C084FC", title: "Tu equipo aprende y es evaluado", desc: "Asigna los programas a equipos o empleados. Mide el progreso y el cumplimiento en tiempo real con reportes completos." },
-  ];
+const STEP_ICONS = [
+  { icon: DocumentArrowUpIcon, color: "#6366F1" },
+  { icon: SparklesIcon, color: "#818CF8" },
+  { icon: MapIcon, color: "#22C55E" },
+  { icon: AcademicCapIcon, color: "#38BDF8" },
+  { icon: CheckBadgeIcon, color: "#C084FC" },
+  { icon: ArrowPathIcon, color: "#F59E0B" },
+];
+
+function HowItWorks({ L }) {
+  const H = L.how;
   return (
-    <section id="how" style={{ background: "#020617", padding: "100px 0" }}>
+    <section id="how" style={{ background: "#020617", padding: "96px 0", ...SECTION_SCROLL }}>
       <div className="max-w-6xl mx-auto px-4 md:px-8">
-        <div className="text-center mb-16">
-          <p style={{ fontSize: 11, fontWeight: 700, color: "#6366F1", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 10 }}>Cómo funciona</p>
-          <h2 style={{ fontSize: "clamp(24px, 4vw, 40px)", fontWeight: 800, color: "#F1F5F9", lineHeight: 1.15, letterSpacing: "-0.02em" }}>
-            De documento a curso completo<br />
-            <span style={{ color: "#818CF8" }}>en 3 pasos</span>
-          </h2>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {steps.map(({ n, icon: Icon, color, title, desc }) => (
-            <div key={n} style={{ background: "#0F172A", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 16, padding: "28px 24px", position: "relative", transition: "border-color 0.2s" }}
-              onMouseEnter={(e) => (e.currentTarget.style.borderColor = `${color}40`)}
-              onMouseLeave={(e) => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)")}>
-              <p style={{ fontSize: 11, fontWeight: 800, color, letterSpacing: "0.05em", marginBottom: 16 }}>{n}</p>
-              <div style={{ width: 42, height: 42, borderRadius: 11, background: `${color}18`, border: `1px solid ${color}28`, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
-                <Icon className="h-5 w-5" style={{ color }} />
+        <SectionHeader eyebrow={H.eyebrow} title={H.title} />
+        <ol className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" style={{ listStyle: "none", margin: 0, padding: 0 }}>
+          {H.steps.map(({ title, desc }, i) => {
+            const { icon, color } = STEP_ICONS[i];
+            return (
+              <li key={title} style={{ background: "#0F172A", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 16, padding: "26px 22px", transition: "border-color 0.2s" }}
+                onMouseEnter={(e) => (e.currentTarget.style.borderColor = `${color}40`)}
+                onMouseLeave={(e) => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)")}>
+                <div className="flex items-center justify-between mb-4">
+                  <IconBadge icon={icon} color={color} />
+                  <span style={{ fontSize: 11, fontWeight: 800, color, letterSpacing: "0.05em" }}>
+                    {H.step_label} {String(i + 1).padStart(2, "0")}
+                  </span>
+                </div>
+                <h3 style={{ fontSize: 15, fontWeight: 700, color: "#F1F5F9", marginBottom: 8 }}>{title}</h3>
+                <p style={{ fontSize: 13, color: "#94A3B8", lineHeight: 1.7 }}>{desc}</p>
+              </li>
+            );
+          })}
+        </ol>
+      </div>
+    </section>
+  );
+}
+
+// ─── Benefits ─────────────────────────────────────────────────────────────────
+
+const BENEFIT_ICONS = [ClockIcon, CheckCircleIcon, IdentificationIcon, ArchiveBoxIcon, PresentationChartLineIcon, ArrowTrendingUpIcon];
+
+function Benefits({ L }) {
+  const B = L.benefits;
+  return (
+    <section id="benefits" style={{ background: "#0F172A", padding: "96px 0", ...SECTION_SCROLL }}>
+      <div className="max-w-6xl mx-auto px-4 md:px-8">
+        <SectionHeader eyebrow={B.eyebrow} title={B.title} />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-8">
+          {B.items.map(({ title, desc }, i) => (
+            <div key={title} className="flex items-start gap-4">
+              <IconBadge icon={BENEFIT_ICONS[i]} color="#22C55E" size={38} />
+              <div>
+                <h3 style={{ fontSize: 15, fontWeight: 700, color: "#F1F5F9", marginBottom: 6 }}>{title}</h3>
+                <p style={{ fontSize: 13, color: "#94A3B8", lineHeight: 1.7 }}>{desc}</p>
               </div>
-              <h3 style={{ fontSize: 15, fontWeight: 700, color: "#F1F5F9", marginBottom: 10 }}>{title}</h3>
-              <p style={{ fontSize: 13, color: "#64748B", lineHeight: 1.7 }}>{desc}</p>
             </div>
           ))}
         </div>
@@ -402,115 +665,70 @@ function HowItWorks() {
   );
 }
 
-// ─── Features ─────────────────────────────────────────────────────────────────
+// ─── Measurable training ──────────────────────────────────────────────────────
 
-function Features() {
-  const features = [
-    { icon: BoltIcon, color: "#F59E0B", title: "Generación instantánea de quizzes", desc: "Sube un PDF y en minutos tienes un banco de preguntas categorizado por dificultad listo para evaluar a tu equipo." },
-    { icon: BookOpenIcon, color: "#6366F1", title: "Flashcards automáticas", desc: "El sistema extrae conceptos clave y genera flashcards interactivos que facilitan la retención del conocimiento." },
-    { icon: AcademicCapIcon, color: "#22C55E", title: "Learning Paths personalizados", desc: "Organiza el contenido en rutas de aprendizaje estructuradas y asígnalas a equipos o roles específicos." },
-    { icon: ChartBarIcon, color: "#C084FC", title: "Trazabilidad de compliance", desc: "Sabe exactamente quién completó qué y cuándo. Reportes para auditorías y regulaciones internas." },
-    { icon: UserGroupIcon, color: "#38BDF8", title: "Multi-equipo y multi-rol", desc: "Estructura tu empresa por business units. Cada grupo recibe el contenido relevante para su área." },
-    { icon: LockClosedIcon, color: "#EF4444", title: "Datos 100% privados", desc: "Los documentos de tu empresa permanecen en tu silo. Nunca se comparten ni entrenan modelos de terceros." },
-  ];
+const STATUS_STYLE = {
+  done: { color: "#22C55E", bg: "rgba(34,197,94,0.1)" },
+  progress: { color: "#38BDF8", bg: "rgba(56,189,248,0.1)" },
+  review: { color: "#F59E0B", bg: "rgba(245,158,11,0.1)" },
+  pending: { color: "#94A3B8", bg: "rgba(148,163,184,0.1)" },
+};
+
+function Measurable({ L }) {
+  const M = L.measurable;
   return (
-    <section id="features" style={{ background: "#0F172A", padding: "100px 0" }}>
-      <div className="max-w-6xl mx-auto px-4 md:px-8">
-        <div className="text-center mb-16">
-          <p style={{ fontSize: 11, fontWeight: 700, color: "#6366F1", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 10 }}>Funcionalidades</p>
-          <h2 style={{ fontSize: "clamp(24px, 4vw, 40px)", fontWeight: 800, color: "#F1F5F9", lineHeight: 1.15, letterSpacing: "-0.02em" }}>
-            Todo lo que necesitas para capacitar<br />
-            <span style={{ color: "#818CF8" }}>a tu equipo sin esfuerzo</span>
-          </h2>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {features.map(({ icon: Icon, color, title, desc }) => (
-            <div key={title}
-              style={{ background: "#162032", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 14, padding: 22, transition: "border-color 0.2s, transform 0.2s", cursor: "default" }}
-              onMouseEnter={(e) => { e.currentTarget.style.borderColor = `${color}38`; e.currentTarget.style.transform = "translateY(-2px)"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)"; e.currentTarget.style.transform = ""; }}>
-              <div style={{ width: 38, height: 38, borderRadius: 10, background: `${color}18`, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 14 }}>
-                <Icon className="h-5 w-5" style={{ color }} />
-              </div>
-              <h3 style={{ fontSize: 13, fontWeight: 700, color: "#F1F5F9", marginBottom: 8 }}>{title}</h3>
-              <p style={{ fontSize: 12, color: "#64748B", lineHeight: 1.7 }}>{desc}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ─── Roles ────────────────────────────────────────────────────────────────────
-
-function Roles() {
-  const [active, setActive] = useState(0);
-  const roles = [
-    {
-      tab: "HR Manager",
-      icon: BuildingOffice2Icon,
-      color: "#22C55E",
-      headline: "Onboarding de empleados en días, no semanas",
-      body: "Sube el manual de incorporación, las políticas y el código de conducta. Ankard genera el programa de onboarding completo. Nuevos empleados llegan preparados desde el primer día.",
-      bullets: ["Programa de onboarding automatizado", "Seguimiento de quién lo completó", "Certificación digital de comprensión", "Reutilizable para cada nueva contratación"],
-    },
-    {
-      tab: "L&D Lead",
-      icon: AcademicCapIcon,
-      color: "#6366F1",
-      headline: "Crea cursos corporativos sin ser diseñador instruccional",
-      body: "El equipo de Learning & Development puede convertir cualquier contenido técnico en material de aprendizaje estructurado sin conocimientos de diseño educativo ni herramientas costosas de autoría.",
-      bullets: ["Sin curva de aprendizaje de herramientas", "Contenido actualizable en minutos", "Múltiples formatos: flashcards + quizzes", "Learning paths por rol y departamento"],
-    },
-    {
-      tab: "CTO / IT",
-      icon: ShieldCheckIcon,
-      color: "#C084FC",
-      headline: "Compliance técnico y seguridad sin fricción",
-      body: "Convierte tus políticas de seguridad, procedimientos técnicos y guías de infraestructura en evaluaciones medibles. Demuestra que tu equipo conoce los protocolos.",
-      bullets: ["Documentación técnica → quizzes automatizados", "Control de acceso por equipo y rol", "Datos en tu infraestructura, no en la nube compartida", "Auditoría completa de completaciones"],
-    },
-  ];
-  const r = roles[active];
-
-  return (
-    <section id="roles" style={{ background: "#020617", padding: "100px 0" }}>
-      <div className="max-w-6xl mx-auto px-4 md:px-8">
-        <div className="text-center mb-14">
-          <p style={{ fontSize: 11, fontWeight: 700, color: "#6366F1", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 10 }}>Casos de uso</p>
-          <h2 style={{ fontSize: "clamp(24px, 4vw, 40px)", fontWeight: 800, color: "#F1F5F9", lineHeight: 1.15, letterSpacing: "-0.02em" }}>
-            Diseñado para quienes toman<br /><span style={{ color: "#818CF8" }}>decisiones de capacitación</span>
-          </h2>
-        </div>
-
-        <div className="flex items-center justify-center gap-2 mb-10 flex-wrap">
-          {roles.map(({ tab }, i) => (
-            <button key={tab} onClick={() => setActive(i)}
-              style={{ fontSize: 13, fontWeight: 700, padding: "8px 20px", borderRadius: 999, cursor: "pointer", transition: "all 0.2s", background: active === i ? "linear-gradient(135deg, #6366F1, #818CF8)" : "rgba(255,255,255,0.04)", border: active === i ? "none" : "1px solid rgba(255,255,255,0.08)", color: active === i ? "#fff" : "#94A3B8" }}>
-              {tab}
-            </button>
-          ))}
-        </div>
-
-        <div style={{ background: "#0F172A", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 20, padding: "40px 36px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 48 }}
-          className="flex-col md:grid">
-          <div>
-            <div style={{ width: 46, height: 46, borderRadius: 12, background: `${r.color}18`, border: `1px solid ${r.color}28`, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 18 }}>
-              <r.icon className="h-6 w-6" style={{ color: r.color }} />
-            </div>
-            <h3 style={{ fontSize: "clamp(17px, 2.5vw, 24px)", fontWeight: 800, color: "#F1F5F9", lineHeight: 1.2, marginBottom: 12 }}>{r.headline}</h3>
-            <p style={{ fontSize: 14, color: "#64748B", lineHeight: 1.75 }}>{r.body}</p>
-          </div>
-          <div className="flex flex-col justify-center gap-4">
-            {r.bullets.map((b) => (
-              <div key={b} className="flex items-start gap-3">
-                <CheckCircleIcon className="h-5 w-5 flex-shrink-0 mt-0.5" style={{ color: r.color }} />
-                <p style={{ fontSize: 14, color: "#94A3B8", lineHeight: 1.5 }}>{b}</p>
-              </div>
+    <section id="results" style={{ background: "#020617", padding: "96px 0", ...SECTION_SCROLL }}>
+      <div className="max-w-6xl mx-auto px-4 md:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div>
+          <SectionHeader eyebrow={M.eyebrow} title={M.title} center={false} />
+          <p style={{ fontSize: 15, color: "#94A3B8", lineHeight: 1.75, marginBottom: 14 }}>{M.text}</p>
+          <p style={{ fontSize: 15, color: "#CBD5E1", lineHeight: 1.75, marginBottom: 26 }}>{M.text2}</p>
+          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3" style={{ listStyle: "none", margin: 0, padding: 0 }}>
+            {M.metrics.map((m) => (
+              <li key={m} className="flex items-center gap-2.5" style={{ fontSize: 13, color: "#CBD5E1" }}>
+                <CheckCircleIcon className="h-5 w-5 flex-shrink-0" style={{ color: "#818CF8" }} aria-hidden="true" />
+                {m}
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
+
+        {/* Illustrative preview — sample rows, no real customer data or invented percentages */}
+        <figure style={{ margin: 0, background: "#0F172A", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 16, overflow: "hidden", boxShadow: "0 30px 80px rgba(0,0,0,0.45)" }}>
+          <div className="flex items-center justify-between" style={{ background: "#1E293B", borderBottom: "1px solid rgba(255,255,255,0.06)", padding: "12px 16px" }}>
+            <span style={{ fontSize: 13, fontWeight: 700, color: "#F1F5F9" }}>{M.preview_title}</span>
+            <span style={{ fontSize: 10, fontWeight: 700, color: "#F59E0B", background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.25)", borderRadius: 999, padding: "3px 9px", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+              {M.illustrative}
+            </span>
+          </div>
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+              <thead>
+                <tr>
+                  {[M.preview_cols.employee, M.preview_cols.path, M.preview_cols.status].map((h, i) => (
+                    <th key={h} scope="col" className={i === 1 ? "hidden sm:table-cell" : undefined} style={{ textAlign: "left", fontSize: 10, fontWeight: 700, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.06em", padding: "10px 16px" }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {M.preview_rows.map((row) => {
+                  const s = STATUS_STYLE[row.status];
+                  return (
+                    <tr key={row.name} style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+                      <td style={{ padding: "12px 16px", fontSize: 12, fontWeight: 600, color: "#CBD5E1" }}>{row.name}</td>
+                      <td className="hidden sm:table-cell" style={{ padding: "12px 16px", fontSize: 12, color: "#94A3B8" }}>{row.path}</td>
+                      <td style={{ padding: "12px 16px" }}>
+                        <span style={{ fontSize: 10, fontWeight: 700, color: s.color, background: s.bg, borderRadius: 5, padding: "3px 8px", whiteSpace: "nowrap" }}>
+                          {M.status[row.status]}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </figure>
       </div>
     </section>
   );
@@ -518,40 +736,140 @@ function Roles() {
 
 // ─── Security ─────────────────────────────────────────────────────────────────
 
-function Security() {
-  const items = [
-    { icon: LockClosedIcon, title: "Datos aislados por empresa", desc: "Cada empresa tiene su propio silo. Ningún dato se comparte entre clientes." },
-    { icon: ShieldCheckIcon, title: "Trazabilidad de compliance", desc: "Log completo de quién completó qué y cuándo. Listo para auditorías regulatorias." },
-    { icon: CheckBadgeIcon, title: "Certificaciones digitales", desc: "Genera evidencia verificable de que tus empleados completaron la capacitación." },
-    { icon: ClockIcon, title: "Historial de intentos", desc: "Cada sesión de estudio queda registrada. Visibilidad total del progreso individual." },
-  ];
+const SECURITY_ICONS = [LockClosedIcon, KeyIcon, EnvelopeIcon, DocumentDuplicateIcon, ClockIcon, CheckBadgeIcon];
+
+function Security({ L, onLead }) {
+  const S = L.security;
   return (
-    <section id="security" style={{ background: "#0F172A", padding: "100px 0" }}>
-      <div className="max-w-6xl mx-auto px-4 md:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-          <div>
-            <p style={{ fontSize: 11, fontWeight: 700, color: "#6366F1", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 12 }}>Seguridad y Compliance</p>
-            <h2 style={{ fontSize: "clamp(22px, 3.5vw, 36px)", fontWeight: 800, color: "#F1F5F9", lineHeight: 1.15, letterSpacing: "-0.02em", marginBottom: 16 }}>
-              Diseñado para industrias reguladas
-            </h2>
-            <p style={{ fontSize: 14, color: "#64748B", lineHeight: 1.8, marginBottom: 28 }}>
-              Finanzas, salud, industria, retail — en cualquier sector donde el cumplimiento es obligatorio, Ankard te da la trazabilidad que necesitas para demostrar que tu equipo está capacitado.
-            </p>
-            <button
-              style={{ fontSize: 14, fontWeight: 700, color: "#fff", background: "linear-gradient(135deg, #6366F1, #818CF8)", border: "none", borderRadius: 10, padding: "12px 24px", cursor: "pointer", display: "flex", alignItems: "center", gap: 7 }}>
-              Hablar con ventas <ArrowRightIcon className="h-4 w-4" />
-            </button>
+    <section id="security" style={{ background: "#0F172A", padding: "96px 0", ...SECTION_SCROLL }}>
+      <div className="max-w-6xl mx-auto px-4 md:px-8 grid grid-cols-1 lg:grid-cols-5 gap-12 items-start">
+        <div className="lg:col-span-2">
+          <SectionHeader eyebrow={S.eyebrow} title={S.title} center={false} />
+          <p style={{ fontSize: 15, color: "#94A3B8", lineHeight: 1.8, marginBottom: 28 }}>{S.text}</p>
+          <div className="flex flex-col items-start gap-4">
+            <PrimaryButton onClick={() => onLead("security")}>{S.cta}</PrimaryButton>
+            <a href="/privacidad" style={{ fontSize: 13, fontWeight: 600, color: "#818CF8", textDecoration: "underline", textUnderlineOffset: 3 }}>
+              {S.privacy_link}
+            </a>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {items.map(({ icon: Icon, title, desc }) => (
-              <div key={title} style={{ background: "#162032", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 12, padding: 18 }}>
-                <div style={{ width: 34, height: 34, borderRadius: 9, background: "rgba(99,102,241,0.12)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 12 }}>
-                  <Icon className="h-4 w-4" style={{ color: "#818CF8" }} />
-                </div>
-                <h4 style={{ fontSize: 12, fontWeight: 700, color: "#F1F5F9", marginBottom: 6 }}>{title}</h4>
-                <p style={{ fontSize: 11, color: "#64748B", lineHeight: 1.65 }}>{desc}</p>
-              </div>
-            ))}
+        </div>
+        <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {S.items.map(({ title, desc }, i) => (
+            <div key={title} style={{ background: "#162032", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 12, padding: 18 }}>
+              <IconBadge icon={SECURITY_ICONS[i]} color="#818CF8" size={34} />
+              <h3 style={{ fontSize: 13, fontWeight: 700, color: "#F1F5F9", margin: "12px 0 6px" }}>{title}</h3>
+              <p style={{ fontSize: 12, color: "#94A3B8", lineHeight: 1.65 }}>{desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── Industries ───────────────────────────────────────────────────────────────
+
+const INDUSTRY_ICONS = [UsersIcon, BuildingOffice2Icon, TruckIcon, WrenchScrewdriverIcon, ChatBubbleLeftRightIcon, HeartIcon, BuildingStorefrontIcon, BriefcaseIcon, CogIcon, MapPinIcon];
+
+function Industries({ L }) {
+  const I = L.industries;
+  return (
+    <section id="industries" style={{ background: "#020617", padding: "96px 0", ...SECTION_SCROLL }}>
+      <div className="max-w-6xl mx-auto px-4 md:px-8">
+        <SectionHeader eyebrow={I.eyebrow} title={I.title} intro={I.text} />
+        <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3" style={{ listStyle: "none", margin: 0, padding: 0 }}>
+          {I.items.map((name, i) => {
+            const Icon = INDUSTRY_ICONS[i];
+            return (
+              <li key={name} className="flex items-center gap-2.5" style={{ background: "#0F172A", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "14px 14px" }}>
+                <Icon className="h-5 w-5 flex-shrink-0" style={{ color: "#818CF8" }} aria-hidden="true" />
+                <span style={{ fontSize: 13, fontWeight: 600, color: "#CBD5E1", lineHeight: 1.3 }}>{name}</span>
+              </li>
+            );
+          })}
+        </ul>
+        <p className="text-center" style={{ fontSize: 12, color: "#64748B", marginTop: 24, maxWidth: 640, marginLeft: "auto", marginRight: "auto", lineHeight: 1.6 }}>
+          {I.note}
+        </p>
+      </div>
+    </section>
+  );
+}
+
+// ─── Pricing ──────────────────────────────────────────────────────────────────
+
+function PriceTag({ price, period }) {
+  return (
+    <p style={{ display: "flex", alignItems: "baseline", gap: 6, margin: "14px 0 6px" }}>
+      <span style={{ fontSize: 44, fontWeight: 900, color: "#F1F5F9", letterSpacing: "-0.02em", lineHeight: 1 }}>{price}</span>
+      <span style={{ fontSize: 14, color: "#94A3B8", fontWeight: 600 }}>{period}</span>
+    </p>
+  );
+}
+
+function CheckList({ items, color = "#818CF8" }) {
+  return (
+    <ul className="space-y-2.5" style={{ listStyle: "none", margin: 0, padding: 0 }}>
+      {items.map((it) => (
+        <li key={it} className="flex items-start gap-2.5" style={{ fontSize: 13, color: "#CBD5E1", lineHeight: 1.5 }}>
+          <CheckCircleIcon className="h-5 w-5 flex-shrink-0" style={{ color }} aria-hidden="true" />
+          {it}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function Pricing({ L, onLead }) {
+  const P = L.pricing;
+  return (
+    <section id="pricing" style={{ background: "#0F172A", padding: "96px 0", ...SECTION_SCROLL }}>
+      <div className="max-w-6xl mx-auto px-4 md:px-8">
+        <SectionHeader eyebrow={P.eyebrow} title={P.title} intro={P.subtitle} />
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-5xl mx-auto">
+          {/* Pilot */}
+          <div style={{ background: "linear-gradient(160deg, rgba(99,102,241,0.14), rgba(15,23,42,1) 55%)", border: "1px solid rgba(99,102,241,0.4)", borderRadius: 20, padding: "30px 26px", display: "flex", flexDirection: "column", position: "relative" }}>
+            <span style={{ alignSelf: "flex-start", fontSize: 10, fontWeight: 800, color: "#fff", background: GRADIENT, borderRadius: 999, padding: "4px 11px", letterSpacing: "0.05em", textTransform: "uppercase" }}>
+              {P.pilot.badge}
+            </span>
+            <h3 style={{ fontSize: 20, fontWeight: 800, color: "#F1F5F9", marginTop: 16 }}>{P.pilot.name}</h3>
+            <PriceTag price={P.pilot.price} period={P.pilot.period} />
+            <p style={{ fontSize: 13, color: "#94A3B8", marginBottom: 22 }}>{P.pilot.desc}</p>
+            <div style={{ flex: 1, marginBottom: 24 }}>
+              <CheckList items={P.pilot.includes} />
+            </div>
+            <div style={{ marginBottom: 16 }}><GuaranteeNote>{P.pilot.guarantee}</GuaranteeNote></div>
+            <PrimaryButton full onClick={() => onLead("pilot")}>{P.pilot.cta}</PrimaryButton>
+          </div>
+
+          {/* Business */}
+          <div style={{ background: "#162032", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 20, padding: "30px 26px", display: "flex", flexDirection: "column" }}>
+            <h3 style={{ fontSize: 20, fontWeight: 800, color: "#F1F5F9", marginTop: 30 }}>{P.business.name}</h3>
+            <PriceTag price={P.business.price} period={P.business.period} />
+            <p style={{ fontSize: 13, color: "#94A3B8", marginBottom: 22 }}>{P.business.desc}</p>
+            <p style={{ fontSize: 11, fontWeight: 700, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12 }}>{P.business.includes_title}</p>
+            <div style={{ flex: 1, marginBottom: 24 }}>
+              <CheckList items={P.business.includes} color="#22C55E" />
+            </div>
+            <SecondaryButton full onClick={() => onLead("business")}>{P.business.cta}</SecondaryButton>
+          </div>
+        </div>
+
+        {/* Professional services */}
+        <div className="max-w-5xl mx-auto mt-6 grid grid-cols-1 md:grid-cols-5 gap-8 items-center"
+          style={{ background: "#020617", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 20, padding: "28px 26px" }}>
+          <div className="md:col-span-3">
+            <div className="flex items-center gap-3 mb-3">
+              <IconBadge icon={LifebuoyIcon} color="#C084FC" size={36} />
+              <h3 style={{ fontSize: 17, fontWeight: 800, color: "#F1F5F9", lineHeight: 1.3 }}>{P.services.title}</h3>
+            </div>
+            <p style={{ fontSize: 13, color: "#94A3B8", lineHeight: 1.7, marginBottom: 14 }}>{P.services.text}</p>
+            <CheckList items={P.services.items} color="#C084FC" />
+          </div>
+          <div className="md:col-span-2 flex flex-col gap-3">
+            <p style={{ fontSize: 12, color: "#64748B", lineHeight: 1.6 }}>{P.services.note}</p>
+            <SecondaryButton full onClick={() => onLead("services")}>{P.services.cta}</SecondaryButton>
           </div>
         </div>
       </div>
@@ -559,37 +877,109 @@ function Security() {
   );
 }
 
-// ─── CTA ─────────────────────────────────────────────────────────────────────
+// ─── Guarantee + bonuses + launch program ────────────────────────────────────
 
-function CTASection({ onDemoOpen }) {
-  const navigate = useNavigate();
+function Guarantee({ L }) {
+  const G = L.guarantee;
   return (
-    <section style={{ background: "#020617", padding: "100px 0" }}>
-      <div className="max-w-4xl mx-auto px-4 md:px-8 text-center">
-        <div style={{ background: "linear-gradient(135deg, rgba(99,102,241,0.11), rgba(192,132,252,0.07))", border: "1px solid rgba(99,102,241,0.18)", borderRadius: 24, padding: "60px 36px", position: "relative", overflow: "hidden" }}>
-          <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: 600, height: 300, background: "radial-gradient(ellipse, rgba(99,102,241,0.09) 0%, transparent 70%)", pointerEvents: "none" }} />
-          <RocketLaunchIcon className="h-11 w-11 mx-auto mb-6" style={{ color: "#818CF8" }} />
-          <h2 style={{ fontSize: "clamp(22px, 4vw, 40px)", fontWeight: 900, color: "#F1F5F9", lineHeight: 1.1, letterSpacing: "-0.02em", marginBottom: 14 }}>
-            Empieza hoy — tu primer documento<br />
-            <span style={{ color: "#818CF8" }}>convertido en curso en minutos</span>
-          </h2>
-          <p style={{ fontSize: 15, color: "#64748B", lineHeight: 1.7, maxWidth: 480, margin: "0 auto 32px" }}>
-            Sin tarjeta de crédito. Sin instalación. Sin semanas de configuración. Solo sube tu primer documento y ve la magia.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <button onClick={onDemoOpen}
-              style={{ fontSize: 15, fontWeight: 700, color: "#fff", background: "linear-gradient(135deg, #6366F1, #818CF8)", border: "none", borderRadius: 12, padding: "14px 30px", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, boxShadow: "0 0 40px rgba(99,102,241,0.38)", transition: "opacity 0.15s" }}
-              onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.9")}
-              onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}>
-              Solicitar demo gratuita <ArrowRightIcon className="h-4 w-4" />
-            </button>
-            <button onClick={() => navigate("/auth/sign-in")}
-              style={{ fontSize: 14, fontWeight: 600, color: "#94A3B8", background: "none", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, padding: "13px 22px", cursor: "pointer", transition: "all 0.15s" }}
-              onMouseEnter={(e) => { e.currentTarget.style.color = "#F1F5F9"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.24)"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = "#94A3B8"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)"; }}>
-              Ya tengo cuenta
-            </button>
+    <section id="guarantee" style={{ background: "#020617", padding: "80px 0 40px", ...SECTION_SCROLL }}>
+      <div className="max-w-3xl mx-auto px-4 md:px-8">
+        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 text-center sm:text-left"
+          style={{ background: "rgba(34,197,94,0.06)", border: "1px solid rgba(34,197,94,0.25)", borderRadius: 20, padding: "30px 28px" }}>
+          <div style={{ width: 56, height: 56, borderRadius: 16, background: "rgba(34,197,94,0.12)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+            <ShieldCheckIcon className="h-7 w-7" style={{ color: "#22C55E" }} aria-hidden="true" />
           </div>
+          <div>
+            <h2 style={{ fontSize: "clamp(20px, 3vw, 26px)", fontWeight: 800, color: "#F1F5F9", marginBottom: 8 }}>{G.title}</h2>
+            <p style={{ fontSize: 15, color: "#CBD5E1", lineHeight: 1.7 }}>{G.text}</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Bonuses({ L }) {
+  const B = L.bonuses;
+  return (
+    <section id="bonuses" style={{ background: "#020617", padding: "56px 0 96px", ...SECTION_SCROLL }}>
+      <div className="max-w-6xl mx-auto px-4 md:px-8">
+        <SectionHeader eyebrow={B.eyebrow} title={B.title} />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {B.items.map(({ title, desc }, i) => (
+            <div key={title} style={{ background: "#0F172A", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 14, padding: 22 }}>
+              <div className="flex items-center justify-between mb-4">
+                <IconBadge icon={GiftIcon} color="#F59E0B" size={36} />
+                <span style={{ fontSize: 11, fontWeight: 800, color: "#F59E0B", letterSpacing: "0.05em" }}>{B.label} {i + 1}</span>
+              </div>
+              <h3 style={{ fontSize: 14, fontWeight: 700, color: "#F1F5F9", marginBottom: 8 }}>{title}</h3>
+              <p style={{ fontSize: 13, color: "#94A3B8", lineHeight: 1.65 }}>{desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function LaunchProgram({ L, onLead }) {
+  const P = L.launch;
+  return (
+    <section id="launch" style={{ background: "#0F172A", padding: "88px 0", ...SECTION_SCROLL }}>
+      <div className="max-w-4xl mx-auto px-4 md:px-8 text-center">
+        <div className="flex justify-center mb-5"><IconBadge icon={RocketLaunchIcon} color="#818CF8" size={48} /></div>
+        <Eyebrow>{P.eyebrow}</Eyebrow>
+        <h2 style={{ fontSize: "clamp(24px, 4vw, 36px)", fontWeight: 800, color: "#F1F5F9", lineHeight: 1.2, letterSpacing: "-0.02em", marginBottom: 14 }}>{P.title}</h2>
+        <p style={{ fontSize: 15, color: "#94A3B8", lineHeight: 1.75, maxWidth: 620, margin: "0 auto 28px" }}>{P.text}</p>
+        <PrimaryButton onClick={() => onLead("launch")}>{P.cta}</PrimaryButton>
+      </div>
+    </section>
+  );
+}
+
+// ─── FAQ ──────────────────────────────────────────────────────────────────────
+
+function Faq({ L }) {
+  const F = L.faq;
+  return (
+    <section id="faq" style={{ background: "#020617", padding: "96px 0", ...SECTION_SCROLL }}>
+      <div className="max-w-3xl mx-auto px-4 md:px-8">
+        <SectionHeader eyebrow={F.eyebrow} title={F.title} />
+        <div className="space-y-3">
+          {F.items.map(({ q, a }) => (
+            <details key={q} className="group" style={{ background: "#0F172A", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "0 18px" }}>
+              <summary className="flex items-center justify-between gap-4 cursor-pointer list-none [&::-webkit-details-marker]:hidden" style={{ padding: "16px 0" }}>
+                <h3 style={{ fontSize: 14, fontWeight: 700, color: "#F1F5F9", lineHeight: 1.4 }}>{q}</h3>
+                <ChevronDownIcon className="h-4 w-4 flex-shrink-0 transition-transform group-open:rotate-180" style={{ color: "#64748B" }} aria-hidden="true" />
+              </summary>
+              <p style={{ fontSize: 14, color: "#94A3B8", lineHeight: 1.75, paddingBottom: 18 }}>{a}</p>
+            </details>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── Final CTA ───────────────────────────────────────────────────────────────
+
+function FinalCTA({ L, onLead }) {
+  const F = L.final;
+  return (
+    <section style={{ background: "#020617", padding: "0 0 100px" }}>
+      <div className="max-w-4xl mx-auto px-4 md:px-8 text-center">
+        <div style={{ background: "linear-gradient(135deg, rgba(99,102,241,0.11), rgba(192,132,252,0.07))", border: "1px solid rgba(99,102,241,0.18)", borderRadius: 24, padding: "56px 28px", position: "relative", overflow: "hidden" }}>
+          <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: 600, maxWidth: "100%", height: 300, background: "radial-gradient(ellipse, rgba(99,102,241,0.09) 0%, transparent 70%)", pointerEvents: "none" }} />
+          <BookOpenIcon className="h-11 w-11 mx-auto mb-6 relative" style={{ color: "#818CF8" }} aria-hidden="true" />
+          <h2 className="relative" style={{ fontSize: "clamp(22px, 4vw, 38px)", fontWeight: 900, color: "#F1F5F9", lineHeight: 1.15, letterSpacing: "-0.02em", marginBottom: 14 }}>
+            {F.title}
+          </h2>
+          <p className="relative" style={{ fontSize: 15, color: "#94A3B8", lineHeight: 1.7, maxWidth: 520, margin: "0 auto 30px" }}>{F.text}</p>
+          <div className="relative flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
+            <PrimaryButton size="lg" onClick={() => onLead("pilot")}>{F.cta_primary}</PrimaryButton>
+            <SecondaryButton onClick={() => onLead("demo")}>{F.cta_secondary}</SecondaryButton>
+          </div>
+          <div className="relative"><GuaranteeNote center>{F.guarantee}</GuaranteeNote></div>
         </div>
       </div>
     </section>
@@ -598,44 +988,55 @@ function CTASection({ onDemoOpen }) {
 
 // ─── Footer ───────────────────────────────────────────────────────────────────
 
-function Footer() {
+function Footer({ L, onLead }) {
+  const F = L.footer;
+  const linkStyle = { display: "block", fontSize: 12, color: "#64748B", marginBottom: 8, textDecoration: "none", transition: "color 0.15s", background: "none", border: "none", padding: 0, cursor: "pointer", textAlign: "left", fontFamily: "inherit" };
+  const hover = { onMouseEnter: (e) => (e.currentTarget.style.color = "#CBD5E1"), onMouseLeave: (e) => (e.currentTarget.style.color = "#64748B") };
+  const columns = [
+    { title: F.product, links: [
+      { label: L.nav.product, href: "#solution" },
+      { label: L.nav.how, href: "#how" },
+      { label: L.nav.pricing, href: "#pricing" },
+      { label: L.nav.security, href: "#security" },
+    ] },
+    { title: F.company, links: [
+      { label: F.contact, onClick: () => onLead("demo") },
+      { label: F.help, href: "/faq" },
+      { label: L.nav.sign_in, href: "/auth/sign-in" },
+    ] },
+    { title: F.legal, links: [
+      { label: F.terms, href: "/terminos" },
+      { label: F.privacy, href: "/privacidad" },
+    ] },
+  ];
+
   return (
     <footer style={{ background: "#0F172A", borderTop: "1px solid rgba(255,255,255,0.05)", padding: "48px 0 32px" }}>
       <div className="max-w-6xl mx-auto px-4 md:px-8">
         <div className="flex flex-col md:flex-row items-start justify-between gap-10 mb-10">
           <div>
             <div className="flex items-center gap-2.5 mb-4">
-              <div style={{ width: 28, height: 28, borderRadius: 7, background: "linear-gradient(135deg, #6366F1, #818CF8)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <BoltIcon className="h-4 w-4 text-white" />
+              <div style={{ width: 28, height: 28, borderRadius: 7, background: GRADIENT, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <BoltIcon className="h-4 w-4 text-white" aria-hidden="true" />
               </div>
               <span style={{ fontSize: 15, fontWeight: 800, color: "#F1F5F9" }}>Ankard Enterprise</span>
             </div>
-            <p style={{ fontSize: 12, color: "#475569", lineHeight: 1.7, maxWidth: 240 }}>
-              Capacitación corporativa automatizada con IA. Convierte documentos internos en programas de aprendizaje en minutos.
-            </p>
+            <p style={{ fontSize: 12, color: "#64748B", lineHeight: 1.7, maxWidth: 260 }}>{F.tagline}</p>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-8">
-            {[
-              { title: "Producto", links: ["Características", "Cómo funciona", "Seguridad", "Precios"] },
-              { title: "Empresa", links: ["Sobre nosotros", "Blog", "Casos de éxito", "Contacto"] },
-              { title: "Legal", links: ["Términos de uso", "Privacidad", "Cookies"] },
-            ].map(({ title, links }) => (
+          <nav className="grid grid-cols-2 sm:grid-cols-3 gap-8" aria-label="Footer">
+            {columns.map(({ title, links }) => (
               <div key={title}>
-                <p style={{ fontSize: 10, fontWeight: 700, color: "#475569", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12 }}>{title}</p>
-                {links.map((l) => (
-                  <p key={l} style={{ fontSize: 12, color: "#64748B", marginBottom: 8, cursor: "pointer", transition: "color 0.15s" }}
-                    onMouseEnter={(e) => (e.target.style.color = "#94A3B8")}
-                    onMouseLeave={(e) => (e.target.style.color = "#64748B")}>
-                    {l}
-                  </p>
-                ))}
+                <p style={{ fontSize: 10, fontWeight: 700, color: "#94A3B8", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12 }}>{title}</p>
+                {links.map((l) => l.href
+                  ? <a key={l.label} href={l.href} style={linkStyle} {...hover}>{l.label}</a>
+                  : <button key={l.label} type="button" onClick={l.onClick} style={linkStyle} {...hover}>{l.label}</button>
+                )}
               </div>
             ))}
-          </div>
+          </nav>
         </div>
-        <div style={{ borderTop: "1px solid rgba(255,255,255,0.04)", paddingTop: 22, display: "flex", flexDirection: "column", alignItems: "center", gap: 5 }}>
-          <p style={{ fontSize: 11, color: "#334155" }}>© 2026 Ankard Enterprise. Todos los derechos reservados.</p>
-          <p style={{ fontSize: 10, color: "#1E293B" }}>Capacitación corporativa · LMS con IA · Compliance training · Onboarding digital · Flashcards automáticas</p>
+        <div style={{ borderTop: "1px solid rgba(255,255,255,0.04)", paddingTop: 22, textAlign: "center" }}>
+          <p style={{ fontSize: 11, color: "#475569" }}>© {new Date().getFullYear()} Ankard Enterprise. {F.rights}</p>
         </div>
       </div>
     </footer>
@@ -645,20 +1046,35 @@ function Footer() {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export function LandingPage() {
-  const [demoOpen, setDemoOpen] = useState(false);
+  const [lang, setLang] = useLandingLanguage();
+  const L = dictionaryList[lang].b2b_landing;
+  const [leadMode, setLeadMode] = useState(null);
+  useLandingSeo(lang, L);
+
+  const openLead = (mode) => setLeadMode(mode);
+  const closeLead = React.useCallback(() => setLeadMode(null), []);
 
   return (
-    <div style={{ background: "#020617", minHeight: "100vh" }}>
-      {demoOpen && <DemoModal onClose={() => setDemoOpen(false)} />}
-      <Navbar onDemoOpen={() => setDemoOpen(true)} />
-      <Hero onDemoOpen={() => setDemoOpen(true)} />
-      <Stats />
-      <HowItWorks />
-      <Features />
-      <Roles />
-      <Security />
-      <CTASection onDemoOpen={() => setDemoOpen(true)} />
-      <Footer />
+    <div style={{ background: "#020617", minHeight: "100vh", overflowX: "hidden" }}>
+      {leadMode && <LeadModal key={leadMode} mode={leadMode} lang={lang} L={L} onClose={closeLead} />}
+      <Navbar L={L} lang={lang} onLanguage={setLang} onLead={openLead} />
+      <main>
+        <Hero L={L} onLead={openLead} />
+        <Problem L={L} />
+        <Solution L={L} />
+        <HowItWorks L={L} />
+        <Benefits L={L} />
+        <Measurable L={L} />
+        <Security L={L} onLead={openLead} />
+        <Industries L={L} />
+        <Pricing L={L} onLead={openLead} />
+        <Guarantee L={L} />
+        <Bonuses L={L} />
+        <LaunchProgram L={L} onLead={openLead} />
+        <Faq L={L} />
+        <FinalCTA L={L} onLead={openLead} />
+      </main>
+      <Footer L={L} onLead={openLead} />
     </div>
   );
 }
