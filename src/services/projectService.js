@@ -658,39 +658,43 @@ const projectService = {
     }
   },
 
-  async getBatteryResults(batteryId) {
-    try {
-      const token = localStorage.getItem("token");
-      const url = `${API_BASE}/batteries/${batteryId}/results/`;
+  // UNUSED-CLEANUP (2026-10-11): 0 usos; llama a /batteries/{id}/results/ que no existe en el backend
+  // async getBatteryResults(batteryId) {
+  //   try {
+  //     const token = localStorage.getItem("token");
+  //     const url = `${API_BASE}/batteries/${batteryId}/results/`;
+  //
+  //     const { ok, data } = await apiFetch(url, { token });
+  //
+  //     if (!ok) {
+  //       throw data || { error: "Failed to fetch battery results" };
+  //     }
+  //
+  //     return data;
+  //   } catch (err) {
+  //     throw err?.response?.data || err || { error: "Failed to fetch battery results" };
+  //   }
+  // },
+  // END UNUSED-CLEANUP
 
-      const { ok, data } = await apiFetch(url, { token });
-
-      if (!ok) {
-        throw data || { error: "Failed to fetch battery results" };
-      }
-
-      return data;
-    } catch (err) {
-      throw err?.response?.data || err || { error: "Failed to fetch battery results" };
-    }
-  },
-
-  async getBatteryStats(batteryId) {
-    try {
-      const token = localStorage.getItem("token");
-      const url = `${API_BASE}/batteries/${batteryId}/stats/`;
-
-      const { ok, data } = await apiFetch(url, { token });
-
-      if (!ok) {
-        throw data || { error: "Failed to fetch battery stats" };
-      }
-
-      return data;
-    } catch (err) {
-      throw err?.response?.data || err || { error: "Failed to fetch battery stats" };
-    }
-  },
+  // UNUSED-CLEANUP (2026-10-11): 0 usos; llama a /batteries/{id}/stats/ que no existe en el backend
+  // async getBatteryStats(batteryId) {
+  //   try {
+  //     const token = localStorage.getItem("token");
+  //     const url = `${API_BASE}/batteries/${batteryId}/stats/`;
+  //
+  //     const { ok, data } = await apiFetch(url, { token });
+  //
+  //     if (!ok) {
+  //       throw data || { error: "Failed to fetch battery stats" };
+  //     }
+  //
+  //     return data;
+  //   } catch (err) {
+  //     throw err?.response?.data || err || { error: "Failed to fetch battery stats" };
+  //   }
+  // },
+  // END UNUSED-CLEANUP
 
   // -------- BATTERY ATTEMPTS --------
   async startBatteryAttempt(batteryId) {
@@ -702,14 +706,16 @@ const projectService = {
     }
   },
 
-  async submitBatteryAnswers(batteryId, payload) {
-    try {
-      const res = await api.post(`/batteries/${batteryId}/submit_answers/`, payload);
-      return res.data;
-    } catch (err) {
-      throw err?.response?.data || { error: "Failed to submit answers" };
-    }
-  },
+  // UNUSED-CLEANUP (2026-10-11): 0 usos; llama a /batteries/{id}/submit_answers/ que no existe en el backend
+  // async submitBatteryAnswers(batteryId, payload) {
+  //   try {
+  //     const res = await api.post(`/batteries/${batteryId}/submit_answers/`, payload);
+  //     return res.data;
+  //   } catch (err) {
+  //     throw err?.response?.data || { error: "Failed to submit answers" };
+  //   }
+  // },
+  // END UNUSED-CLEANUP
 
   async finishBatteryAttempt(batteryId, payload) {
     try {

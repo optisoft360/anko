@@ -135,7 +135,8 @@ export const learningApi = {
   startAssignment: (id) => enterpriseApi.post(`/enterprise/learning-assignments/${id}/start/`, {}, { params: cp() }).then((r) => r.data),
   completeModule: (id, data) => enterpriseApi.post(`/enterprise/learning-assignments/${id}/complete-module/`, data, { params: cp() }).then((r) => r.data),
   getMyProgress: (id) => enterpriseApi.get(`/enterprise/learning-assignments/${id}/progress/`, { params: cp() }).then((r) => r.data),
-  getLearningPathProgress: (id) => enterpriseApi.get(`/enterprise/learning-paths/${id}/my-progress/`, { params: cp() }).then((r) => r.data),
+  // UNUSED-CLEANUP (2026-10-11): 0 usos; /enterprise/learning-paths/{id}/my-progress/ no existe en el backend
+  // getLearningPathProgress: (id) => enterpriseApi.get(`/enterprise/learning-paths/${id}/my-progress/`, { params: cp() }).then((r) => r.data),
 
   // Reviews and Gaps
   getDueReviews: (p) => enterpriseApi.get("/enterprise/review-schedules/my-due-reviews/", { params: cp(p) }).then((r) => r.data),

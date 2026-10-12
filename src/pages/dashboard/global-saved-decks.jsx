@@ -1,3 +1,4 @@
+// UNUSED-CLEANUP (2026-10-11): página sin ruta (su endpoint del backend está comentado). Borrar junto con el modelo.
 import React from "react";
 import GlobalCrudPage from "@/widgets/GlobalCrudPage";
 import { useLanguage } from "@/context/language-context";

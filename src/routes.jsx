@@ -23,7 +23,7 @@ import {
 import {
   Home, Projects, GlobalTopics, GlobalRules, GlobalBatteries, GlobalSections, Billing, Faqs, AboutUs, ContactPage,
   GlobalResources, GlobalPermissions, GlobalRoles, GlobalPlans, GlobalPlanLimits, GlobalSubscriptions,
-  GlobalBatteryShares, GlobalSavedBatteries, GlobalInvites, GlobalDecks, GlobalFlashcards, GlobalDeckShares, GlobalSavedDecks,
+  GlobalBatteryShares, /* GlobalSavedBatteries: UNUSED-CLEANUP */ GlobalInvites, GlobalDecks, GlobalFlashcards, GlobalDeckShares, /* GlobalSavedDecks: UNUSED-CLEANUP */
   GlobalUsers, GlobalProjects, GlobalSupportRequests, GlobalLearningPaths, MyDecks, MyBatteries, PublicDecks, PublicBatteries
 } from "@/pages/dashboard";
 import { SignIn, SignUp, EmailVerification, ForgotPassword, ResetPassword } from "@/pages/auth";
@@ -58,12 +58,14 @@ export const routes = [
       { name: "plan-limits",      path: "/plan-limits",       element: <GlobalPlanLimits />,     hidden: true },
       { name: "subscriptions",    path: "/subscriptions",     element: <GlobalSubscriptions />,  hidden: true },
       { name: "battery-shares",   path: "/battery-shares",   element: <GlobalBatteryShares />,  hidden: true },
-      { name: "saved-batteries",  path: "/saved-batteries",  element: <GlobalSavedBatteries />, hidden: true },
+      // UNUSED-CLEANUP (2026-10-11): endpoint admin/saved-batteries comentado en el backend
+      // { name: "saved-batteries",  path: "/saved-batteries",  element: <GlobalSavedBatteries />, hidden: true },
       { name: "invites",          path: "/invites",           element: <GlobalInvites />,        hidden: true },
       { name: "decks",            path: "/decks",             element: <GlobalDecks />,          hidden: true },
       { name: "flashcards",       path: "/flashcards",        element: <GlobalFlashcards />,     hidden: true },
       { name: "deck-shares",      path: "/deck-shares",       element: <GlobalDeckShares />,     hidden: true },
-      { name: "saved-decks",      path: "/saved-decks",       element: <GlobalSavedDecks />,     hidden: true },
+      // UNUSED-CLEANUP (2026-10-11): endpoint admin/saved-decks comentado en el backend
+      // { name: "saved-decks",      path: "/saved-decks",       element: <GlobalSavedDecks />,     hidden: true },
       { name: "global-projects",  path: "/global-projects",   element: <GlobalProjects />,       hidden: true },
       { name: "support-requests",    path: "/support-requests",     element: <GlobalSupportRequests />,  hidden: true },
       { name: "global-learning-paths", path: "/global-learning-paths", element: <GlobalLearningPaths />, hidden: true },

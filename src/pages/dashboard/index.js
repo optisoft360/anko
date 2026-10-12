@@ -21,12 +21,12 @@ export * from "@/pages/dashboard/global-plans";
 export * from "@/pages/dashboard/global-plan-limits";
 export * from "@/pages/dashboard/global-subscriptions";
 export * from "@/pages/dashboard/global-battery-shares";
-export * from "@/pages/dashboard/global-saved-batteries";
+// export * from "@/pages/dashboard/global-saved-batteries";  // UNUSED-CLEANUP (2026-10-11)
 export * from "@/pages/dashboard/global-invites";
 export * from "@/pages/dashboard/global-decks";
 export * from "@/pages/dashboard/global-flashcards";
 export * from "@/pages/dashboard/global-deck-shares";
-export * from "@/pages/dashboard/global-saved-decks";
+// export * from "@/pages/dashboard/global-saved-decks";  // UNUSED-CLEANUP (2026-10-11)
 export * from "@/pages/dashboard/global-users";
 export * from "@/pages/dashboard/global-projects";
 export * from "@/pages/dashboard/global-support-requests";
