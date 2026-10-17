@@ -65,7 +65,8 @@ function displayName(u) {
 export default function InviteUser() {
   const navigate = useNavigate();
   const { t } = useLanguage();
-  const { companies } = useAuth();
+  // Only platform admins may browse the platform-wide user directory (/api/users/).
+  const { companies, isAdmin } = useAuth();
   const company = companies?.[0];
   const companyId = company?.company_id;
   const ROLES = useRoles();
@@ -259,6 +260,8 @@ export default function InviteUser() {
           background: "#0F172A", border: "1px solid rgba(255,255,255,0.07)",
           borderRadius: 18, overflow: "hidden",
         }}>
+          {isAdmin && (
+            <>
           {/* Search input */}
           <div style={{ padding: "22px 22px 16px" }}>
             <p style={{ fontSize: 10, fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.1em", margin: "0 0 12px" }}>
@@ -339,6 +342,8 @@ export default function InviteUser() {
               </div>
             )}
           </div>
+            </>
+          )}
 
           {/* Manual email entry */}
           <div style={{ padding: "16px 22px 22px", borderTop: "1px solid rgba(255,255,255,0.05)" }}>
