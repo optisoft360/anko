@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback, useRef, useMemo } from "react";
+import { enumLabel, useKnowledgeEnumLabels } from "@/utils/enumLabel";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import {
   ArrowLeftIcon, PlusIcon, DocumentArrowUpIcon,
@@ -252,7 +253,7 @@ function AutoGenBanner({ runState, collapsed, onToggle, onDismiss, onStop }) {
                   <div key={s.id} className="flex items-center gap-2">
                     <div style={{ width: 6, height: 6, borderRadius: "50%", background: dot.color, flexShrink: 0 }} />
                     <span style={{ fontSize: 11, color: s.status === "running" ? "var(--text-primary)" : "var(--text-tertiary)", fontWeight: s.status === "running" ? 600 : 400, flex: 1 }} className="truncate">
-                      {STAGE_LABELS[s.step_key] || s.step_key}
+                      {enumLabel(STAGE_LABELS, s.step_key, "step_key")}
                       {s.item_key ? ` (${s.item_key})` : ""}
                     </span>
                     {s.progress_percent != null && s.status === "running" && (
@@ -2294,6 +2295,7 @@ export function ProcessDetail() {
   const { t } = useLanguage();
   const SOURCE_LABELS = useSourceLabels();
   const TYPE_LABELS = useTypeLabels();
+  const ENUMS = useKnowledgeEnumLabels();
   const STATUS_LABELS = useStatusLabels();
   const { activeCompanyId, isPlatformAdmin, hasMinRole } = useEnterprise();
   const { user } = useAuth();
@@ -2867,15 +2869,15 @@ export function ProcessDetail() {
             <div className="flex items-center gap-2 flex-wrap">
               <h1 style={{ color: "var(--text-primary)", fontWeight: 700, fontSize: 18 }}>{ks.title}</h1>
               {ks.source_type && (
-                <Pill label={SOURCE_LABELS[ks.source_type] || ks.source_type} style={{ background: "var(--bg-elevated)", color: "var(--text-secondary)" }} />
+                <Pill label={enumLabel(SOURCE_LABELS, ks.source_type, "source_type")} style={{ background: "var(--bg-elevated)", color: "var(--text-secondary)" }} />
               )}
               {ks.process_type && (
-                <Pill label={TYPE_LABELS[ks.process_type] || ks.process_type} style={{ background: typeColor.bg, color: typeColor.text }} />
+                <Pill label={enumLabel(TYPE_LABELS, ks.process_type, "process_type")} style={{ background: typeColor.bg, color: typeColor.text }} />
               )}
               {ks.difficulty && (
-                <Pill label={ks.difficulty} style={{ background: diffColor.bg, color: diffColor.text, textTransform: "capitalize" }} />
+                <Pill label={ENUMS.difficulty(ks.difficulty)} style={{ background: diffColor.bg, color: diffColor.text }} />
               )}
-              <Pill label={STATUS_LABELS[ks.status] || ks.status} style={{ background: statusBg.bg, color: statusBg.text }} />
+              <Pill label={enumLabel(STATUS_LABELS, ks.status, "status")} style={{ background: statusBg.bg, color: statusBg.text }} />
             </div>
             {ks.description && (
               <p style={{ color: "var(--text-secondary)", fontSize: 13, marginTop: 5, lineHeight: 1.6 }}>{ks.description}</p>

@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
+import { enumLabel } from "@/utils/enumLabel";
 import { useNavigate } from "react-router-dom";
 import {
   PlusIcon, RectangleStackIcon, ClockIcon, TrashIcon,
@@ -160,7 +161,7 @@ function WizardStep2({ selectedIds, onToggle, sources, loadingSources, onBack, o
                   </div>
                   <span style={{ fontSize: 12.5, fontWeight: 500, color: "var(--text-primary)", flex: 1 }}>{src.title}</span>
                   <span style={{ background: tc.bg, color: tc.text, fontSize: 9, fontWeight: 700, padding: "1px 6px", borderRadius: 3 }}>
-                    {TYPE_LABELS[src.process_type] || src.process_type}
+                    {enumLabel(TYPE_LABELS, src.process_type, "process_type")}
                   </span>
                 </div>
               </button>

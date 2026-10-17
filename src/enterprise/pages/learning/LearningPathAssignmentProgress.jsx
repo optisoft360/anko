@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
+import { enumLabel, useKnowledgeEnumLabels } from "@/utils/enumLabel";
 import { useNavigate } from "react-router-dom";
 import {
   CheckCircleIcon, LockClosedIcon, PlayIcon,
@@ -496,6 +497,7 @@ function NodeIcon({ status, size = 30, iconSize = 14 }) {
 }
 
 function ProcessNode({ mod, index, status, isLast, isOpen, onClick, assignmentId, onModuleComplete, onModuleProgress, percent }) {
+  const ENUMS = useKnowledgeEnumLabels();
   const { t } = useLanguage();
   const typeColor = { document: "#60a5fa", topic: "#a855f7", deck: "#f59e0b", battery: "#f87171", course: "#4ade80" }[mod.process_type] || "var(--text-tertiary)";
   const locked = status === "locked";
@@ -504,7 +506,7 @@ function ProcessNode({ mod, index, status, isLast, isOpen, onClick, assignmentId
 
   const typeBadge = mod.process_type && (
     <span style={{ padding: "2px 8px", borderRadius: 20, background: "rgba(148,163,184,0.1)", border: `1px solid ${typeColor}`, color: typeColor, fontSize: 10, fontWeight: 700, textTransform: "uppercase", flexShrink: 0 }}>
-      {mod.process_type}
+      {ENUMS.processType(mod.process_type)}
     </span>
   );
   const durationLabel = (mod.estimated_duration_minutes || 0) > 0 && (
@@ -536,7 +538,7 @@ function ProcessNode({ mod, index, status, isLast, isOpen, onClick, assignmentId
                 <div className="min-w-0">
                   <p style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)" }} className="truncate">{mod.name}</p>
                   <div className="flex items-center gap-2 mt-0.5">
-                    {mod.process_type && <span style={{ fontSize: 9, fontWeight: 700, color: typeColor, textTransform: "uppercase" }}>{mod.process_type}</span>}
+                    {mod.process_type && <span style={{ fontSize: 9, fontWeight: 700, color: typeColor, textTransform: "uppercase" }}>{ENUMS.processType(mod.process_type)}</span>}
                     {durationLabel}
                   </div>
                 </div>

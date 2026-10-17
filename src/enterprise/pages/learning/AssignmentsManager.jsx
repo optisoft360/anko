@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
+import { enumLabel, useKnowledgeEnumLabels } from "@/utils/enumLabel";
 import { formatCalendarDate } from "@/utils/calendarDate";
 import { apiErrorMessage } from "@/utils/apiError";
 import { useNavigate } from "react-router-dom";
@@ -56,6 +57,7 @@ function FilterChip({ label, active, onClick }) {
 // ─── New Assignment Modal ─────────────────────────────────────────────────────
 
 function NewAssignmentModal({ companyId, onCreated, onClose }) {
+  const ENUMS = useKnowledgeEnumLabels();
   const { t } = useLanguage();
   const [step, setStep] = useState(1);
   const [contentType, setContentType] = useState("path"); // "path" | "module"
@@ -209,7 +211,7 @@ function NewAssignmentModal({ companyId, onCreated, onClose }) {
                           <p style={{ fontSize: 12.5, fontWeight: 600, color: "var(--text-primary)" }}>{mod.name}</p>
                           <p style={{ fontSize: 10, color: "var(--text-tertiary)", marginTop: 1 }}>
                             {mod.process_type || t("enterprise.learning.assignmentsManager.modal.process")}
-                            {mod.difficulty ? ` · ${mod.difficulty}` : ""}
+                            {mod.difficulty ? ` · ${ENUMS.difficulty(mod.difficulty)}` : ""}
                             {mod.estimated_duration_minutes ? ` · ${mod.estimated_duration_minutes} min` : ""}
                           </p>
                         </div>

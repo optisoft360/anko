@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
+import { enumLabel, useKnowledgeEnumLabels } from "@/utils/enumLabel";
 import { useNavigate } from "react-router-dom";
 import {
   PlusIcon, BookOpenIcon, AcademicCapIcon,
@@ -39,16 +40,17 @@ function TypePill({ type }) {
   const c = typeColors[type] || { bg: "var(--bg-elevated)", text: "var(--text-secondary)" };
   return (
     <span style={{ background: c.bg, color: c.text, fontSize: 10, fontWeight: 700, padding: "2px 7px", borderRadius: 4, letterSpacing: "0.03em" }}>
-      {types[type] || type}
+      {enumLabel(types, type, "process_type")}
     </span>
   );
 }
 
 function DifficultyPill({ difficulty }) {
+  const ENUMS = useKnowledgeEnumLabels();
   const c = DIFFICULTY_COLORS[difficulty] || { bg: "var(--bg-elevated)", text: "var(--text-secondary)" };
   return (
     <span style={{ background: c.bg, color: c.text, fontSize: 10, fontWeight: 700, padding: "2px 7px", borderRadius: 4, textTransform: "capitalize" }}>
-      {difficulty}
+      {ENUMS.difficulty(difficulty)}
     </span>
   );
 }

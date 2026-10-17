@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
+import { enumLabel, useKnowledgeEnumLabels } from "@/utils/enumLabel";
 import { apiErrorMessage } from "@/utils/apiError";
 import { useParams, useNavigate } from "react-router-dom";
 import {
@@ -133,7 +134,7 @@ function AddProcesoModal({ pathId, currentModuleIds, onAdded, onClose }) {
                     </div>
                     <span style={{ fontSize: 12.5, fontWeight: 500, color: "var(--text-primary)", flex: 1 }}>{mod.title}</span>
                     <span style={{ background: tc.bg, color: tc.text, fontSize: 9, fontWeight: 700, padding: "1px 6px", borderRadius: 3 }}>
-                      {TYPE_LABELS[mod.process_type] || mod.process_type}
+                      {enumLabel(TYPE_LABELS, mod.process_type, "process_type")}
                     </span>
                   </div>
                 </button>
@@ -204,6 +205,7 @@ function EditHeaderForm({ path, onSaved, onCancel }) {
 // ─── Module row ───────────────────────────────────────────────────────────────
 
 function ModuleRow({ mod, index, total, pathId, pathName, onRemoved, onMoveUp, onMoveDown }) {
+  const ENUMS = useKnowledgeEnumLabels();
   const navigate = useNavigate();
   const { t } = useLanguage();
   const TYPE_LABELS = useTypeLabels();
@@ -261,10 +263,10 @@ function ModuleRow({ mod, index, total, pathId, pathName, onRemoved, onMoveUp, o
           <div className="flex items-center gap-2 flex-wrap">
             <p style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)" }}>{mod.name}</p>
             <span style={{ background: tc.bg, color: tc.text, fontSize: 9, fontWeight: 700, padding: "1px 6px", borderRadius: 3 }}>
-              {TYPE_LABELS[mod.process_type] || mod.process_type}
+              {enumLabel(TYPE_LABELS, mod.process_type, "process_type")}
             </span>
             {mod.difficulty && (
-              <span style={{ color: dc.text, fontSize: 9, fontWeight: 700, textTransform: "capitalize" }}>{mod.difficulty}</span>
+              <span style={{ color: dc.text, fontSize: 9, fontWeight: 700, }}>{ENUMS.difficulty(mod.difficulty)}</span>
             )}
             {!mod.is_required && (
               <span style={{ color: "var(--text-tertiary)", fontSize: 9, fontWeight: 700 }}>{t("enterprise.learning.pathDetail.moduleRow.optional")}</span>
