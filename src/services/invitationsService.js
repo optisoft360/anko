@@ -1,6 +1,7 @@
 import api from "./api";
 
-const BASE = "/api/enterprise";
+// The axios client baseURL already ends in /api — paths must not repeat it.
+const BASE = "/enterprise";
 
 const invitationsService = {
   async listByCompany(companyId, params = {}) {

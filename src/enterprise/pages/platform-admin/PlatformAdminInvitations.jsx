@@ -369,7 +369,7 @@ export default function PlatformAdminInvitations() {
   useEffect(() => { load(); }, [load]);
 
   useEffect(() => {
-    api.get("/api/enterprise/companies/")
+    api.get("/enterprise/companies/")
       .then(r => setCompanies(Array.isArray(r.data) ? r.data : (r.data?.results ?? [])))
       .catch(() => {});
   }, []);

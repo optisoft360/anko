@@ -90,7 +90,7 @@ export default function InviteUser() {
   /* load existing members to exclude from search */
   useEffect(() => {
     if (!companyId) return;
-    api.get(`/api/enterprise/companies/${companyId}/members/`)
+    api.get(`/enterprise/companies/${companyId}/members/`)
       .then(r => setMembers(Array.isArray(r.data) ? r.data : (r.data?.results ?? [])))
       .catch(() => {});
   }, [companyId]);
@@ -102,7 +102,7 @@ export default function InviteUser() {
     searchTimer.current = setTimeout(async () => {
       setSearching(true);
       try {
-        const res = await api.get(`/api/users/?search=${encodeURIComponent(query)}&page_size=8`);
+        const res = await api.get(`/users/?search=${encodeURIComponent(query)}&page_size=8`);
         const memberEmails = new Set(members.map(m => m.email));
         setResults((res.data.results || []).filter(u => !memberEmails.has(u.email)));
       } catch { setResults([]); }
