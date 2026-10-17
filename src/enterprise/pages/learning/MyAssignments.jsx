@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { formatCalendarDate } from "@/utils/calendarDate";
 import { useNavigate } from "react-router-dom";
 import {
   BookOpenIcon, ClockIcon, CheckCircleIcon, ExclamationCircleIcon,
@@ -37,8 +38,7 @@ function AssignmentCard({ assignment: a, onOpen, onViewCertificate, starting }) 
   const pct = a.progress?.percent_required ?? a.progress?.percent_total ?? 0;
   const completedMods = a.progress?.completed_modules ?? 0;
   const totalMods = a.progress?.total_modules ?? 0;
-  const dueDate = a.due_date ? new Date(a.due_date) : null;
-  const dueStr = dueDate ? dueDate.toLocaleDateString(language === "es" ? "es" : "en-US", { day: "2-digit", month: "short", year: "numeric" }) : null;
+  const dueStr = formatCalendarDate(a.due_date, language);
   const isDone = a.status === "completed";
   const isOverdue = status === "overdue";
 

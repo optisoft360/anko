@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
+import { formatCalendarDate } from "@/utils/calendarDate";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeftIcon, ClockIcon, RectangleStackIcon } from "@heroicons/react/24/outline";
 import { learningApi } from "../../api/enterpriseApi";
@@ -21,9 +22,7 @@ export function AssignmentDetail() {
   useEffect(() => { load(); }, [load]);
 
   const isDone = assignment?.status === "completed";
-  const dueStr = assignment?.due_date
-    ? new Date(assignment.due_date).toLocaleDateString(language === "es" ? "es" : "en-US", { day: "2-digit", month: "short", year: "numeric" })
-    : null;
+  const dueStr = formatCalendarDate(assignment?.due_date, language);
 
   if (loading) return (
     <div className="flex items-center justify-center py-32">

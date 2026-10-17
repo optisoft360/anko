@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
+import { apiErrorMessage } from "@/utils/apiError";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeftIcon, PencilIcon, CheckIcon, XMarkIcon, PlusIcon, TrashIcon,
@@ -244,7 +245,10 @@ function AssignModal({ program, companyId, onClose, onAssigned }) {
     ]).then(([m, tms]) => { setMembers(m); setTeams(tms); }).catch(() => {}).finally(() => setLoading(false));
   }, [companyId]);
 
+  const submittingRef = useRef(false);
   const handleAssign = async () => {
+    if (submittingRef.current) return; // no double submit
+    submittingRef.current = true;
     setSaving(true); setError(""); setSuccess("");
     try {
       if (tab === "user") {
@@ -259,8 +263,8 @@ function AssignModal({ program, companyId, onClose, onAssigned }) {
       setSelectedUser(null); setSelectedTeam(null); setDueDate(""); setSearch("");
       onAssigned?.();
     } catch (err) {
-      setError(err?.detail || err?.non_field_errors?.[0] || t("enterprise.compliance.programDetail.assignModal.error"));
-    } finally { setSaving(false); }
+      setError(apiErrorMessage(err, t("enterprise.compliance.programDetail.assignModal.error")));
+    } finally { setSaving(false); submittingRef.current = false; }
   };
 
   const filteredMembers = members.filter((m) =>

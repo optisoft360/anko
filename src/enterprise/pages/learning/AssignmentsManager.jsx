@@ -1,4 +1,6 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
+import { formatCalendarDate } from "@/utils/calendarDate";
+import { apiErrorMessage } from "@/utils/apiError";
 import { useNavigate } from "react-router-dom";
 import {
   PlusIcon, ClockIcon, CheckCircleIcon, PlayIcon,
@@ -81,7 +83,10 @@ function NewAssignmentModal({ companyId, onCreated, onClose }) {
     ]).then(([p, mod, m, tms]) => { setPaths(p); setModules(mod); setMembers(m); setTeams(tms); }).catch(() => {}).finally(() => setLoading(false));
   }, [companyId]);
 
+  const submittingRef = useRef(false);
   const handleAssign = async () => {
+    if (submittingRef.current) return; // no double submit
+    submittingRef.current = true;
     setSaving(true); setError("");
     try {
       const due = dueDate || undefined;
@@ -102,8 +107,8 @@ function NewAssignmentModal({ companyId, onCreated, onClose }) {
       onCreated();
       onClose();
     } catch (err) {
-      setError(err?.detail || err?.non_field_errors?.[0] || t("enterprise.learning.assignmentsManager.modal.assignError"));
-    } finally { setSaving(false); }
+      setError(apiErrorMessage(err, t("enterprise.learning.assignmentsManager.modal.assignError")));
+    } finally { setSaving(false); submittingRef.current = false; }
   };
 
   const filteredMembers = members.filter((m) => !search || (m.full_name || m.username || m.email || "").toLowerCase().includes(search.toLowerCase()));
@@ -320,7 +325,7 @@ function AssignmentRow({ a, onClick }) {
   const pct = a.progress?.percent_required ?? a.progress?.percent_total ?? 0;
   const completedMods = a.progress?.completed_modules ?? 0;
   const totalMods = a.progress?.total_modules ?? 0;
-  const dueStr = a.due_date ? new Date(a.due_date).toLocaleDateString(language === "es" ? "es" : "en-US", { day: "2-digit", month: "short", year: "numeric" }) : null;
+  const dueStr = formatCalendarDate(a.due_date, language);
   const isOverdue = a.is_overdue || a.status === "overdue";
 
   return (

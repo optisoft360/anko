@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
+import { apiErrorMessage } from "@/utils/apiError";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeftIcon, PlusIcon, TrashIcon, ArrowPathIcon,
@@ -322,7 +323,10 @@ function AssignModal({ pathId, companyId, onClose }) {
     ]).then(([m, tms]) => { setMembers(m); setTeams(tms); }).catch(() => {}).finally(() => setLoading(false));
   }, [companyId]);
 
+  const submittingRef = useRef(false);
   const handleAssign = async () => {
+    if (submittingRef.current) return; // no double submit
+    submittingRef.current = true;
     setSaving(true); setError(""); setSuccess("");
     try {
       if (tab === "user") {
@@ -336,8 +340,8 @@ function AssignModal({ pathId, companyId, onClose }) {
       }
       setSelectedUser(null); setSelectedTeam(null); setDueDate(""); setSearch("");
     } catch (err) {
-      setError(err?.detail || err?.non_field_errors?.[0] || t("enterprise.learning.pathDetail.assignModal.error"));
-    } finally { setSaving(false); }
+      setError(apiErrorMessage(err, t("enterprise.learning.pathDetail.assignModal.error")));
+    } finally { setSaving(false); submittingRef.current = false; }
   };
 
   const filteredMembers = members.filter((m) =>
