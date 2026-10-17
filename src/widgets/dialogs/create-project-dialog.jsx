@@ -14,6 +14,7 @@ import { FolderPlusIcon } from "@heroicons/react/24/outline";
 import projectService, { API_BASE } from "../../services/projectService";
 import { useLanguage } from "@/context/language-context";
 import { useJobs } from "@/context/job-context";
+import { applyUploadValidation, UPLOAD_ALLOWED_FILE_TYPES, MAX_UPLOAD_BYTES } from "@/utils/fileValidation";
 
 import Uppy from "@uppy/core";
 import XHRUpload from "@uppy/xhr-upload";
@@ -31,13 +32,15 @@ export function CreateProjectDialog({ open, onClose, onCreate, projects = [] }) 
   const [loading, setLoading] = useState(false);
 
   // Initialize Uppy
+  const tRef = React.useRef(t);
+  tRef.current = t;
   const uppy = useMemo(() => {
-    return new Uppy({
+    return applyUploadValidation(new Uppy({
       id: 'create-project-uploader',
       autoProceed: false,
       restrictions: {
-        maxFileSize: 400 * 1024 * 1024, // 400MB
-        allowedFileTypes: ['.pdf', '.doc', '.docx', '.txt', '.md'],
+        maxFileSize: MAX_UPLOAD_BYTES,
+        allowedFileTypes: UPLOAD_ALLOWED_FILE_TYPES,
       },
     }).use(XHRUpload, {
       endpoint: 'will-be-set-later', // Placeholder
@@ -49,7 +52,7 @@ export function CreateProjectDialog({ open, onClose, onCreate, projects = [] }) 
       // Assuming 'files' takes multiple, bundle: true might be needed if the endpoint expects a list.
       // Checking projectService: sends FormData with multiple "files" entries.
       bundle: false,
-    });
+    }), () => tRef.current);
   }, []);
 
   // Inject fresh token before upload starts

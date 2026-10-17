@@ -10,6 +10,7 @@ import {
 } from "@material-tailwind/react";
 import { useLanguage } from "@/context/language-context";
 import { useJobs } from "@/context/job-context";
+import { applyUploadValidation, UPLOAD_ALLOWED_FILE_TYPES, MAX_UPLOAD_BYTES, uploadHelpText } from "@/utils/fileValidation";
 import { API_BASE } from "@/services/api"; // Ensure this import works
 
 import Uppy from "@uppy/core";
@@ -20,14 +21,16 @@ export function UploadDocumentsDialog({ open, onClose, onUpload, project }) {
   const { t } = useLanguage();
   const { addJob } = useJobs();
 
+  const tRef = React.useRef(t);
+  tRef.current = t;
   const uppy = useMemo(() => {
     const u = new Uppy({
       id: 'doc-uploader',
       autoProceed: false,
       restrictions: {
-        maxFileSize: 400 * 1024 * 1024,
+        maxFileSize: MAX_UPLOAD_BYTES,
         maxNumberOfFiles: 10,
-        allowedFileTypes: ['.pdf', '.doc', '.docx', '.txt', '.md'],
+        allowedFileTypes: UPLOAD_ALLOWED_FILE_TYPES,
       },
     }).use(XHRUpload, {
       endpoint: 'placeholder',
@@ -37,7 +40,7 @@ export function UploadDocumentsDialog({ open, onClose, onUpload, project }) {
       bundle: false,
     });
 
-    return u;
+    return applyUploadValidation(u, () => tRef.current);
   }, []);
 
   // Update endpoint when project changes
@@ -128,6 +131,7 @@ export function UploadDocumentsDialog({ open, onClose, onUpload, project }) {
       <DialogBody divider className="p-0">
         <Dashboard
           uppy={uppy}
+          note={uploadHelpText(t)}
           width="100%"
           height={350}
           showProgressDetails={true}

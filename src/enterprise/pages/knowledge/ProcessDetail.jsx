@@ -22,6 +22,7 @@ import { ExamSimulatorDialog } from "@/widgets/dialogs/index";
 import { FlashcardViewDialog } from "@/widgets/dialogs/flashcard-view-dialog";
 import { FlashcardLearnDialog } from "@/widgets/dialogs/flashcard-learn-dialog";
 import projectService from "@/services/projectService";
+import { UPLOAD_ACCEPT, uploadErrorMessage, uploadHelpText, validateUploadFile } from "@/utils/fileValidation";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -313,16 +314,33 @@ function AutoGenBanner({ runState, collapsed, onToggle, onDismiss, onStop }) {
 
 // ─── Add Document Modal ───────────────────────────────────────────────────────
 
-function AddDocModal({ ksId, companyId, onClose, onAdded }) {
+export function AddDocModal({ ksId, companyId, onClose, onAdded, initialFiles = [] }) {
   const { t } = useLanguage();
-  const [files, setFiles] = useState([]);
+  // Every picked/dropped file is listed; rejected ones carry their reason and block "Upload".
+  const [entries, setEntries] = useState([]);
+  const files = entries.filter((e) => !e.error).map((e) => e.file);
+  const hasRejected = entries.some((e) => e.error);
   const [uploading, setUploading] = useState(false);
   const [results, setResults] = useState([]);
   const [error, setError] = useState("");
   const inputRef = useRef(null);
 
+  const selectFiles = (list) => {
+    setError("");
+    setEntries(Array.from(list || []).map((file) => {
+      const code = validateUploadFile(file);
+      return { file, error: code ? uploadErrorMessage(code, t) : null };
+    }));
+  };
+
+  useEffect(() => {
+    if (initialFiles.length) selectFiles(initialFiles);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleUpload = async () => {
-    if (!files.length) return;
+    // Never send anything while a selected file fails the client-side policy.
+    if (!files.length || hasRejected) return;
     setUploading(true); setError("");
     const done = [];
     for (const file of files) {
@@ -334,7 +352,11 @@ function AddDocModal({ ksId, companyId, onClose, onAdded }) {
           `${API_BASE}/enterprise/knowledge-sources/${ksId}/add-document/?company_id=${companyId}`,
           { method: "POST", headers: { Authorization: `Token ${token}` }, body: form }
         );
-        if (!res.ok) throw new Error(await res.text());
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({}));
+          done.push({ name: file.name, ok: false, reason: typeof body?.detail === "string" ? body.detail : "" });
+          continue;
+        }
         const data = await res.json();
         done.push({ name: file.name, ok: true, ks: data });
       } catch {
@@ -363,24 +385,31 @@ function AddDocModal({ ksId, companyId, onClose, onAdded }) {
           <div className="space-y-4">
             <div
               onClick={() => inputRef.current?.click()}
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={(e) => { e.preventDefault(); selectFiles(e.dataTransfer.files); }}
               style={{ border: "2px dashed var(--border)", borderRadius: 8, padding: "28px 20px", textAlign: "center", cursor: "pointer", transition: "border-color 150ms" }}
               onMouseEnter={(e) => (e.currentTarget.style.borderColor = "var(--accent)")}
               onMouseLeave={(e) => (e.currentTarget.style.borderColor = "var(--border)")}>
               <DocumentArrowUpIcon style={{ width: 28, height: 28, color: "var(--text-tertiary)", margin: "0 auto 8px" }} />
               <p style={{ color: "var(--text-primary)", fontWeight: 600, fontSize: 13 }}>
-                {files.length > 0 ? t("enterprise.knowledge.processDetail.addDocModal.filesSelected", { count: files.length, plural: files.length !== 1 ? "s" : "" }) : t("enterprise.knowledge.processDetail.addDocModal.clickOrDrag")}
+                {entries.length > 0 ? t("enterprise.knowledge.processDetail.addDocModal.filesSelected", { count: entries.length, plural: entries.length !== 1 ? "s" : "" }) : t("enterprise.knowledge.processDetail.addDocModal.clickOrDrag")}
               </p>
-              <p style={{ color: "var(--text-tertiary)", fontSize: 11, marginTop: 3 }}>{t("enterprise.knowledge.processDetail.addDocModal.fileTypes")}</p>
+              <p style={{ color: "var(--text-tertiary)", fontSize: 11, marginTop: 3 }}>{uploadHelpText(t)}</p>
             </div>
-            <input ref={inputRef} type="file" multiple accept=".pdf,.doc,.docx,.txt,.md,.pptx,.xlsx" style={{ display: "none" }}
-              onChange={(e) => setFiles(Array.from(e.target.files || []))} />
+            <input ref={inputRef} type="file" multiple accept={UPLOAD_ACCEPT} style={{ display: "none" }}
+              onChange={(e) => { selectFiles(e.target.files); e.target.value = ""; }} />
 
-            {files.length > 0 && (
+            {entries.length > 0 && (
               <div className="space-y-1">
-                {Array.from(files).map((f, i) => (
-                  <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 0" }}>
-                    <DocumentArrowUpIcon style={{ width: 12, height: 12, color: "var(--text-tertiary)", flexShrink: 0 }} />
-                    <span style={{ fontSize: 12, color: "var(--text-secondary)" }} className="truncate">{f.name}</span>
+                {entries.map(({ file: f, error: reason }, i) => (
+                  <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8, padding: "5px 0" }}>
+                    {reason
+                      ? <ExclamationTriangleIcon style={{ width: 12, height: 12, color: "#f87171", flexShrink: 0, marginTop: 2 }} />
+                      : <DocumentArrowUpIcon style={{ width: 12, height: 12, color: "var(--text-tertiary)", flexShrink: 0, marginTop: 2 }} />}
+                    <div style={{ minWidth: 0 }}>
+                      <span style={{ fontSize: 12, color: reason ? "#f87171" : "var(--text-secondary)", display: "block" }} className="truncate">{f.name}</span>
+                      {reason && <span style={{ fontSize: 11, color: "#f87171" }}>{reason}</span>}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -390,8 +419,8 @@ function AddDocModal({ ksId, companyId, onClose, onAdded }) {
 
             <div className="flex justify-end gap-2 pt-1">
               <button onClick={onClose} className="ank-btn-ghost text-xs">{t("enterprise.compliance.programs.cancel")}</button>
-              <button onClick={handleUpload} disabled={!files.length || uploading} className="ank-btn-accent text-xs"
-                style={{ opacity: !files.length || uploading ? 0.6 : 1 }}>
+              <button onClick={handleUpload} disabled={!files.length || hasRejected || uploading} className="ank-btn-accent text-xs"
+                style={{ opacity: !files.length || hasRejected || uploading ? 0.6 : 1 }}>
                 {uploading ? <><ArrowPathIcon className="h-3.5 w-3.5 animate-spin" /> {t("enterprise.knowledge.processDetail.addDocModal.uploading")}</> : <><DocumentArrowUpIcon className="h-3.5 w-3.5" /> {t("enterprise.knowledge.processDetail.addDocModal.upload")}</>}
               </button>
             </div>
@@ -403,7 +432,7 @@ function AddDocModal({ ksId, companyId, onClose, onAdded }) {
                 {r.ok
                   ? <CheckCircleSolid style={{ width: 14, height: 14, color: "#4ade80", flexShrink: 0 }} />
                   : <ExclamationTriangleIcon style={{ width: 14, height: 14, color: "#f87171", flexShrink: 0 }} />}
-                <span style={{ fontSize: 12, color: r.ok ? "#4ade80" : "#f87171", fontWeight: 600 }} className="truncate">{r.name}</span>
+                <span style={{ fontSize: 12, color: r.ok ? "#4ade80" : "#f87171", fontWeight: 600 }} className="truncate">{r.name}{r.reason ? ` — ${r.reason}` : ""}</span>
               </div>
             ))}
             <div className="flex justify-end pt-3">
@@ -1090,13 +1119,13 @@ function DocumentsPanel({ docs, onAdd }) {
 
       {/* Drag-drop zone */}
       <div
-        onClick={onAdd}
+        onClick={() => onAdd()}
         style={{ margin: "8px 12px 12px", border: "1.5px dashed rgba(255,255,255,0.1)", borderRadius: 8, padding: "20px 16px", textAlign: "center", cursor: "pointer", transition: "border-color 150ms" }}
         onMouseEnter={(e) => (e.currentTarget.style.borderColor = "rgba(99,102,241,0.4)")}
         onMouseLeave={(e) => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)")}
         onDragOver={(e) => { e.preventDefault(); e.currentTarget.style.borderColor = "rgba(99,102,241,0.5)"; }}
         onDragLeave={(e) => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)")}
-        onDrop={(e) => { e.preventDefault(); onAdd(); }}
+        onDrop={(e) => { e.preventDefault(); onAdd(Array.from(e.dataTransfer.files || [])); }}
       >
         <div style={{ width: 32, height: 32, borderRadius: "50%", background: "rgba(255,255,255,0.05)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 8px" }}>
           <ArrowUpTrayIcon style={{ width: 16, height: 16, color: "#64748B" }} />
@@ -2283,6 +2312,7 @@ export function ProcessDetail() {
   const [resultsLoading, setResultsLoading] = useState(true);
   const [results, setResults] = useState(INIT_RESULTS);
   const [showAddDoc, setShowAddDoc] = useState(false);
+  const [droppedFiles, setDroppedFiles] = useState([]);
   const [showAddDeck, setShowAddDeck] = useState(false);
   const [showAddBattery, setShowAddBattery] = useState(false);
   const [activeTagGroupId, setActiveTagGroupId] = useState(null);
@@ -2907,7 +2937,7 @@ export function ProcessDetail() {
 
       {/* Two-column layout: Documentos | Estructura de conocimiento */}
       <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 340px) 1fr", gap: 16, marginTop: 16, alignItems: "start" }}>
-        <DocumentsPanel docs={docs} onAdd={() => setShowAddDoc(true)} />
+        <DocumentsPanel docs={docs} onAdd={(dropped) => { setDroppedFiles(dropped || []); setShowAddDoc(true); }} />
         <KnowledgeStructurePanel
           topics={results.topics}
           decks={results.decks}
@@ -2940,8 +2970,9 @@ export function ProcessDetail() {
         <AddDocModal
           ksId={id}
           companyId={activeCompanyId}
-          onClose={() => setShowAddDoc(false)}
+          onClose={() => { setShowAddDoc(false); setDroppedFiles([]); }}
           onAdded={handleDocAdded}
+          initialFiles={droppedFiles}
         />
       )}
 

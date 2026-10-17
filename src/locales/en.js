@@ -2129,7 +2129,7 @@ export const en = {
                     title: "Add documents",
                     clickOrDrag: "Click or drag files here",
                     filesSelected: "{count} file{plural} selected",
-                    fileTypes: "PDF, DOCX, PPTX, TXT, MD — max. 400 MB",
+                    fileTypes: "PDF, DOCX, XLSX, PPTX, TXT, MD — max. 400 MB",
                     uploading: "Uploading…",
                     upload: "Upload",
                     done: "Done"
@@ -2340,7 +2340,7 @@ export const en = {
                 },
                 step3: {
                     intro: "The process was created. Now upload the documents that make it up — PDFs, manuals, presentations or any reference material. You can upload more documents at any time from the process page.",
-                    uploadNote: "PDF, DOCX, PPTX, TXT, MD — max. 400 MB per file",
+                    uploadNote: "PDF, DOCX, XLSX, PPTX, TXT, MD — max. 400 MB per file",
                     skip: "Skip — go to process",
                     finish: "Finish",
                     finishWithCount: "Finish ({count} doc{plural})"
@@ -3102,5 +3102,10 @@ export const en = {
                 },
             },
         },
+    },
+    upload_validation: {
+        unsupported: "File type not supported. Allowed formats: {formats}.",
+        too_large: "File exceeds the maximum allowed size of {mb} MB.",
+        note: "{formats} — max. {mb} MB per file",
     },
 };

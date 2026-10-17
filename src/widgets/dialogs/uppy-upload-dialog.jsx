@@ -17,6 +17,7 @@ import "@uppy/dashboard/dist/style.min.css";
 import projectService from "@/services/projectService";
 import { useJobs } from "@/context/job-context";
 import { useLanguage } from "@/context/language-context";
+import { applyUploadValidation, uploadHelpText } from "@/utils/fileValidation";
 
 // -------------------- helpers --------------------
 async function calculateSHA256(file) {
@@ -37,13 +38,14 @@ function sanitizeFilename(filename) {
 export function UppyUploadDialog({ open, onClose, project, onUploadSuccess, onUploadError }) {
     const { t } = useLanguage();
     const { addJob } = useJobs();
+    const tRef = React.useRef(t);
+    tRef.current = t;
 
     const [uppy] = useState(() => {
         const u = new Uppy({
             id: "uppy-uploader",
             autoProceed: false,
             restrictions: {
-                maxFileSize: 500 * 1024 * 1024,
                 maxNumberOfFiles: 20,
             },
         });
@@ -52,9 +54,11 @@ export function UppyUploadDialog({ open, onClose, project, onUploadSuccess, onUp
             endpoint: "/companion",
             limit: 5,
             shouldUseMultipart: () => true,
+            // Companion only signs uploads for authenticated users.
+            headers: { Authorization: `Token ${localStorage.getItem("token") || ""}` },
         });
 
-        return u;
+        return applyUploadValidation(u, () => tRef.current);
     });
 
     // ---------- meta ----------
@@ -199,7 +203,7 @@ export function UppyUploadDialog({ open, onClose, project, onUploadSuccess, onUp
                         inline
                         proudlyDisplayPoweredByUppy={false}
                         showProgressDetails
-                        note="Files up to 500MB supported."
+                        note={uploadHelpText(t)}
                         theme="light"
                     />
                 </div>

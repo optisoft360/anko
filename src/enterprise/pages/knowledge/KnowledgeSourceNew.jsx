@@ -11,6 +11,7 @@ import { CheckCircleIcon } from "@heroicons/react/24/solid";
 import { knowledgeApi } from "../../api/enterpriseApi";
 import { useEnterprise } from "../../context/enterprise-context";
 import { useLanguage } from "../../../context/language-context";
+import { applyUploadValidation, UPLOAD_ALLOWED_FILE_TYPES, MAX_UPLOAD_BYTES, uploadHelpText } from "@/utils/fileValidation";
 import { API_BASE } from "@/services/api";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -341,14 +342,16 @@ function Step3({ ksId, companyId, onFinish }) {
   const [uploadedDocs, setUploadedDocs] = useState([]);
   const uppyRef = useRef(null);
 
+  const tRef = useRef(t);
+  tRef.current = t;
   if (!uppyRef.current) {
     uppyRef.current = new Uppy({
       id: `ks-docs-${ksId}`,
       autoProceed: false,
       restrictions: {
-        maxFileSize: 400 * 1024 * 1024,
+        maxFileSize: MAX_UPLOAD_BYTES,
         maxNumberOfFiles: 30,
-        allowedFileTypes: [".pdf", ".doc", ".docx", ".txt", ".md", ".pptx", ".xlsx"],
+        allowedFileTypes: UPLOAD_ALLOWED_FILE_TYPES,
       },
     }).use(XHRUpload, {
       endpoint: `${API_BASE}/enterprise/knowledge-sources/${ksId}/add-document/`,
@@ -358,6 +361,7 @@ function Step3({ ksId, companyId, onFinish }) {
       bundle: false,
       headers: {},
     });
+    applyUploadValidation(uppyRef.current, () => tRef.current);
   }
 
   const uppy = uppyRef.current;
@@ -398,7 +402,7 @@ function Step3({ ksId, companyId, onFinish }) {
           inline
           proudlyDisplayPoweredByUppy={false}
           showProgressDetails
-          note={t("enterprise.knowledge.sourceNew.step3.uploadNote")}
+          note={uploadHelpText(t)}
           theme="dark"
         />
       </div>

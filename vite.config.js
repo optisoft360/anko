@@ -9,6 +9,10 @@ export default defineConfig({
   esbuild: {
     target: "esnext",
   },
+  test: {
+    environment: "jsdom",
+    include: ["src/**/*.test.{js,jsx}"],
+  },
   optimizeDeps: {
     include: ["@uppy/core", "@uppy/dashboard", "@uppy/aws-s3", "@uppy/react"],
     esbuildOptions: {
