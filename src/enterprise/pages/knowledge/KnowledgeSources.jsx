@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { enumLabel, useKnowledgeEnumLabels } from "@/utils/enumLabel";
 import { useNavigate } from "react-router-dom";
 import {
@@ -16,6 +16,15 @@ const DIFFICULTY_COLORS = {
   medium: { bg: "rgba(245,158,11,0.1)", text: "#f59e0b" },
   hard:   { bg: "rgba(239,68,68,0.1)",  text: "#f87171" },
 };
+
+
+/** Server-side filter params for the processes list; empty filters are omitted. */
+export function buildProcessFilterParams(typeFilter, diffFilter) {
+  const params = {};
+  if (typeFilter) params.process_type = typeFilter;
+  if (diffFilter) params.difficulty = diffFilter;
+  return params;
+}
 
 function usePillLabels() {
   const { t } = useLanguage();
@@ -246,15 +255,15 @@ export function KnowledgeSources() {
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleting, setDeleting] = useState(false);
 
+  // Only the latest request may update the list (fast filter changes can resolve out of order).
+  const requestSeq = useRef(0);
   const load = useCallback(() => {
+    const seq = ++requestSeq.current;
     setLoading(true);
-    const params = {};
-    if (typeFilter) params.process_type = typeFilter;
-    if (diffFilter) params.difficulty = diffFilter;
-    knowledgeApi.list(params)
-      .then((d) => setItems(d.results || d || []))
-      .catch(() => setItems([]))
-      .finally(() => setLoading(false));
+    knowledgeApi.list(buildProcessFilterParams(typeFilter, diffFilter))
+      .then((d) => { if (seq === requestSeq.current) setItems(d.results || d || []); })
+      .catch(() => { if (seq === requestSeq.current) setItems([]); })
+      .finally(() => { if (seq === requestSeq.current) setLoading(false); });
   }, [activeCompanyId, typeFilter, diffFilter]);
 
   useEffect(() => { load(); }, [load]);
