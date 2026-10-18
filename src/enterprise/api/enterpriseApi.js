@@ -192,6 +192,9 @@ export const knowledgeApi = {
   update: (id, data) => enterpriseApi.patch(`/enterprise/knowledge-sources/${id}/`, data, { params: cp() }).then((r) => r.data),
   remove: (id) => enterpriseApi.delete(`/enterprise/knowledge-sources/${id}/`, { params: cp() }).then((r) => r.data),
   process: (id) => enterpriseApi.post(`/enterprise/knowledge-sources/${id}/process/`, {}, { params: cp() }).then((r) => r.data),
+  // F-08: manual deck inside a topic of the process.
+  createTopicDeck: (id, topicId, data) =>
+    enterpriseApi.post(`/enterprise/knowledge-sources/${id}/topics/${topicId}/decks/`, data, { params: cp() }).then((r) => r.data),
   status: (id) => enterpriseApi.get(`/enterprise/knowledge-sources/${id}/status/`, { params: cp() }).then((r) => r.data),
   generateTraining: (id) => enterpriseApi.post(`/enterprise/knowledge-sources/${id}/generate-training/`, {}, { params: cp() }).then((r) => r.data),
   detectChanges: (id) => enterpriseApi.post(`/enterprise/knowledge-sources/${id}/detect-changes/`, {}, { params: cp() }).then((r) => r.data),

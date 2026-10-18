@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback, useRef, useMemo } from "react";
+import { apiErrorMessage } from "@/utils/apiError";
 import { enumLabel, useKnowledgeEnumLabels } from "@/utils/enumLabel";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import {
@@ -1809,7 +1810,7 @@ function SectionTree({ scannedDocuments, selectedIds, onToggleDoc, onToggleSecti
   );
 }
 
-function EnterpriseDeckDialog({ open, onClose, onCreate, projectId }) {
+export function EnterpriseDeckDialog({ open, onClose, onCreate, projectId }) {
   const { t } = useLanguage();
   const [activeTab, setActiveTab] = React.useState("ai");
   const [formData, setFormData] = React.useState({ title: "", description: "", visibility: "private", section_ids: [], document_ids: [], cards_count: 5, cards: [] });
@@ -1874,17 +1875,32 @@ function EnterpriseDeckDialog({ open, onClose, onCreate, projectId }) {
       if (scannedDocuments.length === 0) errs.general = t("enterprise.knowledge.processDetail.noSectionsAvailable");
       else if (formData.section_ids.length === 0) errs.general = t("enterprise.knowledge.processDetail.selectSection");
     } else {
-      if (formData.cards.length === 0) errs.general = t("enterprise.knowledge.processDetail.deckDialog.addAtLeastOneCard");
+      const pendingFront = currentCard.front.trim();
+      const pendingBack = currentCard.back.trim();
+      if ((pendingFront || pendingBack) && !(pendingFront && pendingBack)) {
+        errs.general = t("enterprise.knowledge.processDetail.deckDialog.unsavedCard");
+      } else if (formData.cards.length === 0 && !(pendingFront && pendingBack)) {
+        errs.general = t("enterprise.knowledge.processDetail.deckDialog.addAtLeastOneCard");
+      }
     }
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!validate()) return;
+    if (submitting || !validate()) return;
+    // A complete card typed but not yet "Added to list" is included instead of being lost.
+    const pending = currentCard.front.trim() && currentCard.back.trim() ? [{ ...currentCard }] : [];
+    const cards = activeTab === "manual" ? [...formData.cards, ...pending] : formData.cards;
     setSubmitting(true);
-    onCreate({ ...formData, mode: activeTab });
+    try {
+      await onCreate({ ...formData, cards, mode: activeTab });
+    } catch (err) {
+      // Keep the modal open with everything the user typed.
+      setErrors({ general: apiErrorMessage(err, t("enterprise.knowledge.processDetail.deckDialog.createError")) });
+      setSubmitting(false);
+    }
   };
 
   const btnBase = { padding: "0 16px", height: 40, borderRadius: 9, fontSize: 13, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 7, transition: "all 150ms", border: "none" };
@@ -1914,7 +1930,7 @@ function EnterpriseDeckDialog({ open, onClose, onCreate, projectId }) {
           {/* Tabs */}
           <div style={{ display: "flex", gap: 4, background: "rgba(255,255,255,0.04)", border: `1px solid ${D.border}`, borderRadius: "11px 11px 0 0", padding: "5px 5px 0" }}>
             {[{ key: "ai", label: t("enterprise.knowledge.processDetail.deckDialog.tabAi"), icon: <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/> }, { key: "manual", label: t("enterprise.knowledge.processDetail.deckDialog.tabManual"), icon: <><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></> }].map(({ key, label, icon }) => (
-              <button key={key} onClick={() => setActiveTab(key)} style={{ flex: 1, padding: "9px 0", fontSize: 12, fontWeight: 600, cursor: "pointer", borderRadius: "8px 8px 0 0", background: activeTab === key ? D.bg : "transparent", color: activeTab === key ? D.accent : D.dim, border: "none", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, transition: "all 150ms" }}>
+              <button key={key} onClick={() => { setActiveTab(key); setErrors({}); }} style={{ flex: 1, padding: "9px 0", fontSize: 12, fontWeight: 600, cursor: "pointer", borderRadius: "8px 8px 0 0", background: activeTab === key ? D.bg : "transparent", color: activeTab === key ? D.accent : D.dim, border: "none", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, transition: "all 150ms" }}>
                 <svg viewBox="0 0 24 24" style={{ width: 12, height: 12, stroke: "currentColor", strokeWidth: 2, fill: "none" }}>{icon}</svg>
                 {label}
               </button>
@@ -2538,19 +2554,25 @@ export function ProcessDetail() {
   }, []);
 
   const handleCreateDeck = async (deckData) => {
+    if (deckData.mode === "manual") {
+      // F-08: KS-scoped endpoint (the legacy /decks/create-with-flashcards/ needs a Project,
+      // which a process doesn't have). Errors propagate so the dialog stays open.
+      const tagGroupId = activeTagGroupId;
+      if (!tagGroupId) throw { detail: t("enterprise.knowledge.processDetail.deckDialog.topicRequired") };
+      await knowledgeApi.createTopicDeck(id, tagGroupId, {
+        title: deckData.title.trim(),
+        description: deckData.description || "",
+        is_public: deckData.visibility === "public",
+        flashcards: deckData.cards.map(({ front, back, notes }) => ({ front, back, notes: notes || "" })),
+      });
+      setShowAddDeck(false);
+      setActiveTagGroupId(null);
+      loadResults();
+      loadTagGroups();
+      return;
+    }
     try {
-      if (deckData.mode === "manual") {
-        // NOTE: this legacy endpoint still hard-requires a real Project id, which a
-        // KnowledgeSource process doesn't have — manual mode remains broken for
-        // Enterprise Knowledge Source decks until it's ported to start-generate too.
-        await projectService.createDeckManual({
-          project_id: Number(id),
-          title: deckData.title,
-          description: deckData.description,
-          visibility: deckData.visibility,
-          cards: deckData.cards,
-        });
-      } else {
+      {
         // Uses /decks/start-generate/ (not the legacy /decks/create-with-cards/, which
         // hard-requires a Project). `id` here is a KnowledgeSource id, not a Project id,
         // so no project_id is sent — the topic association goes through tag_group_ids.
