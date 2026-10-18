@@ -1772,6 +1772,10 @@ export const en = {
                 }
             },
             teamCompliance: {
+                team: "Team",
+                noTeams: "There are no teams in this company yet. Create one in Settings → Teams.",
+                noMembers: "This team has no members yet.",
+                loadError: "Could not load the team report.",
                 title: "Team Compliance",
                 empty: "No team compliance data",
                 summary: {
@@ -1807,6 +1811,10 @@ export const en = {
                 }
             },
             teamRetention: {
+                team: "Team",
+                noTeams: "There are no teams in this company yet. Create one in Settings → Teams.",
+                noMembers: "This team has no members yet.",
+                loadError: "Could not load the team report.",
                 title: "Team Retention",
                 empty: "No team data",
                 atRisk: "At Risk",

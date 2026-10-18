@@ -1773,6 +1773,10 @@ export const es = {
                 }
             },
             teamCompliance: {
+                team: "Equipo",
+                noTeams: "Esta empresa aún no tiene equipos. Crea uno en Configuración → Equipos.",
+                noMembers: "Este equipo aún no tiene miembros.",
+                loadError: "No se pudo cargar el reporte del equipo.",
                 title: "Cumplimiento del Equipo",
                 empty: "No hay datos de cumplimiento del equipo",
                 summary: {
@@ -1808,6 +1812,10 @@ export const es = {
                 }
             },
             teamRetention: {
+                team: "Equipo",
+                noTeams: "Esta empresa aún no tiene equipos. Crea uno en Configuración → Equipos.",
+                noMembers: "Este equipo aún no tiene miembros.",
+                loadError: "No se pudo cargar el reporte del equipo.",
                 title: "Retención del Equipo",
                 empty: "No hay datos del equipo",
                 atRisk: "En Riesgo",

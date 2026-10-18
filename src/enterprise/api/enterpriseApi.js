@@ -176,7 +176,6 @@ export const complianceApi = {
   myCompliance: (p) => enterpriseApi.get("/enterprise/compliance-assignments/my-compliance/", { params: cp(p) }).then((r) => r.data),
   companyCompliance: (p) => enterpriseApi.get("/enterprise/compliance-assignments/company-compliance/", { params: cp(p) }).then((r) => r.data),
   teamCompliance: (p) => enterpriseApi.get("/enterprise/compliance-assignments/team-compliance/", { params: cp(p) }).then((r) => r.data),
-  teamComplianceSummary: (p) => enterpriseApi.get("/enterprise/compliance-assignments/team-compliance-summary/", { params: cp(p) }).then((r) => r.data),
   expiringAssignments: (p) => enterpriseApi.get("/enterprise/compliance-assignments/expiring/", { params: cp(p) }).then((r) => r.data),
   completeAssignment: (id, data = {}) => enterpriseApi.post(`/enterprise/compliance-assignments/${id}/complete/`, data, { params: cp() }).then((r) => r.data),
   renewAssignment: (id) => enterpriseApi.post(`/enterprise/compliance-assignments/${id}/renew/`, cp()).then((r) => r.data),
