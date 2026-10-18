@@ -6,6 +6,18 @@ export { API_BASE };
 const BASE = "/projects/";
 const BASE_FLASHCARDS = "/flashcards";
 
+async function learnRequest(endpoint, body, signal) {
+  const token = localStorage.getItem("token");
+  const { ok, status, data } = await apiFetch(`${API_BASE}${BASE_FLASHCARDS}/${endpoint}/`, {
+    method: "POST",
+    token,
+    body: JSON.stringify(body),
+    signal,
+  });
+  if (!ok) throw { status, data };
+  return data;
+}
+
 const projectService = {
   async createProject(projectData, logoFile = null, documentFiles = []) {
     try {
@@ -1069,45 +1081,27 @@ const projectService = {
     }
   },
 
-  async wsPullCard({ deckId, jobId, lastSeq = 0 }) {
-    try {
-      const token = localStorage.getItem("token");
-      const url = `${API_BASE}${BASE_FLASHCARDS}/ws-pull-card/`;
-
-      const { ok, data } = await apiFetch(url, {
-        method: "POST",
-        token,
-        body: JSON.stringify({
-          deck_id: deckId,
-          job_id: jobId,
-          last_seq: lastSeq,
-        }),
-      });
-
-      if (!ok) {
-        throw data || { error: "Failed to pull card" };
-      }
-
-      return data;
-    } catch (err) {
-      throw err?.response?.data || err || { error: "Failed to pull card" };
-    }
+  /**
+   * Learn mode (F-05): start or resume a session. Returns
+   * { job_id, ack_seq, next_card | null, session }. Throws { status, data } on HTTP errors.
+   */
+  async learnStart({ deckId, jobId, signal }) {
+    return learnRequest("ws-pull-card", { deck_id: deckId, job_id: jobId }, signal);
   },
 
-  async wsPushFeedback({ deckId, jobId, seq, cardId, rating, timeToAnswerMs = 500 }) {
-    try {
-      const res = await api.post(`${BASE_FLASHCARDS}/ws-push-feedback/`, {
-        deck_id: deckId,
-        job_id: jobId,
-        seq,
-        card_id: cardId,
-        rating,
-        time_to_answer_ms: timeToAnswerMs,
-      });
-      return res.data;
-    } catch (err) {
-      throw err?.response?.data || { error: "Failed to push feedback" };
-    }
+  /**
+   * Learn mode (F-05): answer the current card and receive the next one in the same call.
+   * Send either `rating` (Rating: 1 Again, 2 Hard, 3 Good, 4 Easy) or `action: "skip"`.
+   */
+  async learnAnswer({ deckId, jobId, seq, cardId, rating, action, timeToAnswerMs, signal }) {
+    return learnRequest("ws-push-feedback", {
+      deck_id: deckId,
+      job_id: jobId,
+      seq,
+      card_id: cardId,
+      ...(action ? { action } : { rating }),
+      time_to_answer_ms: timeToAnswerMs,
+    }, signal);
   },
 
   async shuffleDeckCards(deckId) {

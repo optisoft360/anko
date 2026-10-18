@@ -20,115 +20,121 @@ const resolveImageUrl = (path) => {
     return `${MEDIA_BASE}/media/${path}`;
 };
 
-// Rating scale of the scheduler in anko_services (see api/services/flashcards_ws.py):
-// 0 = Hard (shown again soon), 1 = Good (next learning step), 2 = Easy (graduates).
-export const LEARN_RATINGS = { HARD: 0, GOOD: 1, EASY: 2 };
-// "Next" without flipping counts as Good (product decision, F-05).
-export const NEXT_RATING = LEARN_RATINGS.GOOD;
+// Single rating scale (FSRS convention), shared with the API (LearnRating in api/models.py).
+export const Rating = Object.freeze({ Again: 1, Hard: 2, Good: 3, Easy: 4 });
 
-export function FlashcardLearnDialog({ open, onClose, deckId, deckTitle, jobId: initialJobId }) {
+const MAX_NETWORK_RETRIES = 2;
+
+const RATING_BUTTONS = [
+    { rating: Rating.Again, es: "Otra vez", en: "Again", color: "#f87171" },
+    { rating: Rating.Hard, es: "Difícil", en: "Hard", color: "#f59e0b" },
+    { rating: Rating.Good, es: "Bien", en: "Good", color: "#4ade80" },
+    { rating: Rating.Easy, es: "Fácil", en: "Easy", color: "#38bdf8" },
+];
+
+function newJobId() {
+    if (typeof crypto !== "undefined" && crypto.randomUUID) return crypto.randomUUID();
+    return `learn-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
+const isAbort = (err) => err?.name === "AbortError";
+
+export function FlashcardLearnDialog({ open, onClose, deckId, deckTitle }) {
     const { t, language } = useLanguage();
     const [card, setCard] = useState(null);
     const [isFlipped, setIsFlipped] = useState(false);
-    const [loading, setLoading] = useState(false);
+    const [busy, setBusy] = useState(false);
     const [finished, setFinished] = useState(false);
     const [errorMsg, setErrorMsg] = useState(null);
-    const [seq, setSeq] = useState(0);
-    const [jobId, setJobId] = useState(null);
-    const [startTime, setStartTime] = useState(Date.now());
-    const [isReview, setIsReview] = useState(false);
-    // seq only moves forward within a session; seen ids mark repeated cards as "Review".
-    const lastSeqRef = useRef(0);
-    const seenIdsRef = useRef(new Set());
+    const [session, setSession] = useState(null);
 
-    useEffect(() => {
-        if (open && deckId) {
+    // Per-session values live in refs so re-renders never reset them.
+    const jobIdRef = useRef(null);
+    const seqRef = useRef(1);          // next seq to send; only advances on ack_seq
+    const busyRef = useRef(false);     // one request in flight, ever
+    const abortRef = useRef(null);
+    const startTimeRef = useRef(Date.now());
+
+    const applyPayload = (data) => {
+        setSession(data?.session || null);
+        if (!data?.next_card) {
             setCard(null);
-            setFinished(false);
-            setErrorMsg(null);
-            setSeq(0);
-            setJobId(null);
-            lastSeqRef.current = 0;
-            seenIdsRef.current = new Set();
-            loadNextCard(0);
+            setFinished(true);
+            return;
         }
-    }, [open, deckId, language]);
+        setCard(data.next_card);
+        setIsFlipped(false);
+        startTimeRef.current = Date.now();
+    };
 
-    const loadNextCard = async (lastSeq) => {
+    const fail = (err) => {
+        const detail = err?.data?.detail || err?.detail || err?.message;
+        setErrorMsg(typeof detail === "string" && detail ? detail : (language === "es" ? "Error al conectar con el servidor." : "Could not reach the server."));
+    };
+
+    const startSession = async () => {
+        abortRef.current?.abort();
+        const controller = new AbortController();
+        abortRef.current = controller;
+        jobIdRef.current = newJobId();
+        seqRef.current = 1;
+        busyRef.current = true;
+        setBusy(true); setCard(null); setFinished(false); setErrorMsg(null); setSession(null);
         try {
-            setLoading(true);
-            const resolvedJobId = jobId || initialJobId || null;
-            const data = await projectService.wsPullCard({ deckId, jobId: resolvedJobId, lastSeq: Math.max(lastSeq, lastSeqRef.current) });
-            if (!data || !data.card) {
-                if (data?.message_type === "done") {
-                    setFinished(true);
-                } else {
-                    const detail = data?.detail?.detail || data?.detail || data?.message_type || "No hay tarjetas disponibles.";
-                    setErrorMsg(typeof detail === "string" ? detail : JSON.stringify(detail));
-                }
-                setCard(null);
-            } else {
-                const cardData = { ...data.card, seq: data.seq };
-                setIsReview(data.kind === "review" || seenIdsRef.current.has(cardData.id));
-                seenIdsRef.current.add(cardData.id);
-                setCard(cardData);
-                setIsFlipped(false);
-                setStartTime(Date.now());
-                if (data.seq) setSeq(data.seq);
-                if (data.seq > lastSeqRef.current) lastSeqRef.current = data.seq;
-                if (data.job_id) setJobId(data.job_id);
-            }
+            const data = await projectService.learnStart({ deckId, jobId: jobIdRef.current, signal: controller.signal });
+            if (!controller.signal.aborted) applyPayload(data);
         } catch (err) {
-            console.error("Error pulling flashcard:", err);
-            const msg = err?.detail || err?.message || err?.error || "Error al conectar con el servidor.";
-            setErrorMsg(typeof msg === "string" ? msg : JSON.stringify(msg));
+            if (!isAbort(err)) fail(err);
         } finally {
-            setLoading(false);
+            if (abortRef.current === controller) { busyRef.current = false; setBusy(false); }
         }
     };
 
-    const handleRate = async (rating) => {
-        if (!card) return;
-        const timeToAnswer = Date.now() - startTime;
+    // A new session (new job_id) every time the modal opens; pending requests are cancelled on close.
+    useEffect(() => {
+        if (open && deckId) startSession();
+        return () => { abortRef.current?.abort(); busyRef.current = false; };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [open, deckId]);
+
+    const sendAnswer = async (answer) => {
+        if (!card || busyRef.current) return; // ignore double clicks / re-entrant calls
+        busyRef.current = true;
+        setBusy(true);
+        const controller = abortRef.current;
+        const timeToAnswerMs = Date.now() - startTimeRef.current;
+        let seq = seqRef.current;
         try {
-            setLoading(true);
-            await projectService.wsPushFeedback({
-                deckId, jobId,
-                seq: card.seq || seq,
-                cardId: card.id,
-                rating,
-                timeToAnswerMs: timeToAnswer,
-            });
-            await loadNextCard(card.seq || seq);
-        } catch (err) {
-            if (err?.message_type === "stale") {
-                // Already rated (double click / retry): just move on.
-                await loadNextCard(card.seq || seq);
-                return;
+            for (let attempt = 0; ; attempt += 1) {
+                try {
+                    const data = await projectService.learnAnswer({
+                        deckId, jobId: jobIdRef.current, seq, cardId: card.card_id ?? card.id,
+                        ...answer, timeToAnswerMs, signal: controller?.signal,
+                    });
+                    seqRef.current = data.ack_seq + 1;
+                    applyPayload(data);
+                    return;
+                } catch (err) {
+                    if (isAbort(err)) return;
+                    if (err?.status === 409 && err?.data?.expected_seq && attempt < MAX_NETWORK_RETRIES) {
+                        seq = err.data.expected_seq; // resync with the server
+                        seqRef.current = seq;
+                        continue;
+                    }
+                    if (err?.status === undefined && attempt < MAX_NETWORK_RETRIES) continue; // network: same seq
+                    fail(err);
+                    return;
+                }
             }
-            console.error("Error pushing feedback:", err);
-            setLoading(false);
+        } finally {
+            busyRef.current = false;
+            setBusy(false);
         }
     };
 
-    const handleFlip = () => setIsFlipped(f => !f);
-
-    const handleShuffle = async () => {
-        try {
-            setLoading(true);
-            await projectService.shuffleDeckCards(deckId);
-            setFinished(false);
-            setErrorMsg(null);
-            setSeq(0);
-            setJobId(null);
-            lastSeqRef.current = 0;
-            seenIdsRef.current = new Set();
-            await loadNextCard(0);
-        } catch (err) {
-            console.error("Shuffle failed:", err);
-            setLoading(false);
-        }
-    };
+    const handleRate = (rating) => sendAnswer({ rating });
+    const handleSkip = () => sendAnswer({ action: "skip" });
+    const handleFlip = () => { if (!busyRef.current) setIsFlipped(f => !f); };
 
     return (
         <Dialog
@@ -149,7 +155,12 @@ export function FlashcardLearnDialog({ open, onClose, deckId, deckTitle, jobId: 
                             <p style={{ color: "#4ade80", fontSize: 11, fontWeight: 600, margin: 0 }}>
                                 {language === "es" ? "Modo Aprendizaje" : "Learning Mode"}
                             </p>
-                            {card && isReview && (
+                            {session && session.total > 0 && (
+                                <span data-testid="session-progress" style={{ fontSize: 10, fontWeight: 700, color: "#94A3B8" }}>
+                                    {session.learned} / {session.total}
+                                </span>
+                            )}
+                            {card?.is_review && (
                                 <span data-testid="review-badge" style={{ fontSize: 10, fontWeight: 700, color: "#f59e0b", background: "rgba(245,158,11,0.12)", border: "1px solid rgba(245,158,11,0.3)", borderRadius: 999, padding: "1px 8px" }}>
                                     {language === "es" ? "Repaso" : "Review"}
                                 </span>
@@ -170,7 +181,7 @@ export function FlashcardLearnDialog({ open, onClose, deckId, deckTitle, jobId: 
                 <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "24px 20px", overflow: "hidden" }}>
 
                     {/* Loading (initial) */}
-                    {loading && !card ? (
+                    {busy && !card && !finished ? (
                         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
                             <div style={{ width: 36, height: 36, borderRadius: "50%", border: "3px solid rgba(99,102,241,0.25)", borderTopColor: "#6366F1" }} className="animate-spin" />
                             <p style={{ color: "#94A3B8", fontSize: 13, fontStyle: "italic", margin: 0 }}>
@@ -219,16 +230,16 @@ export function FlashcardLearnDialog({ open, onClose, deckId, deckTitle, jobId: 
                                     onMouseEnter={e => { e.currentTarget.style.background = "rgba(99,102,241,0.1)"; }}
                                     onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
                                 >
-                                    {language === "es" ? "Volver" : "Back"}
+                                    {language === "es" ? "Cerrar" : "Close"}
                                 </button>
                                 <button
-                                    onClick={handleShuffle}
+                                    onClick={startSession}
                                     style={{ display: "flex", alignItems: "center", gap: 7, padding: "10px 20px", borderRadius: 10, background: "linear-gradient(135deg, #6366F1, #818CF8)", border: "none", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer", transition: "opacity 150ms" }}
                                     onMouseEnter={e => { e.currentTarget.style.opacity = "0.85"; }}
                                     onMouseLeave={e => { e.currentTarget.style.opacity = "1"; }}
                                 >
                                     <ArrowPathIcon style={{ width: 14, height: 14 }} />
-                                    {language === "es" ? "Barajar" : "Shuffle"}
+                                    {language === "es" ? "Repetir" : "Repeat"}
                                 </button>
                             </div>
                         </div>
@@ -239,9 +250,9 @@ export function FlashcardLearnDialog({ open, onClose, deckId, deckTitle, jobId: 
 
                             {/* Card with flip */}
                             <div
-                                style={{ position: "relative", width: "100%", cursor: "pointer", opacity: loading ? 0.6 : 1, transition: "opacity 200ms" }}
+                                style={{ position: "relative", width: "100%", cursor: "pointer", opacity: busy ? 0.6 : 1, transition: "opacity 200ms" }}
                                 className={`aspect-[3/2] md:aspect-[16/9] transition-transform duration-700 transform-style-3d ${isFlipped ? "rotate-y-180" : ""}`}
-                                onClick={!loading ? handleFlip : undefined}
+                                onClick={!busy ? handleFlip : undefined}
                             >
                                 {/* Front */}
                                 <div style={{
@@ -322,40 +333,37 @@ export function FlashcardLearnDialog({ open, onClose, deckId, deckTitle, jobId: 
                                 </div>
                             </div>
 
-                            {/* Rating buttons */}
-                            <div style={{ display: "flex", alignItems: "center", gap: 12, justifyContent: "center", minHeight: 48 }}>
+                            {/* Rating buttons — disabled while a request is in flight */}
+                            <div style={{ display: "flex", alignItems: "center", gap: 10, justifyContent: "center", flexWrap: "wrap", minHeight: 48 }}>
                                 {!isFlipped ? (
-                                    <button
-                                        onClick={e => { e.stopPropagation(); handleRate(NEXT_RATING); }}
-                                        disabled={loading}
-                                        style={{ display: "flex", alignItems: "center", gap: 8, padding: "11px 32px", borderRadius: 30, background: "linear-gradient(135deg, #6366F1, #818CF8)", border: "none", color: "#fff", fontSize: 14, fontWeight: 700, cursor: loading ? "default" : "pointer", boxShadow: "0 8px 24px rgba(99,102,241,0.35)", transition: "opacity 150ms", opacity: loading ? 0.6 : 1 }}
-                                        onMouseEnter={e => { if (!loading) e.currentTarget.style.opacity = "0.85"; }}
-                                        onMouseLeave={e => { e.currentTarget.style.opacity = loading ? "0.6" : "1"; }}
-                                    >
-                                        {language === "es" ? "Siguiente" : "Next"}
-                                        <ChevronRightIcon style={{ width: 15, height: 15 }} />
-                                    </button>
-                                ) : (
                                     <>
                                         <button
-                                            onClick={e => { e.stopPropagation(); handleRate(LEARN_RATINGS.HARD); }}
-                                            disabled={loading}
-                                            style={{ display: "flex", alignItems: "center", gap: 7, padding: "11px 28px", borderRadius: 30, background: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.3)", color: "#f87171", fontSize: 14, fontWeight: 700, cursor: loading ? "default" : "pointer", transition: "all 150ms", opacity: loading ? 0.5 : 1 }}
-                                            onMouseEnter={e => { if (!loading) { e.currentTarget.style.background = "rgba(248,113,113,0.18)"; e.currentTarget.style.borderColor = "rgba(248,113,113,0.5)"; } }}
-                                            onMouseLeave={e => { e.currentTarget.style.background = "rgba(248,113,113,0.1)"; e.currentTarget.style.borderColor = "rgba(248,113,113,0.3)"; }}
+                                            onClick={e => { e.stopPropagation(); handleFlip(); }}
+                                            disabled={busy}
+                                            style={{ display: "flex", alignItems: "center", gap: 8, padding: "11px 32px", borderRadius: 30, background: "linear-gradient(135deg, #6366F1, #818CF8)", border: "none", color: "#fff", fontSize: 14, fontWeight: 700, cursor: busy ? "default" : "pointer", boxShadow: "0 8px 24px rgba(99,102,241,0.35)", transition: "opacity 150ms", opacity: busy ? 0.6 : 1 }}
                                         >
-                                            {language === "es" ? "Difícil" : "Hard"}
+                                            {language === "es" ? "Siguiente" : "Next"}
+                                            <ChevronRightIcon style={{ width: 15, height: 15 }} />
                                         </button>
                                         <button
-                                            onClick={e => { e.stopPropagation(); handleRate(LEARN_RATINGS.GOOD); }}
-                                            disabled={loading}
-                                            style={{ display: "flex", alignItems: "center", gap: 7, padding: "11px 28px", borderRadius: 30, background: "rgba(74,222,128,0.1)", border: "1px solid rgba(74,222,128,0.3)", color: "#4ade80", fontSize: 14, fontWeight: 700, cursor: loading ? "default" : "pointer", transition: "all 150ms", opacity: loading ? 0.5 : 1 }}
-                                            onMouseEnter={e => { if (!loading) { e.currentTarget.style.background = "rgba(74,222,128,0.18)"; e.currentTarget.style.borderColor = "rgba(74,222,128,0.5)"; } }}
-                                            onMouseLeave={e => { e.currentTarget.style.background = "rgba(74,222,128,0.1)"; e.currentTarget.style.borderColor = "rgba(74,222,128,0.3)"; }}
+                                            onClick={e => { e.stopPropagation(); handleSkip(); }}
+                                            disabled={busy}
+                                            style={{ padding: "10px 18px", borderRadius: 30, background: "transparent", border: "1px solid rgba(148,163,184,0.25)", color: "#94A3B8", fontSize: 13, fontWeight: 600, cursor: busy ? "default" : "pointer", opacity: busy ? 0.5 : 1 }}
                                         >
-                                            {language === "es" ? "Bien" : "Good"}
+                                            {language === "es" ? "Saltar" : "Skip"}
                                         </button>
                                     </>
+                                ) : (
+                                    RATING_BUTTONS.map(({ rating, es, en, color }) => (
+                                        <button
+                                            key={rating}
+                                            onClick={e => { e.stopPropagation(); handleRate(rating); }}
+                                            disabled={busy}
+                                            style={{ padding: "11px 22px", borderRadius: 30, background: `${color}1A`, border: `1px solid ${color}4D`, color, fontSize: 14, fontWeight: 700, cursor: busy ? "default" : "pointer", transition: "all 150ms", opacity: busy ? 0.5 : 1 }}
+                                        >
+                                            {language === "es" ? es : en}
+                                        </button>
+                                    ))
                                 )}
                             </div>
                         </div>
@@ -378,7 +386,6 @@ FlashcardLearnDialog.propTypes = {
     onClose: PropTypes.func.isRequired,
     deckId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     deckTitle: PropTypes.string,
-    jobId: PropTypes.string,
 };
 
 export default FlashcardLearnDialog;

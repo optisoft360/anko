@@ -470,7 +470,7 @@ function ProcessKnowledgeView({ ksId, moduleId, assignmentId, alreadyCompleted, 
 
       <DocumentViewDialog doc={viewingDoc} onClose={() => setViewingDoc(null)} />
       <FlashcardViewDialog open={!!studyDeck} onClose={() => setStudyDeck(null)} deckId={studyDeck?.id} deckTitle={studyDeck?.title} />
-      <FlashcardLearnDialog open={!!learnDeck} onClose={() => setLearnDeck(null)} deckId={learnDeck?.id} deckTitle={learnDeck?.title} jobId={learnDeck?.external_job_id} />
+      <FlashcardLearnDialog open={!!learnDeck} onClose={() => setLearnDeck(null)} deckId={learnDeck?.id} deckTitle={learnDeck?.title} />
       <ExamSimulatorDialog open={!!simulationBattery} handler={() => setSimulationBattery(null)} battery={simulationBattery} onFinish={() => loadContent({ silent: true })} />
     </div>
   );

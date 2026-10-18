@@ -2997,7 +2997,6 @@ export function ProcessDetail() {
         onClose={() => setLearnDeck(null)}
         deckId={learnDeck?.id}
         deckTitle={learnDeck?.title}
-        jobId={learnDeck?.external_job_id}
       />
 
       <ConfirmDeleteDialog
