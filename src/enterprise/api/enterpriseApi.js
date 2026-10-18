@@ -128,6 +128,7 @@ export const learningApi = {
   createProgram: (data) => enterpriseApi.post("/enterprise/training-programs/", data, { params: cp() }).then((r) => r.data),
   updateProgram: (id, data) => enterpriseApi.patch(`/enterprise/training-programs/${id}/`, data, { params: cp() }).then((r) => r.data),
   publishProgram: (id, data) => enterpriseApi.post(`/enterprise/training-programs/${id}/publish/`, data, { params: cp() }).then((r) => r.data),
+  getProgramVersions: (id) => enterpriseApi.get(`/enterprise/training-programs/${id}/versions/`, { params: cp() }).then((r) => r.data),
 
   // Assignments
   getAssignments: (p) => enterpriseApi.get("/enterprise/learning-assignments/", { params: cp(p) }).then((r) => r.data),
