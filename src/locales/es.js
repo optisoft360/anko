@@ -1773,6 +1773,10 @@ export const es = {
                 }
             },
             teamCompliance: {
+                team: "Equipo",
+                noTeams: "Esta empresa aún no tiene equipos. Crea uno en Configuración → Equipos.",
+                noMembers: "Este equipo aún no tiene miembros.",
+                loadError: "No se pudo cargar el reporte del equipo.",
                 title: "Cumplimiento del Equipo",
                 empty: "No hay datos de cumplimiento del equipo",
                 summary: {
@@ -1808,6 +1812,10 @@ export const es = {
                 }
             },
             teamRetention: {
+                team: "Equipo",
+                noTeams: "Esta empresa aún no tiene equipos. Crea uno en Configuración → Equipos.",
+                noMembers: "Este equipo aún no tiene miembros.",
+                loadError: "No se pudo cargar el reporte del equipo.",
                 title: "Retención del Equipo",
                 empty: "No hay datos del equipo",
                 atRisk: "En Riesgo",
@@ -2161,6 +2169,9 @@ export const es = {
                     maxCards: "Máximo 15 tarjetas por mazo",
                     descriptionPlaceholder: "Describe este mazo...",
                     addAtLeastOneCard: "Agrega al menos una tarjeta.",
+                    unsavedCard: "Completa o borra la tarjeta que estás escribiendo: necesita anverso y reverso.",
+                    createError: "No se pudo crear el mazo.",
+                    topicRequired: "Abre «+ Agregar deck» desde un tópico para crear un mazo manual.",
                     cardsLabel: "Tarjetas",
                     cardBadge: "TARJETA {n}",
                     front: "Frente",
@@ -2190,6 +2201,17 @@ export const es = {
                     empty: "Sin documentos adjuntos.",
                     dragDrop: "Arrastra y suelta documentos aquí",
                     orSelectFiles: "o selecciona archivos"
+                },
+                topicDialog: {
+                    title: "Agregar tópico",
+                    titleField: "Nombre del tópico",
+                    titlePlaceholder: "Ej. Equipo de protección personal",
+                    titleRequired: "El nombre del tópico es obligatorio.",
+                    descriptionPlaceholder: "¿Qué cubre este tópico?",
+                    tagsField: "Etiquetas",
+                    tagsPlaceholder: "Separadas por comas, ej. cascos, botas",
+                    create: "Crear tópico",
+                    createError: "No se pudo crear el tópico."
                 },
                 structurePanel: {
                     title: "Estructura de conocimiento",
@@ -2266,14 +2288,16 @@ export const es = {
                 connections: "Conexiones ({count})",
                 computingLayout: "Calculando diseño...",
                 noData: "No hay datos del grafo de conocimiento",
-                noDataHint: "Procesa documentos con IA para construir el grafo.",
+                noDataHint: "Genera tópicos en un proceso (Auto-generar o «Agregar tópico») y pulsa Actualizar.",
+                loadError: "No se pudo cargar el grafo de conocimiento.",
                 nodeTypes: {
                     concept: "Concepto",
                     procedure: "Procedimiento",
                     regulation: "Regulación",
                     skill: "Habilidad",
                     topic: "Tópico",
-                    rule: "Regla"
+                    rule: "Regla",
+                    document: "Proceso"
                 },
                 edgeTypes: {
                     requires: "requiere",

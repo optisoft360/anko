@@ -128,6 +128,7 @@ export const learningApi = {
   createProgram: (data) => enterpriseApi.post("/enterprise/training-programs/", data, { params: cp() }).then((r) => r.data),
   updateProgram: (id, data) => enterpriseApi.patch(`/enterprise/training-programs/${id}/`, data, { params: cp() }).then((r) => r.data),
   publishProgram: (id, data) => enterpriseApi.post(`/enterprise/training-programs/${id}/publish/`, data, { params: cp() }).then((r) => r.data),
+  getProgramVersions: (id) => enterpriseApi.get(`/enterprise/training-programs/${id}/versions/`, { params: cp() }).then((r) => r.data),
 
   // Assignments
   getAssignments: (p) => enterpriseApi.get("/enterprise/learning-assignments/", { params: cp(p) }).then((r) => r.data),
@@ -175,7 +176,6 @@ export const complianceApi = {
   myCompliance: (p) => enterpriseApi.get("/enterprise/compliance-assignments/my-compliance/", { params: cp(p) }).then((r) => r.data),
   companyCompliance: (p) => enterpriseApi.get("/enterprise/compliance-assignments/company-compliance/", { params: cp(p) }).then((r) => r.data),
   teamCompliance: (p) => enterpriseApi.get("/enterprise/compliance-assignments/team-compliance/", { params: cp(p) }).then((r) => r.data),
-  teamComplianceSummary: (p) => enterpriseApi.get("/enterprise/compliance-assignments/team-compliance-summary/", { params: cp(p) }).then((r) => r.data),
   expiringAssignments: (p) => enterpriseApi.get("/enterprise/compliance-assignments/expiring/", { params: cp(p) }).then((r) => r.data),
   completeAssignment: (id, data = {}) => enterpriseApi.post(`/enterprise/compliance-assignments/${id}/complete/`, data, { params: cp() }).then((r) => r.data),
   renewAssignment: (id) => enterpriseApi.post(`/enterprise/compliance-assignments/${id}/renew/`, cp()).then((r) => r.data),
@@ -191,6 +191,14 @@ export const knowledgeApi = {
   update: (id, data) => enterpriseApi.patch(`/enterprise/knowledge-sources/${id}/`, data, { params: cp() }).then((r) => r.data),
   remove: (id) => enterpriseApi.delete(`/enterprise/knowledge-sources/${id}/`, { params: cp() }).then((r) => r.data),
   process: (id) => enterpriseApi.post(`/enterprise/knowledge-sources/${id}/process/`, {}, { params: cp() }).then((r) => r.data),
+  // F-09: topics created by hand inside a process.
+  createTopic: (id, data) =>
+    enterpriseApi.post(`/enterprise/knowledge-sources/${id}/topics/`, data, { params: cp() }).then((r) => r.data),
+  updateTopic: (id, topicId, data) =>
+    enterpriseApi.patch(`/enterprise/knowledge-sources/${id}/topics/${topicId}/`, data, { params: cp() }).then((r) => r.data),
+  // F-08: manual deck inside a topic of the process.
+  createTopicDeck: (id, topicId, data) =>
+    enterpriseApi.post(`/enterprise/knowledge-sources/${id}/topics/${topicId}/decks/`, data, { params: cp() }).then((r) => r.data),
   status: (id) => enterpriseApi.get(`/enterprise/knowledge-sources/${id}/status/`, { params: cp() }).then((r) => r.data),
   generateTraining: (id) => enterpriseApi.post(`/enterprise/knowledge-sources/${id}/generate-training/`, {}, { params: cp() }).then((r) => r.data),
   detectChanges: (id) => enterpriseApi.post(`/enterprise/knowledge-sources/${id}/detect-changes/`, {}, { params: cp() }).then((r) => r.data),
@@ -217,6 +225,8 @@ export const knowledgeApi = {
   applyImpact: (id) => enterpriseApi.post(`/enterprise/change-impact/${id}/apply/`, {}, { params: cp() }).then((r) => r.data),
 
   getGraph: (p) => enterpriseApi.get("/enterprise/knowledge-graph/graph/", { params: cp(p) }).then((r) => r.data),
+  // F-13: rebuild the structure graph (process, topics, tags, procedures).
+  rebuildGraph: (p) => enterpriseApi.post("/enterprise/knowledge-graph/rebuild/", {}, { params: cp(p) }).then((r) => r.data),
   getResults: (id) => enterpriseApi.get(`/enterprise/knowledge-sources/${id}/results/`, { params: cp() }).then((r) => r.data),
   // KnowledgeSource documents are linked via KnowledgeSourceDocument, not Document.project —
   // this must NOT be confused with projectService.getDocumentsWithSections (Project-scoped).

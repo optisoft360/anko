@@ -6,6 +6,12 @@ import { useEnterprise } from "../../context/enterprise-context";
 import { useLanguage } from "../../../context/language-context";
 import { EmptyState } from "../../components/EmptyState";
 import { TableSkeleton } from "../../components/LoadingSkeleton";
+import { apiErrorMessage } from "@/utils/apiError";
+
+/** Payload expected by POST /training-programs/{id}/publish/. */
+export function buildPublishVersionPayload(selectedPath, notes) {
+  return { learning_path_id: Number(selectedPath), notes: notes || "" };
+}
 
 const STATUS_TONE = {
   draft:     { bg: "rgba(255,255,255,0.06)", text: "#8B8B9C" },
@@ -81,14 +87,15 @@ function PublishVersionModal({ program, onClose, onPublished }) {
   const handlePublish = async (e) => {
     e.preventDefault();
     if (!selectedPath) { setError(t("enterprise.learning.trainingPrograms.selectPath")); return; }
+    if (saving) return;
     setSaving(true);
     setError("");
     try {
-      await learningApi.publishProgram(program.id, { learning_path: parseInt(selectedPath), notes });
+      await learningApi.publishProgram(program.id, buildPublishVersionPayload(selectedPath, notes));
       onPublished();
       onClose();
     } catch (err) {
-      setError(err?.detail || t("enterprise.learning.trainingPrograms.publishError"));
+      setError(apiErrorMessage(err, t("enterprise.learning.trainingPrograms.publishError")));
     } finally { setSaving(false); }
   };
 
@@ -103,7 +110,7 @@ function PublishVersionModal({ program, onClose, onPublished }) {
           {t("enterprise.learning.trainingPrograms.publishModal.hint")}
         </p>
         <form onSubmit={handlePublish} className="space-y-4">
-          <select style={{ ...INPUT, cursor: "pointer" }} value={selectedPath} onChange={(e) => setSelectedPath(e.target.value)} required>
+          <select style={{ ...INPUT, cursor: "pointer" }} value={selectedPath} onChange={(e) => { setSelectedPath(e.target.value); setError(""); }}>
             <option value="">{t("enterprise.learning.trainingPrograms.publishModal.selectPlaceholder")}</option>
             {paths.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
           </select>
@@ -124,8 +131,20 @@ function PublishVersionModal({ program, onClose, onPublished }) {
 function ProgramCard({ program, onPublishVersion }) {
   const { t, language } = useLanguage();
   const hasAI = program.metadata?.knowledge_source_id;
-  const currentVersion = program.versions?.find((v) => v.is_current);
   const [expanded, setExpanded] = useState(false);
+  const [versions, setVersions] = useState(program.versions || null);
+  const currentNumber = program.current_version_number ?? program.versions?.find((v) => v.is_current)?.version_number;
+  const versionCount = program.version_count ?? program.versions?.length ?? 0;
+
+  const toggleHistory = () => {
+    const next = !expanded;
+    setExpanded(next);
+    if (next) {
+      learningApi.getProgramVersions(program.id)
+        .then((d) => setVersions(Array.isArray(d) ? d : d.results || []))
+        .catch(() => setVersions([]));
+    }
+  };
   const tone = STATUS_TONE[program.status] || STATUS_TONE.draft;
 
   return (
@@ -152,9 +171,9 @@ function ProgramCard({ program, onPublishVersion }) {
                 <p style={{ fontSize: 12, color: "var(--text-tertiary)", marginTop: 3 }}>{program.description}</p>
               )}
               <div className="flex gap-3 mt-1.5">
-                <span style={{ fontSize: 11, color: "var(--text-tertiary)" }}>{t("enterprise.learning.trainingPrograms.versionCount", { n: program.version_count ?? program.versions?.length ?? 0 })}</span>
-                {currentVersion && (
-                  <span style={{ fontSize: 11, fontWeight: 700, color: "#4ade80" }}>{t("enterprise.learning.trainingPrograms.currentVersion", { n: currentVersion.version_number })}</span>
+                <span style={{ fontSize: 11, color: "var(--text-tertiary)" }}>{t("enterprise.learning.trainingPrograms.versionCount", { n: versionCount })}</span>
+                {currentNumber != null && (
+                  <span style={{ fontSize: 11, fontWeight: 700, color: "#4ade80" }}>{t("enterprise.learning.trainingPrograms.currentVersion", { n: currentNumber })}</span>
                 )}
               </div>
             </div>
@@ -164,8 +183,8 @@ function ProgramCard({ program, onPublishVersion }) {
               style={{ fontSize: 11, fontWeight: 700, color: "#4ade80", background: "rgba(74,222,128,0.1)", border: "1px solid rgba(74,222,128,0.25)", borderRadius: 6, padding: "6px 10px", cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}>
               <CheckBadgeIcon style={{ width: 13, height: 13 }} /> {t("enterprise.learning.trainingPrograms.newVersion")}
             </button>
-            {program.versions?.length > 0 && (
-              <button onClick={() => setExpanded((v) => !v)}
+            {versionCount > 0 && (
+              <button onClick={toggleHistory}
                 style={{ fontSize: 11, fontWeight: 600, color: "var(--text-tertiary)", background: "none", border: "1px solid var(--border)", borderRadius: 6, padding: "6px 10px", cursor: "pointer" }}>
                 {t("enterprise.learning.trainingPrograms.history")}
               </button>
@@ -174,17 +193,20 @@ function ProgramCard({ program, onPublishVersion }) {
         </div>
       </div>
 
-      {expanded && program.versions?.length > 0 && (
+      {expanded && (
         <div style={{ borderTop: "1px solid var(--border)", background: "var(--bg-app)", padding: "12px 18px" }}>
           <p style={{ fontSize: 10, fontWeight: 700, color: "var(--text-tertiary)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 8 }}>{t("enterprise.learning.trainingPrograms.versionHistory")}</p>
           <div className="space-y-2">
-            {program.versions.map((v) => (
-              <div key={v.id} className="flex items-center gap-3" style={{ fontSize: 12 }}>
+            {versions === null && <p style={{ fontSize: 12, color: "var(--text-tertiary)" }}>…</p>}
+            {(versions || []).map((v) => (
+              <div key={v.id} className="flex items-center gap-3 flex-wrap" style={{ fontSize: 12 }}>
                 <span style={{ width: 20, height: 20, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 700, background: v.is_current ? "#22C55E" : "var(--bg-elevated)", color: v.is_current ? "#fff" : "var(--text-tertiary)" }}>
                   {v.version_number}
                 </span>
                 <span style={{ color: "var(--text-secondary)" }}>{v.learning_path_name || "—"}</span>
                 {v.is_current && <span style={{ fontSize: 10, fontWeight: 700, color: "#4ade80" }}>{t("enterprise.learning.trainingPrograms.current")}</span>}
+                {v.notes && <span style={{ color: "var(--text-tertiary)", fontSize: 11 }}>· {v.notes}</span>}
+                {v.created_by_username && <span style={{ color: "var(--text-tertiary)", fontSize: 11 }}>· {v.created_by_username}</span>}
                 <span style={{ color: "var(--text-tertiary)", fontSize: 11, marginLeft: "auto" }}>{v.created_at ? new Date(v.created_at).toLocaleDateString(language === "es" ? "es" : "en-US") : "—"}</span>
               </div>
             ))}

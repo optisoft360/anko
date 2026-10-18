@@ -1772,6 +1772,10 @@ export const en = {
                 }
             },
             teamCompliance: {
+                team: "Team",
+                noTeams: "There are no teams in this company yet. Create one in Settings → Teams.",
+                noMembers: "This team has no members yet.",
+                loadError: "Could not load the team report.",
                 title: "Team Compliance",
                 empty: "No team compliance data",
                 summary: {
@@ -1807,6 +1811,10 @@ export const en = {
                 }
             },
             teamRetention: {
+                team: "Team",
+                noTeams: "There are no teams in this company yet. Create one in Settings → Teams.",
+                noMembers: "This team has no members yet.",
+                loadError: "Could not load the team report.",
                 title: "Team Retention",
                 empty: "No team data",
                 atRisk: "At Risk",
@@ -2160,6 +2168,9 @@ export const en = {
                     maxCards: "Maximum 15 cards per deck",
                     descriptionPlaceholder: "Describe this deck...",
                     addAtLeastOneCard: "Add at least one card.",
+                    unsavedCard: "Finish or clear the card you are typing: it needs both a front and a back.",
+                    createError: "Could not create the deck.",
+                    topicRequired: "Open “+ Add deck” from a topic to create a manual deck.",
                     cardsLabel: "Cards",
                     cardBadge: "CARD {n}",
                     front: "Front",
@@ -2189,6 +2200,17 @@ export const en = {
                     empty: "No documents attached.",
                     dragDrop: "Drag and drop documents here",
                     orSelectFiles: "or select files"
+                },
+                topicDialog: {
+                    title: "Add topic",
+                    titleField: "Topic name",
+                    titlePlaceholder: "E.g. Personal protective equipment",
+                    titleRequired: "The topic name is required.",
+                    descriptionPlaceholder: "What does this topic cover?",
+                    tagsField: "Tags",
+                    tagsPlaceholder: "Comma-separated, e.g. helmets, boots",
+                    create: "Create topic",
+                    createError: "Could not create the topic."
                 },
                 structurePanel: {
                     title: "Knowledge Structure",
@@ -2265,14 +2287,16 @@ export const en = {
                 connections: "Connections ({count})",
                 computingLayout: "Computing layout...",
                 noData: "No knowledge graph data",
-                noDataHint: "Process documents with AI to build the graph.",
+                noDataHint: "Generate topics for a process (Auto-generate or “Add topic”), then press Refresh.",
+                loadError: "Could not load the knowledge graph.",
                 nodeTypes: {
                     concept: "Concept",
                     procedure: "Procedure",
                     regulation: "Regulation",
                     skill: "Skill",
                     topic: "Topic",
-                    rule: "Rule"
+                    rule: "Rule",
+                    document: "Process"
                 },
                 edgeTypes: {
                     requires: "requires",

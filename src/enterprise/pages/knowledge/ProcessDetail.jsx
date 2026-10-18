@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback, useRef, useMemo } from "react";
+import { apiErrorMessage } from "@/utils/apiError";
 import { enumLabel, useKnowledgeEnumLabels } from "@/utils/enumLabel";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import {
@@ -1354,13 +1355,13 @@ function TopicTreeItem({
   const [expanded, setExpanded] = useState(true);
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
   const tagCount = topic.tags?.length || 0;
-  const description = topic.tags?.slice(0, 5).join(", ") || "";
+  const description = topic.description || topic.tags?.slice(0, 5).join(", ") || "";
   const addDeck = () => onAddDeck?.(topic.id);
   const addBattery = () => onAddBattery?.(topic.id);
   const deleteTopic = () => onDeleteTopic?.({
     id: topic.id,
     _kind: "topic",
-    label: t("enterprise.knowledge.processDetail.topicLabel", { n: index + 1 }),
+    label: topic.title || t("enterprise.knowledge.processDetail.topicLabel", { n: index + 1 }),
     deckCount: decks.length,
     batteryCount: batteries.length,
   });
@@ -1408,7 +1409,7 @@ function TopicTreeItem({
               ? <ChevronDownIcon style={{ width: 13, height: 13 }} />
               : <ChevronRightIcon style={{ width: 13, height: 13 }} />}
           </button>
-          <span style={{ fontWeight: 700, color: "#F1F5F9", fontSize: 13, flexShrink: 0 }}>{t("enterprise.knowledge.processDetail.topicLabel", { n: index + 1 })}</span>
+          <span style={{ fontWeight: 700, color: "#F1F5F9", fontSize: 13, flexShrink: 0 }}>{topic.title || t("enterprise.knowledge.processDetail.topicLabel", { n: index + 1 })}</span>
           <span style={{ padding: "1px 7px", borderRadius: 20, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.09)", color: "#64748B", fontSize: 10, fontWeight: 600, flexShrink: 0 }}>
             {t("enterprise.knowledge.processDetail.tagsCount", { n: tagCount })}
           </span>
@@ -1464,7 +1465,11 @@ function TopicTreeItem({
                 job={j} onDismissJob={onDismissItemJob} />
             ))}
             {decks.length === 0 && batteries.length === 0 && pendingDeckJobs.length === 0 && pendingBatteryJobs.length === 0 && (
-              <p style={{ color: "#334155", fontSize: 12, fontStyle: "italic", padding: "4px 8px", margin: 0 }}>{t("enterprise.knowledge.processDetail.noContentGenerated")}</p>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", padding: "4px 8px" }}>
+                <p style={{ color: "#334155", fontSize: 12, fontStyle: "italic", margin: 0 }}>{t("enterprise.knowledge.processDetail.noContentGenerated")}</p>
+                {onAddDeck && <button type="button" onClick={addDeck} style={{ padding: "4px 8px", borderRadius: 6, background: "rgba(74,222,128,0.07)", border: "1px solid rgba(74,222,128,0.18)", color: "#4ade80", fontSize: 11, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}>+ {t("enterprise.knowledge.processDetail.addDeck")}</button>}
+                {onAddBattery && <button type="button" onClick={addBattery} style={{ padding: "4px 8px", borderRadius: 6, background: "rgba(74,222,128,0.07)", border: "1px solid rgba(74,222,128,0.18)", color: "#4ade80", fontSize: 11, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}>+ {t("enterprise.knowledge.processDetail.addBattery")}</button>}
+              </div>
             )}
           </div>
         )}
@@ -1479,7 +1484,7 @@ function KnowledgeStructurePanel({
   canReorder, onTagGroupDecksReorder, onTagGroupBatteriesReorder,
   onTopicDecksReorder, onTopicBatteriesReorder,
   onStudy, onLearn, onSimulate, onDeleteBattery, onDeleteDeck, onDeleteTopic, onAutoGen,
-  onAddDeck, onAddBattery, itemJobs, onDismissItemJob,
+  onAddDeck, onAddBattery, onAddTopic, itemJobs, onDismissItemJob,
 }) {
   const { t } = useLanguage();
   const totalQuestions = batteries.reduce((s, b) => s + (b.question_count ?? 0), 0);
@@ -1531,7 +1536,7 @@ function KnowledgeStructurePanel({
                 <span style={{ fontSize: 10, color: "#475569" }}>{label}</span>
               </div>
             ))}
-            <button style={{ display: "flex", alignItems: "center", gap: 4, padding: "4px 10px", background: "rgba(74,222,128,0.08)", border: "1px solid rgba(74,222,128,0.22)", borderRadius: 6, color: "#4ade80", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
+            <button onClick={() => onAddTopic?.()} style={{ display: "flex", alignItems: "center", gap: 4, padding: "4px 10px", background: "rgba(74,222,128,0.08)", border: "1px solid rgba(74,222,128,0.22)", borderRadius: 6, color: "#4ade80", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
               <PlusIcon style={{ width: 11, height: 11 }} /> {t("enterprise.knowledge.processDetail.structurePanel.addTopic")}
             </button>
           </div>
@@ -1809,7 +1814,70 @@ function SectionTree({ scannedDocuments, selectedIds, onToggleDoc, onToggleSecti
   );
 }
 
-function EnterpriseDeckDialog({ open, onClose, onCreate, projectId }) {
+// F-09: "+ Add topic" inside a process.
+export function AddTopicDialog({ open, onClose, onCreate }) {
+  const { t } = useLanguage();
+  const K = "enterprise.knowledge.processDetail.topicDialog.";
+  const [form, setForm] = React.useState({ title: "", description: "", tags: "" });
+  const [error, setError] = React.useState("");
+  const [submitting, setSubmitting] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!open) return;
+    setForm({ title: "", description: "", tags: "" }); setError(""); setSubmitting(false);
+  }, [open]);
+
+  if (!open) return null;
+
+  const handleSubmit = async (e) => {
+    e?.preventDefault();
+    if (submitting) return;
+    if (!form.title.trim()) { setError(t(`${K}titleRequired`)); return; }
+    setSubmitting(true);
+    try {
+      await onCreate({
+        title: form.title.trim(),
+        description: form.description.trim(),
+        tags: form.tags.split(",").map((s) => s.trim()).filter(Boolean),
+      });
+    } catch (err) {
+      setError(apiErrorMessage(err, t(`${K}createError`)));
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div style={{ position: "fixed", inset: 0, zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
+      <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.75)", backdropFilter: "blur(6px)" }} onClick={onClose} />
+      <form onSubmit={handleSubmit} role="dialog" aria-label={t(`${K}title`)} style={{ position: "relative", width: "100%", maxWidth: 480, background: D.bg, border: `1px solid ${D.border}`, borderRadius: 20, padding: 24, display: "flex", flexDirection: "column", gap: 14, boxShadow: "0 32px 80px rgba(0,0,0,0.7)" }}>
+        <h2 style={{ color: D.text, fontWeight: 800, fontSize: 17, margin: 0 }}>{t(`${K}title`)}</h2>
+        <div>
+          <DLbl>{t(`${K}titleField`)} <span style={{ color: D.error }}>*</span></DLbl>
+          <DarkInput value={form.title} onChange={(e) => { setForm((p) => ({ ...p, title: e.target.value })); setError(""); }} name="title" placeholder={t(`${K}titlePlaceholder`)} error={!!error && !form.title.trim()} />
+        </div>
+        <div>
+          <DLbl>{t("enterprise.knowledge.processDetail.descriptionLabel")} <span style={{ color: D.dim, fontSize: 9, fontWeight: 400, textTransform: "none", letterSpacing: 0 }}>{t("enterprise.knowledge.processDetail.optional")}</span></DLbl>
+          <DarkTextarea value={form.description} onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))} name="description" placeholder={t(`${K}descriptionPlaceholder`)} />
+        </div>
+        <div>
+          <DLbl>{t(`${K}tagsField`)} <span style={{ color: D.dim, fontSize: 9, fontWeight: 400, textTransform: "none", letterSpacing: 0 }}>{t("enterprise.knowledge.processDetail.optional")}</span></DLbl>
+          <DarkInput value={form.tags} onChange={(e) => setForm((p) => ({ ...p, tags: e.target.value }))} name="tags" placeholder={t(`${K}tagsPlaceholder`)} />
+        </div>
+        {error && <p style={{ color: D.error, fontSize: 12, margin: 0 }}>{error}</p>}
+        <div style={{ display: "flex", gap: 10 }}>
+          <button type="button" onClick={onClose} style={{ flex: 1, height: 40, borderRadius: 9, background: D.subtle, border: `1px solid ${D.border}`, color: D.muted, fontWeight: 700, cursor: "pointer" }}>
+            {t("enterprise.compliance.programs.cancel")}
+          </button>
+          <button type="submit" disabled={submitting} style={{ flex: 2, height: 40, borderRadius: 9, border: "none", background: submitting ? "rgba(99,102,241,0.5)" : "linear-gradient(135deg, #6366F1 0%, #818CF8 100%)", color: "#fff", fontWeight: 700, cursor: submitting ? "not-allowed" : "pointer" }}>
+            {t(`${K}create`)}
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+export function EnterpriseDeckDialog({ open, onClose, onCreate, projectId }) {
   const { t } = useLanguage();
   const [activeTab, setActiveTab] = React.useState("ai");
   const [formData, setFormData] = React.useState({ title: "", description: "", visibility: "private", section_ids: [], document_ids: [], cards_count: 5, cards: [] });
@@ -1874,17 +1942,32 @@ function EnterpriseDeckDialog({ open, onClose, onCreate, projectId }) {
       if (scannedDocuments.length === 0) errs.general = t("enterprise.knowledge.processDetail.noSectionsAvailable");
       else if (formData.section_ids.length === 0) errs.general = t("enterprise.knowledge.processDetail.selectSection");
     } else {
-      if (formData.cards.length === 0) errs.general = t("enterprise.knowledge.processDetail.deckDialog.addAtLeastOneCard");
+      const pendingFront = currentCard.front.trim();
+      const pendingBack = currentCard.back.trim();
+      if ((pendingFront || pendingBack) && !(pendingFront && pendingBack)) {
+        errs.general = t("enterprise.knowledge.processDetail.deckDialog.unsavedCard");
+      } else if (formData.cards.length === 0 && !(pendingFront && pendingBack)) {
+        errs.general = t("enterprise.knowledge.processDetail.deckDialog.addAtLeastOneCard");
+      }
     }
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!validate()) return;
+    if (submitting || !validate()) return;
+    // A complete card typed but not yet "Added to list" is included instead of being lost.
+    const pending = currentCard.front.trim() && currentCard.back.trim() ? [{ ...currentCard }] : [];
+    const cards = activeTab === "manual" ? [...formData.cards, ...pending] : formData.cards;
     setSubmitting(true);
-    onCreate({ ...formData, mode: activeTab });
+    try {
+      await onCreate({ ...formData, cards, mode: activeTab });
+    } catch (err) {
+      // Keep the modal open with everything the user typed.
+      setErrors({ general: apiErrorMessage(err, t("enterprise.knowledge.processDetail.deckDialog.createError")) });
+      setSubmitting(false);
+    }
   };
 
   const btnBase = { padding: "0 16px", height: 40, borderRadius: 9, fontSize: 13, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 7, transition: "all 150ms", border: "none" };
@@ -1914,7 +1997,7 @@ function EnterpriseDeckDialog({ open, onClose, onCreate, projectId }) {
           {/* Tabs */}
           <div style={{ display: "flex", gap: 4, background: "rgba(255,255,255,0.04)", border: `1px solid ${D.border}`, borderRadius: "11px 11px 0 0", padding: "5px 5px 0" }}>
             {[{ key: "ai", label: t("enterprise.knowledge.processDetail.deckDialog.tabAi"), icon: <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/> }, { key: "manual", label: t("enterprise.knowledge.processDetail.deckDialog.tabManual"), icon: <><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></> }].map(({ key, label, icon }) => (
-              <button key={key} onClick={() => setActiveTab(key)} style={{ flex: 1, padding: "9px 0", fontSize: 12, fontWeight: 600, cursor: "pointer", borderRadius: "8px 8px 0 0", background: activeTab === key ? D.bg : "transparent", color: activeTab === key ? D.accent : D.dim, border: "none", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, transition: "all 150ms" }}>
+              <button key={key} onClick={() => { setActiveTab(key); setErrors({}); }} style={{ flex: 1, padding: "9px 0", fontSize: 12, fontWeight: 600, cursor: "pointer", borderRadius: "8px 8px 0 0", background: activeTab === key ? D.bg : "transparent", color: activeTab === key ? D.accent : D.dim, border: "none", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, transition: "all 150ms" }}>
                 <svg viewBox="0 0 24 24" style={{ width: 12, height: 12, stroke: "currentColor", strokeWidth: 2, fill: "none" }}>{icon}</svg>
                 {label}
               </button>
@@ -2317,6 +2400,7 @@ export function ProcessDetail() {
   const [droppedFiles, setDroppedFiles] = useState([]);
   const [showAddDeck, setShowAddDeck] = useState(false);
   const [showAddBattery, setShowAddBattery] = useState(false);
+  const [showAddTopic, setShowAddTopic] = useState(false);
   const [activeTagGroupId, setActiveTagGroupId] = useState(null);
   const [genState, setGenState] = useState(INIT_GEN);
   const [tagGroups, setTagGroups] = useState([]);
@@ -2537,20 +2621,33 @@ export function ProcessDetail() {
     setShowAddBattery(true);
   }, []);
 
+  // F-09: errors propagate so the dialog stays open with the backend message.
+  const handleCreateTopic = async (topicData) => {
+    await knowledgeApi.createTopic(id, topicData);
+    setShowAddTopic(false);
+    loadResults();
+  };
+
   const handleCreateDeck = async (deckData) => {
+    if (deckData.mode === "manual") {
+      // F-08: KS-scoped endpoint (the legacy /decks/create-with-flashcards/ needs a Project,
+      // which a process doesn't have). Errors propagate so the dialog stays open.
+      const tagGroupId = activeTagGroupId;
+      if (!tagGroupId) throw { detail: t("enterprise.knowledge.processDetail.deckDialog.topicRequired") };
+      await knowledgeApi.createTopicDeck(id, tagGroupId, {
+        title: deckData.title.trim(),
+        description: deckData.description || "",
+        is_public: deckData.visibility === "public",
+        flashcards: deckData.cards.map(({ front, back, notes }) => ({ front, back, notes: notes || "" })),
+      });
+      setShowAddDeck(false);
+      setActiveTagGroupId(null);
+      loadResults();
+      loadTagGroups();
+      return;
+    }
     try {
-      if (deckData.mode === "manual") {
-        // NOTE: this legacy endpoint still hard-requires a real Project id, which a
-        // KnowledgeSource process doesn't have — manual mode remains broken for
-        // Enterprise Knowledge Source decks until it's ported to start-generate too.
-        await projectService.createDeckManual({
-          project_id: Number(id),
-          title: deckData.title,
-          description: deckData.description,
-          visibility: deckData.visibility,
-          cards: deckData.cards,
-        });
-      } else {
+      {
         // Uses /decks/start-generate/ (not the legacy /decks/create-with-cards/, which
         // hard-requires a Project). `id` here is a KnowledgeSource id, not a Project id,
         // so no project_id is sent — the topic association goes through tag_group_ids.
@@ -2962,6 +3059,7 @@ export function ProcessDetail() {
           onAutoGen={handleAutoGen}
           onAddDeck={handleOpenAddDeck}
           onAddBattery={handleOpenAddBattery}
+          onAddTopic={() => setShowAddTopic(true)}
           itemJobs={itemJobs}
           onDismissItemJob={removeItemJob}
         />
@@ -3004,6 +3102,12 @@ export function ProcessDetail() {
         onConfirm={handleConfirmDelete}
         onCancel={() => setDeleteTarget(null)}
         deleting={deleting}
+      />
+
+      <AddTopicDialog
+        open={showAddTopic}
+        onClose={() => setShowAddTopic(false)}
+        onCreate={handleCreateTopic}
       />
 
       <EnterpriseDeckDialog
