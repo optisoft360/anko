@@ -1355,13 +1355,13 @@ function TopicTreeItem({
   const [expanded, setExpanded] = useState(true);
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
   const tagCount = topic.tags?.length || 0;
-  const description = topic.tags?.slice(0, 5).join(", ") || "";
+  const description = topic.description || topic.tags?.slice(0, 5).join(", ") || "";
   const addDeck = () => onAddDeck?.(topic.id);
   const addBattery = () => onAddBattery?.(topic.id);
   const deleteTopic = () => onDeleteTopic?.({
     id: topic.id,
     _kind: "topic",
-    label: t("enterprise.knowledge.processDetail.topicLabel", { n: index + 1 }),
+    label: topic.title || t("enterprise.knowledge.processDetail.topicLabel", { n: index + 1 }),
     deckCount: decks.length,
     batteryCount: batteries.length,
   });
@@ -1409,7 +1409,7 @@ function TopicTreeItem({
               ? <ChevronDownIcon style={{ width: 13, height: 13 }} />
               : <ChevronRightIcon style={{ width: 13, height: 13 }} />}
           </button>
-          <span style={{ fontWeight: 700, color: "#F1F5F9", fontSize: 13, flexShrink: 0 }}>{t("enterprise.knowledge.processDetail.topicLabel", { n: index + 1 })}</span>
+          <span style={{ fontWeight: 700, color: "#F1F5F9", fontSize: 13, flexShrink: 0 }}>{topic.title || t("enterprise.knowledge.processDetail.topicLabel", { n: index + 1 })}</span>
           <span style={{ padding: "1px 7px", borderRadius: 20, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.09)", color: "#64748B", fontSize: 10, fontWeight: 600, flexShrink: 0 }}>
             {t("enterprise.knowledge.processDetail.tagsCount", { n: tagCount })}
           </span>
@@ -1465,7 +1465,11 @@ function TopicTreeItem({
                 job={j} onDismissJob={onDismissItemJob} />
             ))}
             {decks.length === 0 && batteries.length === 0 && pendingDeckJobs.length === 0 && pendingBatteryJobs.length === 0 && (
-              <p style={{ color: "#334155", fontSize: 12, fontStyle: "italic", padding: "4px 8px", margin: 0 }}>{t("enterprise.knowledge.processDetail.noContentGenerated")}</p>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", padding: "4px 8px" }}>
+                <p style={{ color: "#334155", fontSize: 12, fontStyle: "italic", margin: 0 }}>{t("enterprise.knowledge.processDetail.noContentGenerated")}</p>
+                {onAddDeck && <button type="button" onClick={addDeck} style={{ padding: "4px 8px", borderRadius: 6, background: "rgba(74,222,128,0.07)", border: "1px solid rgba(74,222,128,0.18)", color: "#4ade80", fontSize: 11, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}>+ {t("enterprise.knowledge.processDetail.addDeck")}</button>}
+                {onAddBattery && <button type="button" onClick={addBattery} style={{ padding: "4px 8px", borderRadius: 6, background: "rgba(74,222,128,0.07)", border: "1px solid rgba(74,222,128,0.18)", color: "#4ade80", fontSize: 11, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}>+ {t("enterprise.knowledge.processDetail.addBattery")}</button>}
+              </div>
             )}
           </div>
         )}
@@ -1480,7 +1484,7 @@ function KnowledgeStructurePanel({
   canReorder, onTagGroupDecksReorder, onTagGroupBatteriesReorder,
   onTopicDecksReorder, onTopicBatteriesReorder,
   onStudy, onLearn, onSimulate, onDeleteBattery, onDeleteDeck, onDeleteTopic, onAutoGen,
-  onAddDeck, onAddBattery, itemJobs, onDismissItemJob,
+  onAddDeck, onAddBattery, onAddTopic, itemJobs, onDismissItemJob,
 }) {
   const { t } = useLanguage();
   const totalQuestions = batteries.reduce((s, b) => s + (b.question_count ?? 0), 0);
@@ -1532,7 +1536,7 @@ function KnowledgeStructurePanel({
                 <span style={{ fontSize: 10, color: "#475569" }}>{label}</span>
               </div>
             ))}
-            <button style={{ display: "flex", alignItems: "center", gap: 4, padding: "4px 10px", background: "rgba(74,222,128,0.08)", border: "1px solid rgba(74,222,128,0.22)", borderRadius: 6, color: "#4ade80", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
+            <button onClick={() => onAddTopic?.()} style={{ display: "flex", alignItems: "center", gap: 4, padding: "4px 10px", background: "rgba(74,222,128,0.08)", border: "1px solid rgba(74,222,128,0.22)", borderRadius: 6, color: "#4ade80", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
               <PlusIcon style={{ width: 11, height: 11 }} /> {t("enterprise.knowledge.processDetail.structurePanel.addTopic")}
             </button>
           </div>
@@ -1806,6 +1810,69 @@ function SectionTree({ scannedDocuments, selectedIds, onToggleDoc, onToggleSecti
           </div>
         );
       })}
+    </div>
+  );
+}
+
+// F-09: "+ Add topic" inside a process.
+export function AddTopicDialog({ open, onClose, onCreate }) {
+  const { t } = useLanguage();
+  const K = "enterprise.knowledge.processDetail.topicDialog.";
+  const [form, setForm] = React.useState({ title: "", description: "", tags: "" });
+  const [error, setError] = React.useState("");
+  const [submitting, setSubmitting] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!open) return;
+    setForm({ title: "", description: "", tags: "" }); setError(""); setSubmitting(false);
+  }, [open]);
+
+  if (!open) return null;
+
+  const handleSubmit = async (e) => {
+    e?.preventDefault();
+    if (submitting) return;
+    if (!form.title.trim()) { setError(t(`${K}titleRequired`)); return; }
+    setSubmitting(true);
+    try {
+      await onCreate({
+        title: form.title.trim(),
+        description: form.description.trim(),
+        tags: form.tags.split(",").map((s) => s.trim()).filter(Boolean),
+      });
+    } catch (err) {
+      setError(apiErrorMessage(err, t(`${K}createError`)));
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div style={{ position: "fixed", inset: 0, zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
+      <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.75)", backdropFilter: "blur(6px)" }} onClick={onClose} />
+      <form onSubmit={handleSubmit} role="dialog" aria-label={t(`${K}title`)} style={{ position: "relative", width: "100%", maxWidth: 480, background: D.bg, border: `1px solid ${D.border}`, borderRadius: 20, padding: 24, display: "flex", flexDirection: "column", gap: 14, boxShadow: "0 32px 80px rgba(0,0,0,0.7)" }}>
+        <h2 style={{ color: D.text, fontWeight: 800, fontSize: 17, margin: 0 }}>{t(`${K}title`)}</h2>
+        <div>
+          <DLbl>{t(`${K}titleField`)} <span style={{ color: D.error }}>*</span></DLbl>
+          <DarkInput value={form.title} onChange={(e) => { setForm((p) => ({ ...p, title: e.target.value })); setError(""); }} name="title" placeholder={t(`${K}titlePlaceholder`)} error={!!error && !form.title.trim()} />
+        </div>
+        <div>
+          <DLbl>{t("enterprise.knowledge.processDetail.descriptionLabel")} <span style={{ color: D.dim, fontSize: 9, fontWeight: 400, textTransform: "none", letterSpacing: 0 }}>{t("enterprise.knowledge.processDetail.optional")}</span></DLbl>
+          <DarkTextarea value={form.description} onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))} name="description" placeholder={t(`${K}descriptionPlaceholder`)} />
+        </div>
+        <div>
+          <DLbl>{t(`${K}tagsField`)} <span style={{ color: D.dim, fontSize: 9, fontWeight: 400, textTransform: "none", letterSpacing: 0 }}>{t("enterprise.knowledge.processDetail.optional")}</span></DLbl>
+          <DarkInput value={form.tags} onChange={(e) => setForm((p) => ({ ...p, tags: e.target.value }))} name="tags" placeholder={t(`${K}tagsPlaceholder`)} />
+        </div>
+        {error && <p style={{ color: D.error, fontSize: 12, margin: 0 }}>{error}</p>}
+        <div style={{ display: "flex", gap: 10 }}>
+          <button type="button" onClick={onClose} style={{ flex: 1, height: 40, borderRadius: 9, background: D.subtle, border: `1px solid ${D.border}`, color: D.muted, fontWeight: 700, cursor: "pointer" }}>
+            {t("enterprise.compliance.programs.cancel")}
+          </button>
+          <button type="submit" disabled={submitting} style={{ flex: 2, height: 40, borderRadius: 9, border: "none", background: submitting ? "rgba(99,102,241,0.5)" : "linear-gradient(135deg, #6366F1 0%, #818CF8 100%)", color: "#fff", fontWeight: 700, cursor: submitting ? "not-allowed" : "pointer" }}>
+            {t(`${K}create`)}
+          </button>
+        </div>
+      </form>
     </div>
   );
 }
@@ -2333,6 +2400,7 @@ export function ProcessDetail() {
   const [droppedFiles, setDroppedFiles] = useState([]);
   const [showAddDeck, setShowAddDeck] = useState(false);
   const [showAddBattery, setShowAddBattery] = useState(false);
+  const [showAddTopic, setShowAddTopic] = useState(false);
   const [activeTagGroupId, setActiveTagGroupId] = useState(null);
   const [genState, setGenState] = useState(INIT_GEN);
   const [tagGroups, setTagGroups] = useState([]);
@@ -2552,6 +2620,13 @@ export function ProcessDetail() {
     setActiveTagGroupId(tagGroupId || null);
     setShowAddBattery(true);
   }, []);
+
+  // F-09: errors propagate so the dialog stays open with the backend message.
+  const handleCreateTopic = async (topicData) => {
+    await knowledgeApi.createTopic(id, topicData);
+    setShowAddTopic(false);
+    loadResults();
+  };
 
   const handleCreateDeck = async (deckData) => {
     if (deckData.mode === "manual") {
@@ -2984,6 +3059,7 @@ export function ProcessDetail() {
           onAutoGen={handleAutoGen}
           onAddDeck={handleOpenAddDeck}
           onAddBattery={handleOpenAddBattery}
+          onAddTopic={() => setShowAddTopic(true)}
           itemJobs={itemJobs}
           onDismissItemJob={removeItemJob}
         />
@@ -3026,6 +3102,12 @@ export function ProcessDetail() {
         onConfirm={handleConfirmDelete}
         onCancel={() => setDeleteTarget(null)}
         deleting={deleting}
+      />
+
+      <AddTopicDialog
+        open={showAddTopic}
+        onClose={() => setShowAddTopic(false)}
+        onCreate={handleCreateTopic}
       />
 
       <EnterpriseDeckDialog

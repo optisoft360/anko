@@ -2193,6 +2193,17 @@ export const en = {
                     dragDrop: "Drag and drop documents here",
                     orSelectFiles: "or select files"
                 },
+                topicDialog: {
+                    title: "Add topic",
+                    titleField: "Topic name",
+                    titlePlaceholder: "E.g. Personal protective equipment",
+                    titleRequired: "The topic name is required.",
+                    descriptionPlaceholder: "What does this topic cover?",
+                    tagsField: "Tags",
+                    tagsPlaceholder: "Comma-separated, e.g. helmets, boots",
+                    create: "Create topic",
+                    createError: "Could not create the topic."
+                },
                 structurePanel: {
                     title: "Knowledge Structure",
                     summary: "{topics} topics · {decks} decks · {batteries} batteries",

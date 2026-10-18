@@ -2194,6 +2194,17 @@ export const es = {
                     dragDrop: "Arrastra y suelta documentos aquí",
                     orSelectFiles: "o selecciona archivos"
                 },
+                topicDialog: {
+                    title: "Agregar tópico",
+                    titleField: "Nombre del tópico",
+                    titlePlaceholder: "Ej. Equipo de protección personal",
+                    titleRequired: "El nombre del tópico es obligatorio.",
+                    descriptionPlaceholder: "¿Qué cubre este tópico?",
+                    tagsField: "Etiquetas",
+                    tagsPlaceholder: "Separadas por comas, ej. cascos, botas",
+                    create: "Crear tópico",
+                    createError: "No se pudo crear el tópico."
+                },
                 structurePanel: {
                     title: "Estructura de conocimiento",
                     summary: "{topics} tópicos · {decks} decks · {batteries} baterías",
