@@ -2288,14 +2288,16 @@ export const es = {
                 connections: "Conexiones ({count})",
                 computingLayout: "Calculando diseño...",
                 noData: "No hay datos del grafo de conocimiento",
-                noDataHint: "Procesa documentos con IA para construir el grafo.",
+                noDataHint: "Genera tópicos en un proceso (Auto-generar o «Agregar tópico») y pulsa Actualizar.",
+                loadError: "No se pudo cargar el grafo de conocimiento.",
                 nodeTypes: {
                     concept: "Concepto",
                     procedure: "Procedimiento",
                     regulation: "Regulación",
                     skill: "Habilidad",
                     topic: "Tópico",
-                    rule: "Regla"
+                    rule: "Regla",
+                    document: "Proceso"
                 },
                 edgeTypes: {
                     requires: "requiere",

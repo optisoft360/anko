@@ -2287,14 +2287,16 @@ export const en = {
                 connections: "Connections ({count})",
                 computingLayout: "Computing layout...",
                 noData: "No knowledge graph data",
-                noDataHint: "Process documents with AI to build the graph.",
+                noDataHint: "Generate topics for a process (Auto-generate or “Add topic”), then press Refresh.",
+                loadError: "Could not load the knowledge graph.",
                 nodeTypes: {
                     concept: "Concept",
                     procedure: "Procedure",
                     regulation: "Regulation",
                     skill: "Skill",
                     topic: "Topic",
-                    rule: "Rule"
+                    rule: "Rule",
+                    document: "Process"
                 },
                 edgeTypes: {
                     requires: "requires",

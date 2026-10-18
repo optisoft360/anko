@@ -225,6 +225,8 @@ export const knowledgeApi = {
   applyImpact: (id) => enterpriseApi.post(`/enterprise/change-impact/${id}/apply/`, {}, { params: cp() }).then((r) => r.data),
 
   getGraph: (p) => enterpriseApi.get("/enterprise/knowledge-graph/graph/", { params: cp(p) }).then((r) => r.data),
+  // F-13: rebuild the structure graph (process, topics, tags, procedures).
+  rebuildGraph: (p) => enterpriseApi.post("/enterprise/knowledge-graph/rebuild/", {}, { params: cp(p) }).then((r) => r.data),
   getResults: (id) => enterpriseApi.get(`/enterprise/knowledge-sources/${id}/results/`, { params: cp() }).then((r) => r.data),
   // KnowledgeSource documents are linked via KnowledgeSourceDocument, not Document.project —
   // this must NOT be confused with projectService.getDocumentsWithSections (Project-scoped).

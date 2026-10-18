@@ -3,6 +3,7 @@ import { ArrowPathIcon, LinkIcon, FunnelIcon } from "@heroicons/react/24/outline
 import { knowledgeApi } from "../../api/enterpriseApi";
 import { useEnterprise } from "../../context/enterprise-context";
 import { useLanguage } from "../../../context/language-context";
+import { apiErrorMessage } from "@/utils/apiError";
 
 const NODE_COLORS = {
   concept:   "#6366f1",
@@ -11,6 +12,7 @@ const NODE_COLORS = {
   skill:     "#22c55e",
   topic:     "#a855f7",
   rule:      "#78716c",
+  document:  "#0ea5e9",
 };
 
 const EDGE_COLORS = {
@@ -33,6 +35,7 @@ function useNodeTypeLabels() {
     skill: t("enterprise.knowledge.graph.nodeTypes.skill"),
     topic: t("enterprise.knowledge.graph.nodeTypes.topic"),
     rule: t("enterprise.knowledge.graph.nodeTypes.rule"),
+    document: t("enterprise.knowledge.graph.nodeTypes.document"),
   };
 }
 
@@ -47,6 +50,14 @@ function useEdgeTypeLabels() {
     contradicts: t("enterprise.knowledge.graph.edgeTypes.contradicts"),
   };
 }
+
+// The API sends source_node_id/target_node_id; older payloads used source_id/source.
+export const edgeEnds = (e) => [e.source_node_id ?? e.source_id ?? e.source, e.target_node_id ?? e.target_id ?? e.target];
+// importance_score is 0-100 from the API; the drawing works with 0-1.
+export const importanceOf = (n) => {
+  const v = Number(n.importance_score ?? 50);
+  return Math.max(0, Math.min(1, v > 1 ? v / 100 : v));
+};
 
 /* Simple force-directed layout using Fruchterman-Reingold approximation */
 function computeLayout(nodes, edges, W, H) {
@@ -87,8 +98,7 @@ function computeLayout(nodes, edges, W, H) {
 
     // Attraction
     edges.forEach((e) => {
-      const si = e.source_id || e.source;
-      const ti = e.target_id || e.target;
+      const [si, ti] = edgeEnds(e);
       if (!positions[si] || !positions[ti]) return;
       const dx = positions[si].x - positions[ti].x;
       const dy = positions[si].y - positions[ti].y;
@@ -115,12 +125,16 @@ function computeLayout(nodes, edges, W, H) {
 }
 
 export function KnowledgeGraph() {
-  const { activeCompanyId } = useEnterprise();
+  const { activeCompanyId, role, isPlatformAdmin } = useEnterprise();
+  // Same roles the backend accepts for /knowledge-graph/rebuild/.
+  const canRebuild = isPlatformAdmin || ["owner", "admin", "manager", "trainer"].includes(role);
   const { t } = useLanguage();
   const NODE_TYPE_LABELS = useNodeTypeLabels();
   const EDGE_TYPE_LABELS = useEdgeTypeLabels();
   const [graph, setGraph] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [rebuilding, setRebuilding] = useState(false);
   const [sources, setSources] = useState([]);
   const [filters, setFilters] = useState({ nodeTypes: new Set(NODE_TYPES), source: "" });
   const [positions, setPositions] = useState({});
@@ -128,29 +142,58 @@ export function KnowledgeGraph() {
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const dragging = useRef(false);
+  const svgRef = useRef(null);
   const lastPt = useRef(null);
   const W = 1100, H = 700;
 
   const loadGraph = useCallback(() => {
     setLoading(true);
+    setError(null);
     const p = {};
     if (filters.source) p.knowledge_source_id = filters.source;
-    Promise.all([
+    return Promise.all([
       knowledgeApi.getGraph(p),
       knowledgeApi.list({}),
     ])
       .then(([g, ksResp]) => {
         setGraph(g);
         setSources(ksResp.results || ksResp || []);
-        const nodes = (g.nodes || []).filter((n) => filters.nodeTypes.has(n.node_type));
-        const edges = g.edges || g.relationships || [];
-        setPositions(computeLayout(nodes, edges, W, H));
+        setSelected(null);
+        // Lay out every node so toggling a type filter never leaves nodes without a position.
+        setPositions(computeLayout(g.nodes || [], g.edges || g.relationships || [], W, H));
       })
-      .catch(() => {})
+      .catch((err) => { setGraph(null); setError(apiErrorMessage(err, t("enterprise.knowledge.graph.loadError"))); })
       .finally(() => setLoading(false));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeCompanyId, filters.source]);
 
   useEffect(() => { loadGraph(); }, [loadGraph]);
+
+  // Refresh = rebuild the structure graph (trainer role or higher), then reload.
+  // Other viewers get a plain reload.
+  const refresh = async () => {
+    if (canRebuild) {
+      setRebuilding(true);
+      try {
+        await knowledgeApi.rebuildGraph(filters.source ? { knowledge_source_id: filters.source } : {});
+      } catch (err) {
+        setRebuilding(false);
+        setError(apiErrorMessage(err, t("enterprise.knowledge.graph.loadError")));
+        return;
+      }
+      setRebuilding(false);
+    }
+    loadGraph();
+  };
+
+  // Non-passive wheel listener so the page doesn't scroll while zooming the graph.
+  useEffect(() => {
+    const el = svgRef.current;
+    if (!el) return undefined;
+    const onWheel = (e) => { e.preventDefault(); setZoom((z) => Math.max(0.2, Math.min(4, z - e.deltaY * 0.001))); };
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => el.removeEventListener("wheel", onWheel);
+  });
 
   const toggleType = (type) => {
     setFilters((prev) => {
@@ -163,12 +206,10 @@ export function KnowledgeGraph() {
   const visibleNodes = (graph?.nodes || []).filter((n) => filters.nodeTypes.has(n.node_type));
   const visibleIds = new Set(visibleNodes.map((n) => n.id));
   const visibleEdges = (graph?.edges || graph?.relationships || []).filter((e) => {
-    const s = e.source_id || e.source;
-    const t2 = e.target_id || e.target;
+    const [s, t2] = edgeEnds(e);
     return visibleIds.has(s) && visibleIds.has(t2);
   });
-
-  const onWheel = (e) => { e.preventDefault(); setZoom((z) => Math.max(0.2, Math.min(4, z - e.deltaY * 0.001))); };
+  const sourceTitle = (id) => sources.find((s) => s.id === id)?.title;
   const onMouseDown = (e) => { dragging.current = true; lastPt.current = { x: e.clientX, y: e.clientY }; };
   const onMouseMove = (e) => {
     if (!dragging.current) return;
@@ -178,11 +219,7 @@ export function KnowledgeGraph() {
   const onMouseUp = () => { dragging.current = false; };
 
   const selectedRelations = selected
-    ? visibleEdges.filter((e) => {
-        const s = e.source_id || e.source;
-        const t2 = e.target_id || e.target;
-        return s === selected.id || t2 === selected.id;
-      })
+    ? visibleEdges.filter((e) => edgeEnds(e).includes(selected.id))
     : [];
 
   return (
@@ -194,8 +231,8 @@ export function KnowledgeGraph() {
             {t("enterprise.knowledge.graph.summary", { nodes: visibleNodes.length, edges: visibleEdges.length })}
           </p>
         </div>
-        <button onClick={loadGraph} disabled={loading} className="ank-btn-ghost text-xs" style={{ opacity: loading ? 0.6 : 1 }}>
-          <ArrowPathIcon className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} /> {t("enterprise.knowledge.graph.refresh")}
+        <button onClick={refresh} disabled={loading || rebuilding} className="ank-btn-ghost text-xs" style={{ opacity: loading || rebuilding ? 0.6 : 1 }}>
+          <ArrowPathIcon className={`h-3.5 w-3.5 ${loading || rebuilding ? "animate-spin" : ""}`} /> {t("enterprise.knowledge.graph.refresh")}
         </button>
       </div>
 
@@ -230,16 +267,16 @@ export function KnowledgeGraph() {
                 style={{ width: "100%", fontSize: 12, background: "var(--bg-elevated)", border: "1px solid var(--border)", borderRadius: 8, padding: "7px 8px", color: "var(--text-secondary)", outline: "none" }}
               >
                 <option value="">{t("enterprise.knowledge.graph.allSources")}</option>
-                {sources.filter((s) => s.status === "processed").map((s) => (
+                {sources.map((s) => (
                   <option key={s.id} value={s.id}>{s.title}</option>
                 ))}
               </select>
             </div>
 
             <div className="flex gap-1">
-              <button onClick={() => setZoom((z) => Math.min(4, z + 0.25))}
+              <button data-testid="zoom-in" onClick={() => setZoom((z) => Math.min(4, z + 0.25))}
                 style={{ flex: 1, padding: "5px 0", background: "var(--bg-elevated)", border: "1px solid var(--border)", borderRadius: 8, color: "var(--text-secondary)", fontWeight: 700, fontSize: 13, cursor: "pointer" }}>+</button>
-              <button onClick={() => setZoom((z) => Math.max(0.2, z - 0.25))}
+              <button data-testid="zoom-out" onClick={() => setZoom((z) => Math.max(0.2, z - 0.25))}
                 style={{ flex: 1, padding: "5px 0", background: "var(--bg-elevated)", border: "1px solid var(--border)", borderRadius: 8, color: "var(--text-secondary)", fontWeight: 700, fontSize: 13, cursor: "pointer" }}>−</button>
               <button onClick={() => { setPan({ x: 0, y: 0 }); setZoom(1); }}
                 style={{ flex: 1, padding: "5px 0", background: "var(--bg-elevated)", border: "1px solid var(--border)", borderRadius: 8, color: "var(--text-tertiary)", fontWeight: 700, fontSize: 11, cursor: "pointer" }}>{t("enterprise.knowledge.graph.fit")}</button>
@@ -259,16 +296,21 @@ export function KnowledgeGraph() {
               {selected.description && (
                 <p style={{ fontSize: 11, color: "var(--text-tertiary)" }}>{selected.description}</p>
               )}
+              {selected.source_id && sourceTitle(selected.source_id) && (
+                <p style={{ fontSize: 11, color: "var(--text-tertiary)" }}>
+                  {t("enterprise.knowledge.graph.knowledgeSourceLabel")}: <span style={{ color: "var(--text-secondary)", fontWeight: 600 }}>{sourceTitle(selected.source_id)}</span>
+                </p>
+              )}
               {selected.importance_score != null && (
                 <div>
                   <div className="flex justify-between mb-1">
                     <span style={{ fontSize: 11, color: "var(--text-tertiary)" }}>{t("enterprise.knowledge.graph.importance")}</span>
                     <span style={{ fontSize: 11, fontWeight: 700, color: "#818CF8" }}>
-                      {Math.round(selected.importance_score * 100)}%
+                      {Math.round(importanceOf(selected) * 100)}%
                     </span>
                   </div>
                   <div style={{ height: 5, background: "var(--bg-elevated)", borderRadius: 20, overflow: "hidden" }}>
-                    <div style={{ height: "100%", borderRadius: 20, background: "#6366F1", width: `${selected.importance_score * 100}%` }} />
+                    <div style={{ height: "100%", borderRadius: 20, background: "#6366F1", width: `${importanceOf(selected) * 100}%` }} />
                   </div>
                 </div>
               )}
@@ -279,7 +321,8 @@ export function KnowledgeGraph() {
                   </p>
                   <div className="space-y-1" style={{ maxHeight: 128, overflowY: "auto" }}>
                     {selectedRelations.slice(0, 8).map((e, i) => {
-                      const otherId = (e.source_id || e.source) === selected.id ? (e.target_id || e.target) : (e.source_id || e.source);
+                      const [s, t2] = edgeEnds(e);
+                      const otherId = s === selected.id ? t2 : s;
                       const other = visibleNodes.find((n) => n.id === otherId);
                       return (
                         <div key={i} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: "var(--text-tertiary)" }}>
@@ -307,7 +350,11 @@ export function KnowledgeGraph() {
             </div>
           )}
 
-          {!loading && !visibleNodes.length && (
+          {!loading && error && (
+            <div role="alert" style={{ padding: 16, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: 12, color: "#f87171", fontSize: 13, marginBottom: 12 }}>{error}</div>
+          )}
+
+          {!loading && !error && !visibleNodes.length && (
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: 384, background: "var(--bg-app)", borderRadius: 12, border: "1px solid var(--border)", color: "var(--text-tertiary)", gap: 10 }}>
               <LinkIcon style={{ width: 40, height: 40, opacity: 0.3 }} />
               <p style={{ fontWeight: 600, fontSize: 13 }}>{t("enterprise.knowledge.graph.noData")}</p>
@@ -317,9 +364,10 @@ export function KnowledgeGraph() {
 
           {visibleNodes.length > 0 && (
             <svg
+              ref={svgRef}
+              data-testid="knowledge-graph"
               viewBox={`0 0 ${W} ${H}`}
               style={{ width: "100%", height: 520, background: "var(--bg-app)", borderRadius: 12, border: "1px solid var(--border)", cursor: dragging.current ? "grabbing" : "grab" }}
-              onWheel={onWheel}
               onMouseDown={onMouseDown}
               onMouseMove={onMouseMove}
               onMouseUp={onMouseUp}
@@ -328,12 +376,13 @@ export function KnowledgeGraph() {
               <g transform={`translate(${pan.x},${pan.y}) scale(${zoom})`}>
                 {/* Edges */}
                 {visibleEdges.map((e, i) => {
-                  const s = positions[e.source_id || e.source];
-                  const tgt = positions[e.target_id || e.target];
+                  const [sid, tid] = edgeEnds(e);
+                  const s = positions[sid];
+                  const tgt = positions[tid];
                   if (!s || !tgt) return null;
                   const color = EDGE_COLORS[e.relationship_type] || "#64748b";
                   const dashed = ["requires", "contradicts"].includes(e.relationship_type);
-                  const strength = e.strength ?? 0.5;
+                  const strength = Number(e.strength ?? 0.5);
                   return (
                     <line key={i}
                       x1={s.x} y1={s.y} x2={tgt.x} y2={tgt.y}
@@ -348,12 +397,11 @@ export function KnowledgeGraph() {
                   const pos = positions[n.id];
                   if (!pos) return null;
                   const color = NODE_COLORS[n.node_type] || "#6366f1";
-                  const r = 8 + (n.importance_score || 0.5) * 16;
+                  const r = 8 + importanceOf(n) * 16;
                   const isSel = selected?.id === n.id;
-                  const isRelated = selectedRelations.some((e) =>
-                    (e.source_id || e.source) === n.id || (e.target_id || e.target) === n.id);
+                  const isRelated = selectedRelations.some((e) => edgeEnds(e).includes(n.id));
                   return (
-                    <g key={n.id} style={{ cursor: "pointer" }}
+                    <g key={n.id} style={{ cursor: "pointer" }} data-node-title={n.title}
                       onClick={() => setSelected(isSel ? null : n)}>
                       <circle cx={pos.x} cy={pos.y} r={r + (isSel ? 5 : 0)}
                         fill={color}
