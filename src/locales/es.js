@@ -961,7 +961,7 @@ export const es = {
         project_label: "Proyecto",
         context_docs: "Contexto (Documentos)",
         select_docs: "Seleccionar documentos",
-        docs_selected: "{count} seleccionado(s)",
+        docs_selected: { one: "{count} seleccionado", other: "{count} seleccionados" },
         no_docs: "No hay documentos",
         no_docs_placeholder: "Selecciona documentos para comenzar.",
         help_text: "Haz una pregunta sobre los documentos seleccionados.",
@@ -982,6 +982,13 @@ export const es = {
         password_requirements: "Debe tener al menos 8 caracteres, incluyendo letras y números."
     },
     enterprise: {
+        onboarding: {
+            loadErrorTitle: "No pudimos cargar tu empresa",
+            loadErrorHint: "Tu sesión sigue activa. Vuelve a intentarlo en un momento.",
+            retry: "Reintentar",
+            noCompanyTitle: "Aún no perteneces a ninguna empresa",
+            noCompanyHint: "Pide al administrador de tu empresa que te envíe una invitación."
+        },
         roles: {
             owner: "Propietario",
             admin: "Administrador",
@@ -1010,7 +1017,7 @@ export const es = {
             assignments: "Asignaciones",
             activeTrainings: "Entrenamientos activos",
             sources: "Fuentes",
-            completedCount: "{count} completadas",
+            completedCount: { one: "{count} completada", other: "{count} completadas" },
             riskValue: "Riesgo {value}",
             programsRatio: "{compliant}/{total} programas",
             expiringSoon: "{count} por vencer",
@@ -1108,7 +1115,7 @@ export const es = {
                     activeCerts: "Certificaciones Activas",
                     validCertifications: "Certificaciones vigentes",
                     reviewsDue: "Repasos Pendientes",
-                    overdueCount: "{n} vencidos",
+                    overdueCount: { one: "{n} vencido", other: "{n} vencidos" },
                     stayOnTrack: "Vas al día"
                 },
                 learning: {
@@ -1150,7 +1157,7 @@ export const es = {
                 avgRetention: "Retención Prom.",
                 avgRisk: "Riesgo Prom.",
                 openGaps: "Brechas de Conocimiento Abiertas",
-                criticalCount: "{n} críticas",
+                criticalCount: { one: "{n} crítica", other: "{n} críticas" },
                 nonCompliantAssignments: "Asignaciones No Conformes",
                 kpi: {
                     headcount: "Cantidad de Empleados",
@@ -1192,7 +1199,7 @@ export const es = {
                 learning: {
                     title: "Progreso de Aprendizaje del Equipo",
                     completionRate: "Tasa de Finalización",
-                    overdueCount: "{n} asignaciones vencidas"
+                    overdueCount: { one: "{n} asignación vencida", other: "{n} asignaciones vencidas" }
                 },
                 atRisk: {
                     title: "Miembros en Riesgo",
@@ -1207,7 +1214,7 @@ export const es = {
                     criticalGaps: "Brechas Críticas",
                     highGaps: "Brechas Altas",
                     mediumGaps: "Brechas Medias",
-                    overdueReviews: "{n} Repasos Vencidos"
+                    overdueReviews: { one: "{n} Repaso Vencido", other: "{n} Repasos Vencidos" }
                 }
             },
             trainer: {
@@ -1229,7 +1236,7 @@ export const es = {
                     title: "Aprendices que Necesitan Atención",
                     empty: "Todos los aprendices van al día",
                     emptyMessage: "Ningún aprendiz necesita atención inmediata.",
-                    overdueCount: "{n} vencidas",
+                    overdueCount: { one: "{n} vencida", other: "{n} vencidas" },
                     viewProfile: "Ver Perfil"
                 },
                 moduleCompletionRate: "Tasa de Finalización de Módulos",
@@ -1239,8 +1246,8 @@ export const es = {
         learning: {
             myAssignments: {
                 title: "Mis Tareas",
-                assignedCount: "{count} learning path{plural} asignado{plural} a ti",
-                completedCount: "{count} completado{plural}",
+                assignedCount: { one: "{count} learning path asignado a ti", other: "{count} learning paths asignados a ti" },
+                completedCount: { one: "{count} completado", other: "{count} completados" },
                 empty: "Sin asignaciones",
                 emptyMessage: "Tu manager o trainer asignará Learning Paths aquí.",
                 learningPath: "Learning Path",
@@ -1280,19 +1287,20 @@ export const es = {
                 openOriginal: "Abrir archivo original",
                 noSections: "Sin secciones extraídas para este documento.",
                 noTitle: "Sin título",
-                cardsCount: "{n} tarjetas",
+                cardsCount: { one: "{n} tarjeta", other: "{n} tarjetas" },
                 deckDefaultDesc: "Conjunto de tarjetas de estudio para este tópico",
                 deckMobileTitle: "Tarjetas",
                 deckMobileDesc: "Repasa los conceptos clave",
                 learnBtn: "Aprender",
                 studyBtn: "Estudiar",
-                questionsCount: "{n} preguntas",
+                questionsCount: { one: "{n} pregunta", other: "{n} preguntas" },
                 batteryDefaultDesc: "Evaluación o práctica relacionada con este tópico",
                 batteryMobileTitle: "Evaluación",
                 batteryMobileDesc: "Pon a prueba tu comprensión",
                 simulateBtn: "Simular",
                 topicLabel: "Tópico {n}",
-                topicsCount: "{n} temas",
+                topicsCount: { one: "{n} tema", other: "{n} temas" },
+                tagsCount: { one: "{n} etiqueta", other: "{n} etiquetas" },
                 noTopicContent: "Sin contenido generado para este tópico aún.",
                 notLinked: "Este proceso aún no está vinculado a una fuente de conocimiento.",
                 knowledgeStructure: "Estructura de conocimiento",
@@ -1316,7 +1324,7 @@ export const es = {
                 newPath: "Nuevo Learning Path",
                 empty: "Sin Learning Paths",
                 emptyMessage: "Crea tu primer Learning Path para organizar tus Procesos en una secuencia de formación.",
-                count: "{count} learning path{plural}",
+                count: { one: "{count} learning path", other: "{count} learning paths" },
                 status: {
                     draft: "Draft",
                     published: "Published",
@@ -1332,7 +1340,7 @@ export const es = {
                 },
                 card: {
                     confirmDelete: "¿Eliminar \"{name}\"? Los procesos no se borrarán.",
-                    processCount: "{count} proceso{plural}"
+                    processCount: { one: "{count} proceso", other: "{count} procesos" }
                 },
                 wizard: {
                     nameRequired: "El nombre es obligatorio.",
@@ -1348,7 +1356,7 @@ export const es = {
                     searchProcesses: "Buscar procesos…",
                     noProcessesYet: "No hay procesos creados aún.",
                     noResults: "Sin resultados.",
-                    selectedCount: "{count} proceso{plural} seleccionado{plural}",
+                    selectedCount: { one: "{count} proceso seleccionado", other: "{count} procesos seleccionados" },
                     back: "Atrás",
                     creating: "Creando…",
                     createPath: "Crear Learning Path",
@@ -1372,7 +1380,7 @@ export const es = {
                 notFound: "Learning Path no encontrado",
                 back: "Volver",
                 backToPaths: "Volver a Learning Paths",
-                processCount: "{count} proceso{plural}",
+                processCount: { one: "{count} proceso", other: "{count} procesos" },
                 finalBattery: "Batería final",
                 edit: "Editar",
                 assign: "Asignar",
@@ -1400,7 +1408,7 @@ export const es = {
                     unlinkedTitle: "Este módulo no está vinculado a un proceso — creado antes de que ese vínculo existiera.",
                     optional: "Optional",
                     unlinked: "Sin vincular",
-                    itemsCount: "{n} items",
+                    itemsCount: { one: "{n} item", other: "{n} items" },
                     passingScore: "Aprobación: {n}%"
                 },
                 assignModal: {
@@ -1419,7 +1427,7 @@ export const es = {
                     assignedToUser: "Asignado a {name} correctamente.",
                     assignedToTeam: "Asignado al equipo \"{name}\" correctamente.",
                     error: "Error al asignar.",
-                    memberCount: "{n} miembros"
+                    memberCount: { one: "{n} miembro", other: "{n} miembros" }
                 }
             },
             trainingPrograms: {
@@ -1435,7 +1443,7 @@ export const es = {
                 createError: "No se pudo crear el programa.",
                 selectPath: "Selecciona un learning path.",
                 publishError: "No se pudo publicar la versión.",
-                versionCount: "{n} versión(es)",
+                versionCount: { one: "{n} versión", other: "{n} versiones" },
                 currentVersion: "Vigente: v{n}",
                 newVersion: "Nueva Versión",
                 history: "Historial",
@@ -1458,7 +1466,7 @@ export const es = {
                 newAssignment: "Nueva Asignación",
                 empty: "Sin asignaciones",
                 emptyMessage: "Asigna Learning Paths a miembros o equipos para iniciar su formación.",
-                count: "{count} asignación{plural}",
+                count: { one: "{count} asignación", other: "{count} asignaciones" },
                 status: {
                     pending: "Pendiente",
                     inProgress: "En progreso",
@@ -1489,7 +1497,7 @@ export const es = {
                     process: "Proceso",
                     noPaths: "Sin Learning Paths creados.",
                     noProcesses: "Sin Procesos creados.",
-                    processCount: "{n} procesos",
+                    processCount: { one: "{n} proceso", other: "{n} procesos" },
                     cancel: "Cancelar",
                     next: "Siguiente →",
                     userTab: "Usuario",
@@ -1498,7 +1506,7 @@ export const es = {
                     searchTeam: "Buscar equipo…",
                     noMembers: "Sin miembros.",
                     noTeams: "Sin equipos.",
-                    memberCount: "{n} miembros",
+                    memberCount: { one: "{n} miembro", other: "{n} miembros" },
                     dueDate: "Fecha límite",
                     assign: "Asignar"
                 }
@@ -1531,7 +1539,7 @@ export const es = {
                 complete: "Completar",
                 noReviews: "Sin repasos {label}",
                 upToDate: "Estás al día. Vuelve más tarde.",
-                overdueSince: "Venció hace {n} día{plural} ({date})",
+                overdueSince: { one: "Venció hace {n} día ({date})", other: "Venció hace {n} días ({date})" },
                 dueOn: "Vence: {date}",
                 types: {
                     flashcard: "Repaso de Flashcard",
@@ -1611,6 +1619,13 @@ export const es = {
                     mandatoryLabel: "Obligatorio para los usuarios/equipos asignados",
                     requiresScoreLabel: "Requiere un puntaje mínimo de aprobación",
                     passingScore: "Puntaje de Aprobación (0–100)",
+                    errors: {
+                        required: "Este campo es obligatorio.",
+                        tooLong: "Usa como máximo {max} caracteres.",
+                        expiryAfterEffective: "La fecha de caducidad debe ser posterior a la de vigencia.",
+                        range: "Introduce un valor entre {min} y {max}.",
+                        activateError: "No se pudo activar el programa."
+                    },
                     nameCodeRequired: "El nombre y el código son obligatorios.",
                     createError: "No se pudo crear el programa."
                 },
@@ -1671,7 +1686,7 @@ export const es = {
                     searchTeam: "Buscar equipo…",
                     noMembers: "No hay miembros.",
                     noTeams: "No hay equipos.",
-                    memberCount: "{n} miembro{plural}",
+                    memberCount: { one: "{n} miembro", other: "{n} miembros" },
                     dueDate: "Fecha Límite",
                     close: "Cerrar",
                     assign: "Asignar",
@@ -1843,6 +1858,13 @@ export const es = {
             }
         },
         certifications: {
+            templateTypes: {
+                course_completion: "Finalización de curso",
+                compliance: "Cumplimiento",
+                skill_mastery: "Dominio de habilidad",
+                certification: "Certificación profesional",
+                custom: "Personalizado"
+            },
             myCertifications: {
                 title: "Mis Certificaciones",
                 issued: "Emitido:",
@@ -2017,10 +2039,10 @@ export const es = {
                 title: "Procesos",
                 subtitle: "Módulos de aprendizaje de tu empresa",
                 newProcess: "Nuevo Proceso",
-                itemCount: "{count} elemento{plural}",
+                itemCount: { one: "{count} elemento", other: "{count} elementos" },
                 minutes: "{n} min",
                 order: "Orden: #{n}",
-                processCount: "{count} proceso{plural}",
+                processCount: { one: "{count} proceso", other: "{count} procesos" },
                 types: {
                     course: "Curso",
                     tutorial: "Tutorial",
@@ -2063,14 +2085,14 @@ export const es = {
                 battery: "Batería",
                 batteryDefaultDescription: "Evaluación o práctica relacionada con este tópico",
                 by: "por {name}",
-                cardsCount: "{n} tarjetas",
+                cardsCount: { one: "{n} tarjeta", other: "{n} tarjetas" },
                 deckDefaultDescription: "Conjunto de tarjetas de estudio para este tópico",
                 deleteBatteryTitle: "Eliminar batería",
                 deleteDeckTitle: "Eliminar deck",
                 descriptionLabel: "Descripción",
                 dismiss: "Descartar",
                 documentsAndSections: "Documentos & Secciones",
-                documentsCount: "{count} documento{plural}",
+                documentsCount: { one: "{count} documento", other: "{count} documentos" },
                 dragToReorder: "Arrastrar para reordenar",
                 dragToReorderLong: "arrastra para reordenar",
                 generateFromDocumentsTitle: "Generar flashcards y baterías desde los documentos",
@@ -2087,7 +2109,7 @@ export const es = {
                 passingScore: "Aprobación: {n}%",
                 processNotFound: "Proceso no encontrado",
                 publicVisibility: "Visibilidad pública",
-                questionsCount: "{n} preguntas",
+                questionsCount: { one: "{n} pregunta", other: "{n} preguntas" },
                 ready: "¡Listo!",
                 reorder: "reordena",
                 sectionsAbbr: "{n} secc.",
@@ -2095,7 +2117,7 @@ export const es = {
                 selectedAbbr: "{n} sel.",
                 simulate: "Simular",
                 study: "Estudiar",
-                tagsCount: "{n} temas",
+                tagsCount: { one: "{n} etiqueta", other: "{n} etiquetas" },
                 topicLabel: "Tópico {n}",
                 unexpectedError: "Ocurrió un error inesperado.",
                 untitled: "Sin título",
@@ -2137,7 +2159,7 @@ export const es = {
                 addDocModal: {
                     title: "Agregar documentos",
                     clickOrDrag: "Haz clic o arrastra archivos aquí",
-                    filesSelected: "{count} archivo{plural} seleccionado{plural}",
+                    filesSelected: { one: "{count} archivo seleccionado", other: "{count} archivos seleccionados" },
                     fileTypes: "PDF, DOCX, XLSX, PPTX, TXT, MD — máx. 400 MB",
                     uploading: "Subiendo…",
                     upload: "Subir",
@@ -2197,7 +2219,7 @@ export const es = {
                     title: "Documentos",
                     addDocument: "Agregar documento",
                     searchPlaceholder: "Buscar documentos...",
-                    count: "{count} documento{plural}",
+                    count: { one: "{count} documento", other: "{count} documentos" },
                     empty: "Sin documentos adjuntos.",
                     dragDrop: "Arrastra y suelta documentos aquí",
                     orSelectFiles: "o selecciona archivos"
@@ -2218,7 +2240,7 @@ export const es = {
                     summary: "{topics} tópicos · {decks} decks · {batteries} baterías",
                     addTopic: "Agregar tópico",
                     completion: "Completitud del proceso",
-                    completedBatteries: "{completed}/{total} baterías ≥ 80%",
+                    completedBatteries: "{completed}/{total} baterías ≥ {passing}%",
                     noStructure: "Sin estructura generada",
                     noStructureHint: "Los tópicos, decks y baterías se generan automáticamente al procesar los documentos con IA.",
                     unclassified: "Sin clasificar",
@@ -2309,6 +2331,24 @@ export const es = {
                 }
             },
             sourceNew: {
+                languageLabel: "Idioma del contenido generado",
+                languageAuto: "Automático (detectado en los documentos)",
+                languageHint: "Los tópicos, tarjetas, preguntas y explicaciones se escriben en este idioma.",
+                languages: {
+                    es: "Español",
+                    en: "Inglés",
+                    pt: "Portugués",
+                    fr: "Francés",
+                    de: "Alemán",
+                    it: "Italiano",
+                    ca: "Catalán",
+                    nl: "Neerlandés"
+                },
+                numberError: {
+                    required: "Este campo es obligatorio.",
+                    integer: "Introduce un número entero.",
+                    range: "Introduce un valor entre {min} y {max}."
+                },
                 backToProcesses: "Volver a Procesos",
                 subtitle: "Crea un proceso de conocimiento para tu empresa",
                 nameRequired: "El nombre es obligatorio.",
@@ -2368,7 +2408,7 @@ export const es = {
                     uploadNote: "PDF, DOCX, XLSX, PPTX, TXT, MD — máx. 400 MB por archivo",
                     skip: "Omitir — ir al proceso",
                     finish: "Finalizar",
-                    finishWithCount: "Finalizar ({count} doc{plural})"
+                    finishWithCount: { one: "Finalizar ({count} doc)", other: "Finalizar ({count} docs)" }
                 }
             },
             sourceDetail: {
@@ -2406,10 +2446,10 @@ export const es = {
                 procedures: {
                     empty: "Aún no se han extraído procedimientos.",
                     criticalOnly: "Mostrar solo críticos",
-                    count: "{count} procedimientos",
+                    count: { one: "{count} procedimiento", other: "{count} procedimientos" },
                     critical: "CRÍTICO",
-                    steps: "{count} pasos",
-                    warnings: "{count} advertencia(s)"
+                    steps: { one: "{count} paso", other: "{count} pasos" },
+                    warnings: { one: "{count} advertencia", other: "{count} advertencias" }
                 },
                 graph: {
                     loading: "Cargando grafo...",
@@ -2489,7 +2529,7 @@ export const es = {
                     confirmRemove: "¿Dar de baja a {name}?",
                     welcomeResent: "Correo de bienvenida reenviado a {name}.",
                     resendError: "No se pudo reenviar el correo.",
-                    count: "{count} miembro{plural}",
+                    count: { one: "{count} miembro", other: "{count} miembros" },
                     addModal: {
                         title: "Agregar usuario",
                         hint: "Si el usuario no tiene cuenta, se creará automáticamente. Deberá usar \"Olvidé mi contraseña\" para establecer su clave.",
@@ -2525,10 +2565,10 @@ export const es = {
                     saveError: "Error al guardar.",
                     create: "Crear",
                     confirmDelete: "¿Eliminar la unidad \"{name}\"?",
-                    count: "{count} unidad{plural}",
+                    count: { one: "{count} unidad", other: "{count} unidades" },
                     newUnit: "Nueva BU",
                     empty: "Sin unidades de negocio aún.",
-                    teamCount: "{count} equipo{plural}",
+                    teamCount: { one: "{count} equipo", other: "{count} equipos" },
                     managerSuffix: "Manager: {name}",
                     editModal: {
                         title: "Editar Unidad de Negocio",
@@ -2551,11 +2591,11 @@ export const es = {
                     confirmDelete: "¿Eliminar el equipo \"{name}\"?",
                     newTeam: "Nuevo Equipo",
                     empty: "Sin equipos aún.",
-                    memberCount: "{count} miembro{plural}",
+                    memberCount: { one: "{count} miembro", other: "{count} miembros" },
                     buSuffix: "BU: {name}",
                     hide: "Ocultar",
                     members: "Miembros",
-                    count: "{count} equipo{plural}",
+                    count: { one: "{count} equipo", other: "{count} equipos" },
                     editModal: {
                         title: "Editar Equipo",
                         newTitle: "Nuevo Equipo",
@@ -2614,7 +2654,7 @@ export const es = {
                 noneRegistered: "No hay empresas registradas",
                 activeInDashboard: "Empresa activa en el Dashboard de Enterprise",
                 operateAsCompany: "Operar como esta empresa",
-                userCount: "{count} usuario{plural}",
+                userCount: { one: "{count} usuario", other: "{count} usuarios" },
                 activeBadge: "Activa",
                 inactiveBadge: "Inactiva",
                 view: "Ver",
@@ -2735,7 +2775,7 @@ export const es = {
             }
         },
         analytics: {
-            daysOption: "{n} días",
+            daysOption: { one: "{n} día", other: "{n} días" },
             companyHealth: {
                 title: "Puntaje de Salud de la Empresa",
                 empty: "No hay datos de salud disponibles",
@@ -2760,7 +2800,7 @@ export const es = {
                 title: "Tendencias de Aprendizaje",
                 empty: "No hay datos de tendencia de aprendizaje",
                 seriesName: "Completados",
-                tooltipCompletions: "{n} completados"
+                tooltipCompletions: { one: "{n} completado", other: "{n} completados" }
             },
             retentionTrends: {
                 title: "Tendencias de Retención",

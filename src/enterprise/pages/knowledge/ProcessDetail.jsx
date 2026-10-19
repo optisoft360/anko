@@ -1,5 +1,7 @@
 import React, { useEffect, useState, useCallback, useRef, useMemo } from "react";
 import { apiErrorMessage } from "@/utils/apiError";
+import { formatBytes } from "@/utils/numberInput";
+import { bestAttemptPercent } from "@/utils/batteryProgress";
 import { enumLabel, useKnowledgeEnumLabels } from "@/utils/enumLabel";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import {
@@ -83,6 +85,10 @@ function useStageLabels() {
   return {
     prepare: t("enterprise.knowledge.processDetail.stages.prepare"),
     preflight: t("enterprise.knowledge.processDetail.stages.preflight"),
+    // 18: the real step keys sent by the API (AUTO_STAGE_KEYS); without them the banner fell
+    // back to the server's status text, which could arrive translated into another language.
+    prepare_inputs: t("enterprise.knowledge.processDetail.stages.prepare"),
+    preflight_reconciliation: t("enterprise.knowledge.processDetail.stages.preflight"),
     process_document: t("enterprise.knowledge.processDetail.stages.processDocument"),
     aggregate_unique_tags: t("enterprise.knowledge.processDetail.stages.aggregateTags"),
     partition_tags: t("enterprise.knowledge.processDetail.stages.partitionTags"),
@@ -164,7 +170,7 @@ const STEP_STATUS_DOT = {
   skipped:   { color: "rgba(255,255,255,0.2)" },
 };
 
-function AutoGenBanner({ runState, collapsed, onToggle, onDismiss, onStop }) {
+function AutoGenBanner({ runState, collapsed, onToggle, onDismiss, onStop, summary }) {
   const { status, progress, message, stage, artifacts, steps, error } = runState;
   const navigate = useNavigate();
   const { t } = useLanguage();
@@ -175,8 +181,12 @@ function AutoGenBanner({ runState, collapsed, onToggle, onDismiss, onStop }) {
   const isFailed   = FAILED_STATUSES.has(status);
   const isCanceled = CANCEL_STATUSES.has(status);
 
-  const decks     = artifacts.filter((a) => a.artifact_type === "deck");
-  const batteries = artifacts.filter((a) => a.artifact_type === "battery");
+  // 14: once finished, the counts come from the same source as the structure panel (results.summary),
+  // not from this run's artifacts (which miss content added to topics afterwards).
+  const runDecks     = artifacts.filter((a) => a.artifact_type === "deck");
+  const runBatteries = artifacts.filter((a) => a.artifact_type === "battery");
+  const decks     = { length: isSuccess && summary ? summary.decks : runDecks.length };
+  const batteries = { length: isSuccess && summary ? summary.batteries : runBatteries.length };
 
   const accentColor = isFailed ? "#f87171" : isCanceled ? "#f59e0b" : isSuccess ? "#4ade80" : "var(--accent)";
   const borderColor = isFailed ? "rgba(239,68,68,0.3)" : isCanceled ? "rgba(245,158,11,0.3)" : isSuccess ? "rgba(74,222,128,0.25)" : "rgba(94,106,210,0.35)";
@@ -504,7 +514,7 @@ function DocumentsTab({ docs, onAdd, onAutoGen, genStatus }) {
               <p style={{ fontSize: 13, fontWeight: 500, color: "var(--text-primary)" }} className="truncate">{doc.filename}</p>
               <p style={{ fontSize: 11, color: "var(--text-tertiary)", marginTop: 1 }}>
                 {doc.type?.toUpperCase()}
-                {doc.size ? ` · ${(doc.size / 1024 / 1024).toFixed(1)} MB` : ""}
+                {doc.size ? ` · ${formatBytes(doc.size)}` : ""}
                 {doc.added_by ? ` · por ${doc.added_by}` : ""}
                 {doc.version_note ? ` · ${doc.version_note}` : ""}
               </p>
@@ -1102,7 +1112,7 @@ function DocumentsPanel({ docs, onAdd }) {
                 <p style={{ color: "#F1F5F9", fontWeight: 600, fontSize: 12, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{doc.filename}</p>
                 <p style={{ color: "#475569", fontSize: 10, margin: "2px 0 0" }}>
                   {ext}
-                  {doc.size ? ` · ${(doc.size / 1024 / 1024).toFixed(1)} MB` : " · 0.0 MB"}
+                  {` · ${formatBytes(doc.size || 0)}`}
                   {doc.added_by ? ` · ${t("enterprise.knowledge.processDetail.by", { name: doc.added_by })}` : ""}
                 </p>
               </div>
@@ -1227,7 +1237,7 @@ function DeckRowItem({ deck, index, onStudy, onLearn, dragHandleProps, onAddDeck
         >
           + {t("enterprise.knowledge.processDetail.addDeck")}
         </button>
-        <button style={{ color: "#475569", fontSize: 11, fontWeight: 600, cursor: "pointer", background: "none", border: "none", flexShrink: 0 }}>{t("enterprise.knowledge.processDetail.more")}</button>
+        {/* 18: the "More" button had no menu; hidden until one exists. */}
         <button
           onClick={() => onDelete?.(deck)}
           title={t("enterprise.knowledge.processDetail.deleteDeckTitle")}
@@ -1262,7 +1272,8 @@ function BatteryRowItem({ battery, index, onSimulate, onDelete, dragHandleProps,
   const { t } = useLanguage();
   const questionCount = battery.question_count ?? 0;
   const label = battery.name || battery.title || `Battery ${index + 1}`;
-  const pct = battery.last_attempt?.percent ?? null;
+  // 14: the bar shows the best finished attempt (same as process completion and the assignment view).
+  const pct = bestAttemptPercent(battery);
   const hasAttempt = pct !== null;
   const pctRounded = hasAttempt ? Math.round(pct) : 0;
   const pctColor = pctRounded >= 80 ? "#4ade80" : pctRounded >= 50 ? "#f59e0b" : "#818CF8";
@@ -1421,7 +1432,7 @@ function TopicTreeItem({
               <Bars3Icon style={{ width: 11, height: 11 }} /> {t("enterprise.knowledge.processDetail.dragToReorderLong")}
             </span>
           )}
-          <button style={{ color: "#475569", fontSize: 11, fontWeight: 600, cursor: "pointer", background: "none", border: "none", flexShrink: 0, whiteSpace: "nowrap" }}>{t("enterprise.knowledge.processDetail.more")}</button>
+          {/* 18: the "More" button had no menu; hidden until one exists. */}
           <button
             onClick={deleteTopic}
             title={t("enterprise.knowledge.processDetail.deleteDialog.titleTopic")}
@@ -1484,11 +1495,12 @@ function KnowledgeStructurePanel({
   canReorder, onTagGroupDecksReorder, onTagGroupBatteriesReorder,
   onTopicDecksReorder, onTopicBatteriesReorder,
   onStudy, onLearn, onSimulate, onDeleteBattery, onDeleteDeck, onDeleteTopic, onAutoGen,
-  onAddDeck, onAddBattery, onAddTopic, itemJobs, onDismissItemJob,
+  onAddDeck, onAddBattery, onAddTopic, itemJobs, onDismissItemJob, summary, passingScore = 70,
 }) {
   const { t } = useLanguage();
-  const totalQuestions = batteries.reduce((s, b) => s + (b.question_count ?? 0), 0);
-  const totalCards = decks.reduce((s, d) => s + (d.flashcards_count ?? d.cardsCount ?? d.card_count ?? 0), 0);
+  // 14: counters come from results.summary (same numbers as the banner); fallback for older APIs.
+  const totalQuestions = summary?.questions ?? batteries.reduce((s, b) => s + (b.question_count ?? 0), 0);
+  const totalCards = summary?.cards ?? decks.reduce((s, d) => s + (d.flashcards_count ?? d.cardsCount ?? d.card_count ?? 0), 0);
   const hasContent = topics.length > 0 || decks.length > 0 || batteries.length > 0;
   const useTagGroupSystem = tagGroups.length > 0;
 
@@ -1504,12 +1516,13 @@ function KnowledgeStructurePanel({
   const unclassifiedDecks = useMemo(() => decks.filter((d) => !allTagGroupDeckIds.has(d.id)), [decks, allTagGroupDeckIds]);
   const unclassifiedBatteries = useMemo(() => batteries.filter((b) => !allTagGroupBatteryIds.has(b.id)), [batteries, allTagGroupBatteryIds]);
 
-  // Proceso de completitud: promedio del last_attempt.percent de todas las baterías
-  const battWithAttempts = batteries.filter((b) => b.last_attempt?.percent != null);
-  const processCompletion = batteries.length > 0
-    ? Math.round(battWithAttempts.reduce((s, b) => s + Number(b.last_attempt.percent), 0) / batteries.length)
-    : 0;
-  const completedBatteries = batteries.filter((b) => (b.last_attempt?.percent ?? 0) >= 80).length;
+  // Process completion: average of the best finished attempt of every battery (0 if never done);
+  // a battery is completed when that score reaches the process minimum_passing_score.
+  const passing = summary?.passing_score ?? passingScore;
+  const processCompletion = summary?.completion_percent ?? (batteries.length > 0
+    ? Math.round(batteries.reduce((s, b) => s + (bestAttemptPercent(b) ?? 0), 0) / batteries.length)
+    : 0);
+  const completedBatteries = summary?.completed_batteries ?? batteries.filter((b) => (bestAttemptPercent(b) ?? 0) >= passing).length;
   const completionColor = processCompletion >= 80 ? "#4ade80" : processCompletion >= 50 ? "#f59e0b" : "#818CF8";
 
   return (
@@ -1520,14 +1533,14 @@ function KnowledgeStructurePanel({
           <div style={{ minWidth: 0 }}>
             <h3 style={{ color: "#F1F5F9", fontWeight: 700, fontSize: 14, margin: 0 }}>{t("enterprise.knowledge.processDetail.structurePanel.title")}</h3>
             <p style={{ color: "#475569", fontSize: 11, margin: "3px 0 0" }}>
-              {t("enterprise.knowledge.processDetail.structurePanel.summary", { topics: topics.length, decks: decks.length, batteries: batteries.length })}
+              {t("enterprise.knowledge.processDetail.structurePanel.summary", { topics: summary?.topics ?? topics.length, decks: summary?.decks ?? decks.length, batteries: summary?.batteries ?? batteries.length })}
             </p>
           </div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 6, alignItems: "center" }}>
             {[
-              { count: topics.length, label: t("enterprise.knowledge.processDetail.structurePanel.stats.topics") },
-              { count: decks.length, label: t("enterprise.knowledge.processDetail.structurePanel.stats.decks") },
-              { count: batteries.length, label: t("enterprise.knowledge.processDetail.structurePanel.stats.batteries") },
+              { count: summary?.topics ?? topics.length, label: t("enterprise.knowledge.processDetail.structurePanel.stats.topics") },
+              { count: summary?.decks ?? decks.length, label: t("enterprise.knowledge.processDetail.structurePanel.stats.decks") },
+              { count: summary?.batteries ?? batteries.length, label: t("enterprise.knowledge.processDetail.structurePanel.stats.batteries") },
               { count: totalQuestions, label: t("enterprise.knowledge.processDetail.structurePanel.stats.questions") },
               { count: totalCards, label: t("enterprise.knowledge.processDetail.structurePanel.stats.cards") },
             ].map(({ count, label }) => (
@@ -1553,7 +1566,7 @@ function KnowledgeStructurePanel({
               {processCompletion}%
             </span>
             <span style={{ fontSize: 10, color: "#475569", flexShrink: 0, whiteSpace: "nowrap" }}>
-              {t("enterprise.knowledge.processDetail.structurePanel.completedBatteries", { completed: completedBatteries, total: batteries.length })}
+              {t("enterprise.knowledge.processDetail.structurePanel.completedBatteries", { completed: completedBatteries, total: batteries.length, passing })}
             </span>
           </div>
         )}
@@ -3031,6 +3044,7 @@ export function ProcessDetail() {
           onToggle={() => setBannerCollapsed((v) => !v)}
           onDismiss={() => { setBannerVisible(false); setGenState(INIT_GEN); localStorage.removeItem(`ks_run_${id}`); }}
           onStop={handleStop}
+          summary={results.summary}
         />
       )}
 
@@ -3060,6 +3074,8 @@ export function ProcessDetail() {
           onAddDeck={handleOpenAddDeck}
           onAddBattery={handleOpenAddBattery}
           onAddTopic={() => setShowAddTopic(true)}
+          summary={results.summary}
+          passingScore={ks?.minimum_passing_score ?? 70}
           itemJobs={itemJobs}
           onDismissItemJob={removeItemJob}
         />

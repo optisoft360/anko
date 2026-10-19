@@ -1,5 +1,6 @@
+import { formatDate } from "@/utils/calendarDate";
 import React, { useEffect, useState, useRef, useCallback } from "react";
-import { apiErrorMessage } from "@/utils/apiError";
+import { apiErrorMessage, mapApiErrors } from "@/utils/apiError";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeftIcon, PencilIcon, CheckIcon, XMarkIcon, PlusIcon, TrashIcon,
@@ -14,7 +15,7 @@ import { useLanguage } from "../../../context/language-context";
 import { StatusBadge } from "../../components/StatusBadge";
 import { LearningPathAssignmentProgress } from "../learning/LearningPathAssignmentProgress";
 import {
-  ProgramFormFields, programToForm, programFormToPayload,
+  ProgramFormFields, programToForm, programFormToPayload, validateProgramForm,
 } from "./CompliancePrograms";
 
 const INPUT = {
@@ -25,7 +26,7 @@ const MODAL_BACKDROP = { position: "fixed", inset: 0, background: "rgba(0,0,0,0.
 const MODAL_CARD = { background: "#0F172A", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 16, width: "100%", maxWidth: 460, boxShadow: "0 20px 60px rgba(0,0,0,0.7)" };
 
 function useTypeLabels() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   return {
     regulatory: t("enterprise.compliance.programs.types.regulatory"),
     internal: t("enterprise.compliance.programs.types.internal"),
@@ -35,7 +36,7 @@ function useTypeLabels() {
   };
 }
 function useFreqLabels() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   return {
     one_time: t("enterprise.compliance.programs.frequencies.oneTime"),
     monthly: t("enterprise.compliance.programs.frequencies.monthly"),
@@ -49,28 +50,34 @@ function useFreqLabels() {
 // ─── Edit Program Form ───────────────────────────────────────────────────────
 
 function EditProgramForm({ program, onSaved, onCancel }) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [form, setForm] = useState(() => programToForm(program));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [errors, setErrors] = useState({});
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.name.trim() || !form.code.trim()) { setError(t("enterprise.compliance.programs.form.nameCodeRequired")); return; }
+    if (saving) return;
+    const local = validateProgramForm(form, t);  // 17
+    setErrors(local);
+    if (Object.keys(local).length) { setError(""); return; }
     setSaving(true);
     setError("");
     try {
       const updated = await complianceApi.updateProgram(program.id, programFormToPayload(form));
       onSaved(updated);
     } catch (err) {
-      setError(err?.detail || err?.code?.[0] || err?.name?.[0] || err?.non_field_errors?.[0] || t("enterprise.compliance.programDetail.editForm.saveError"));
+      const { fields, general } = mapApiErrors(err);
+      setErrors(fields);
+      setError(general || (Object.keys(fields).length ? "" : t("enterprise.compliance.programDetail.editForm.saveError")));
       setSaving(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <ProgramFormFields form={form} onChange={setForm} />
+    <form onSubmit={handleSubmit} noValidate className="space-y-4">
+      <ProgramFormFields form={form} onChange={setForm} errors={errors} />
       {error && <p style={{ fontSize: 12, color: "#f87171" }}>{error}</p>}
       <div className="flex justify-end gap-2 pt-1">
         <button type="button" onClick={onCancel} className="ank-btn-ghost text-xs">{t("enterprise.compliance.programs.cancel")}</button>
@@ -85,7 +92,7 @@ function EditProgramForm({ program, onSaved, onCancel }) {
 // ─── Add Requirement Modal ───────────────────────────────────────────────────
 
 function AddRequirementModal({ program, existingPathIds, onClose, onAdded }) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [paths, setPaths] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedPathId, setSelectedPathId] = useState("");
@@ -184,7 +191,7 @@ function AddRequirementModal({ program, existingPathIds, onClose, onAdded }) {
 // ─── Requirement row ─────────────────────────────────────────────────────────
 
 function RequirementRow({ req, index, onRemoved, canRemove }) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [removing, setRemoving] = useState(false);
 
   const handleRemove = async () => {
@@ -224,7 +231,7 @@ function RequirementRow({ req, index, onRemoved, canRemove }) {
 // ─── Assign Modal (user or team) ─────────────────────────────────────────────
 
 function AssignModal({ program, companyId, onClose, onAssigned }) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [tab, setTab] = useState("user");
   const [members, setMembers] = useState([]);
   const [teams, setTeams] = useState([]);
@@ -372,7 +379,7 @@ function AssignModal({ program, companyId, onClose, onAssigned }) {
 export function ComplianceProgramDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { activeCompanyId } = useEnterprise();
   const { user } = useAuth();
   const { hasMinRole } = useCompanyRole();
@@ -427,9 +434,13 @@ export function ComplianceProgramDetail() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [myComplianceAssignment?.id, program?.id]);
 
+  const [actionError, setActionError] = useState("");
   const handleActivate = async () => {
     setBusy(true);
-    try { setProgram(await complianceApi.activateProgram(id)); } finally { setBusy(false); }
+    setActionError("");
+    try { setProgram(await complianceApi.activateProgram(id)); }
+    catch (err) { setActionError(apiErrorMessage(err, t("enterprise.compliance.programs.form.errors.activateError"))); }  // 17: e.g. already expired
+    finally { setBusy(false); }
   };
   const handleArchive = async () => {
     setBusy(true);
@@ -519,6 +530,7 @@ export function ComplianceProgramDetail() {
                 <button onClick={() => navigate(`/enterprise/compliance/programs/${id}/audit`)} className="ank-btn-ghost text-xs">
                   <ChartBarIcon className="h-3.5 w-3.5" /> {t("enterprise.compliance.programDetail.auditReport")}
                 </button>
+                {actionError && <p role="alert" style={{ fontSize: 12, color: "#f87171", alignSelf: "center" }}>{actionError}</p>}
                 {program.status === "draft" && (
                   <button onClick={handleActivate} disabled={busy} className="ank-btn-accent text-xs" style={{ opacity: busy ? 0.7 : 1 }}>
                     {busy ? <ArrowPathIcon className="h-3.5 w-3.5 animate-spin" /> : <><CheckCircleIcon className="h-3.5 w-3.5" /> {t("enterprise.compliance.programs.activate")}</>}
@@ -634,7 +646,7 @@ export function ComplianceProgramDetail() {
                     {a.team && !a.user && <span style={{ fontSize: 9, fontWeight: 700, color: "var(--text-tertiary)" }}>{t("enterprise.compliance.programDetail.teamTag")}</span>}
                   </div>
                   <div className="flex items-center gap-3 flex-shrink-0">
-                    {a.due_date && <span style={{ fontSize: 11, color: "var(--text-tertiary)" }}>{t("enterprise.compliance.programDetail.due", { date: a.due_date })}</span>}
+                    {a.due_date && <span style={{ fontSize: 11, color: "var(--text-tertiary)" }}>{t("enterprise.compliance.programDetail.due", { date: formatDate(a.due_date, language) })}</span>}
                     <StatusBadge status={a.status} />
                   </div>
                 </div>

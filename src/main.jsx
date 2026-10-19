@@ -14,6 +14,7 @@ import ReactDOM from "react-dom/client";
 import App from "./App";
 import { BrowserRouter } from "react-router-dom";
 import { ThemeProvider } from "@material-tailwind/react";
+import { materialTheme } from "@/configs/material-theme";
 import { MaterialTailwindControllerProvider } from "@/context";
 import { ProjectsProvider } from "@/context/projects-context";
 import AuthProvider from "@/context/auth-context";
@@ -31,7 +32,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
       <BrowserRouter>
-        <ThemeProvider>
+        <ThemeProvider value={materialTheme}>
           <MaterialTailwindControllerProvider>
             <AuthProvider>
               <LanguageProvider>

@@ -1,3 +1,4 @@
+import { formatDate } from "@/utils/calendarDate";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AcademicCapIcon } from "@heroicons/react/24/outline";
@@ -8,7 +9,7 @@ import { EmptyState } from "../../components/EmptyState";
 import { DashboardSkeleton } from "../../components/LoadingSkeleton";
 
 export function MyCertifications() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [certs, setCerts] = useState([]);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -70,8 +71,8 @@ export function MyCertifications() {
                 <p style={{ fontFamily: "monospace", fontSize: 11, color: "var(--text-tertiary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>#{cert.certificate_number}</p>
 
                 <div style={{ fontSize: 11, color: "var(--text-secondary)" }} className="space-y-1">
-                  <div>{t("enterprise.certifications.myCertifications.issued")} <span style={{ fontWeight: 600 }}>{cert.issued_at ? new Date(cert.issued_at).toLocaleDateString() : "—"}</span></div>
-                  <div>{t("enterprise.certifications.myCertifications.expires")} <span style={{ fontWeight: 600 }}>{cert.expires_at ? new Date(cert.expires_at).toLocaleDateString() : t("enterprise.certifications.myCertifications.noExpiry")}</span></div>
+                  <div>{t("enterprise.certifications.myCertifications.issued")} <span style={{ fontWeight: 600 }}>{cert.issued_at ? formatDate(cert.issued_at, language) : "—"}</span></div>
+                  <div>{t("enterprise.certifications.myCertifications.expires")} <span style={{ fontWeight: 600 }}>{cert.expires_at ? formatDate(cert.expires_at, language) : t("enterprise.certifications.myCertifications.noExpiry")}</span></div>
                   {cert.score != null && <div>{t("enterprise.certifications.myCertifications.score")} <span style={{ fontWeight: 700, color: "#818CF8" }}>{cert.score}%</span></div>}
                 </div>
 

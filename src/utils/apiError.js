@@ -13,3 +13,30 @@ export function apiErrorMessage(err, fallback) {
   }
   return fallback;
 }
+
+/**
+ * 17: DRF validation body -> { fields: { name: "message" }, general: "message" | null }.
+ * Accepts the axios error or the already-unwrapped body. `aliases` renames API
+ * fields to form fields (e.g. { title: "name" }).
+ */
+export function mapApiErrors(err, aliases = {}) {
+  const data = err?.response?.data ?? err;
+  const fields = {};
+  let general = null;
+  if (!data || typeof data !== "object" || Array.isArray(data)) {
+    return { fields, general: typeof data === "string" && data ? data : null };
+  }
+  const first = (value) => {
+    if (typeof value === "string") return value;
+    if (Array.isArray(value)) return value.map(first).find(Boolean) || null;
+    if (value && typeof value === "object") return Object.values(value).map(first).find(Boolean) || null;
+    return null;
+  };
+  for (const [key, value] of Object.entries(data)) {
+    const message = first(value);
+    if (!message) continue;
+    if (key === "detail" || key === "non_field_errors") general = general || message;
+    else fields[aliases[key] || key] = message;
+  }
+  return { fields, general };
+}

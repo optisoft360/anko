@@ -1,3 +1,4 @@
+import { formatDate } from "@/utils/calendarDate";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Typography, Button, Input } from "@material-tailwind/react";
@@ -13,7 +14,7 @@ function QRCodeDisplay({ url, alt }) {
 
 export function PublicVerification() {
   const { identifier } = useParams();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(!!identifier);
   const [searchCode, setSearchCode] = useState("");
@@ -41,8 +42,8 @@ export function PublicVerification() {
     { label: t("enterprise.certifications.publicVerification.rows.holder"), value: result.holder_name },
     { label: t("enterprise.certifications.publicVerification.rows.template"), value: result.template_name },
     { label: t("enterprise.certifications.publicVerification.rows.company"), value: result.company_name },
-    { label: t("enterprise.certifications.publicVerification.rows.issued"), value: result.issued_at ? new Date(result.issued_at).toLocaleDateString() : "—" },
-    { label: t("enterprise.certifications.publicVerification.rows.expires"), value: result.expires_at ? new Date(result.expires_at).toLocaleDateString() : t("enterprise.certifications.myCertifications.noExpiry") },
+    { label: t("enterprise.certifications.publicVerification.rows.issued"), value: result.issued_at ? formatDate(result.issued_at, language) : "—" },
+    { label: t("enterprise.certifications.publicVerification.rows.expires"), value: result.expires_at ? formatDate(result.expires_at, language) : t("enterprise.certifications.myCertifications.noExpiry") },
     { label: t("enterprise.certifications.publicVerification.rows.score"), value: result.score != null ? `${result.score}%` : "—" },
     { label: t("enterprise.certifications.publicVerification.rows.certNumber"), value: result.certificate_number },
     { label: t("enterprise.certifications.publicVerification.rows.verificationCode"), value: result.verification_code },

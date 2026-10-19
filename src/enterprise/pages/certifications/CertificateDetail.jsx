@@ -1,3 +1,4 @@
+import { formatDate } from "@/utils/calendarDate";
 import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { toPng } from "html-to-image";
@@ -97,7 +98,7 @@ function StatPill({ icon, label, value, valueNode }) {
 
 export function CertificateDetail() {
   const { id } = useParams();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [cert, setCert] = useState(null);
   const [loading, setLoading] = useState(true);
   const [downloading, setDownloading] = useState(false);
@@ -190,12 +191,12 @@ export function CertificateDetail() {
               <StatPill
                 icon={<CalendarIcon style={{ width: 13, height: 13, color: GOLD_LIGHT }} />}
                 label={t("enterprise.certifications.detail.stats.issued")}
-                value={cert.issued_at ? new Date(cert.issued_at).toLocaleDateString() : "—"}
+                value={cert.issued_at ? formatDate(cert.issued_at_iso || cert.issued_at, language) : "—"}
               />
               <StatPill
                 icon={<CalendarIcon style={{ width: 13, height: 13, color: GOLD_LIGHT }} />}
                 label={t("enterprise.certifications.detail.stats.expires")}
-                value={cert.expires_at ? new Date(cert.expires_at).toLocaleDateString() : t("enterprise.certifications.myCertifications.noExpiry")}
+                value={cert.expires_at ? formatDate(cert.expires_at_iso || cert.expires_at, language) : t("enterprise.certifications.myCertifications.noExpiry")}
               />
               {cert.score != null && (
                 <StatPill

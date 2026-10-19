@@ -1,3 +1,4 @@
+import { noWheel } from "@/utils/numberInput";
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import {
@@ -738,7 +739,7 @@ export function CreateDeckDialog({ open, onClose, onCreate, projectId, deck = nu
                                         {t("project_detail.decks.cards_count")}
                                     </Typography>
                                     <Input
-                                        type="number"
+                                        type="number" {...noWheel}
                                         min="1"
                                         max="15"
                                         className="!border-zinc-200 focus:!border-indigo-600 !bg-zinc-50/50 rounded-xl !text-zinc-900"

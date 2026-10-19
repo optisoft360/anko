@@ -1,3 +1,5 @@
+import { formatDate } from "@/utils/calendarDate";
+import { noWheel } from "@/utils/numberInput";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ShieldCheckIcon, CheckIcon, XMarkIcon, ArrowPathIcon } from "@heroicons/react/24/outline";
@@ -13,7 +15,7 @@ const INPUT = {
 };
 
 function useStatusOptions() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   return [
     { value: "", label: t("enterprise.compliance.assignments.statusOptions.all") },
     { value: "pending", label: t("enterprise.compliance.assignments.statusOptions.pending") },
@@ -28,7 +30,7 @@ function useStatusOptions() {
 // ─── Mark Compliant Modal ─────────────────────────────────────────────────────
 
 function CompleteAssignmentModal({ assignment, onClose, onDone }) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [score, setScore] = useState("");
   const [notes, setNotes] = useState("");
   const [saving, setSaving] = useState(false);
@@ -64,7 +66,7 @@ function CompleteAssignmentModal({ assignment, onClose, onDone }) {
         <form onSubmit={handleSubmit} className="space-y-3">
           <div>
             <label style={{ fontSize: 11, fontWeight: 700, color: "var(--text-tertiary)", display: "block", marginBottom: 5 }} htmlFor="ma-score">{t("enterprise.compliance.assignments.completeModal.scoreLabel")}</label>
-            <input id="ma-score" type="number" min="0" max="100" style={INPUT} value={score} onChange={(e) => setScore(e.target.value)} />
+            <input id="ma-score" type="number" {...noWheel} min="0" max="100" style={INPUT} value={score} onChange={(e) => setScore(e.target.value)} />
           </div>
           <div>
             <label style={{ fontSize: 11, fontWeight: 700, color: "var(--text-tertiary)", display: "block", marginBottom: 5 }} htmlFor="ma-notes">{t("enterprise.compliance.assignments.completeModal.notesLabel")}</label>
@@ -87,7 +89,7 @@ function CompleteAssignmentModal({ assignment, onClose, onDone }) {
 
 export function ComplianceAssignments() {
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const STATUS_OPTIONS = useStatusOptions();
   const [assignments, setAssignments] = useState([]);
   const [statusFilter, setStatusFilter] = useState("");
@@ -158,8 +160,8 @@ export function ComplianceAssignments() {
                         </button>
                       </td>
                       <td style={{ padding: "12px 16px" }}><StatusBadge status={a.status} /></td>
-                      <td style={{ padding: "12px 16px", color: "var(--text-tertiary)", fontSize: 12 }}>{a.due_date || "—"}</td>
-                      <td style={{ padding: "12px 16px", color: "var(--text-tertiary)", fontSize: 12 }}>{a.completed_at ? new Date(a.completed_at).toLocaleDateString() : "—"}</td>
+                      <td style={{ padding: "12px 16px", color: "var(--text-tertiary)", fontSize: 12 }}>{formatDate(a.due_date, language) || "—"}</td>
+                      <td style={{ padding: "12px 16px", color: "var(--text-tertiary)", fontSize: 12 }}>{a.completed_at ? formatDate(a.completed_at, language) : "—"}</td>
                       <td style={{ padding: "12px 16px" }}>
                         <div className="flex gap-1 flex-wrap">
                           {canComplete && (

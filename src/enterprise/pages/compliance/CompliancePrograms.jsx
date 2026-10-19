@@ -8,12 +8,35 @@ import { StatusBadge } from "../../components/StatusBadge";
 import { EmptyState } from "../../components/EmptyState";
 import { TableSkeleton } from "../../components/LoadingSkeleton";
 import { useCompanyRole } from "../../hooks/useCompanyRole";
+import { mapApiErrors } from "@/utils/apiError";
+import { intInRange, noWheel } from "@/utils/numberInput";
 
 const INPUT = {
   width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)",
   borderRadius: 8, padding: "9px 12px", fontSize: 13, color: "#F1F5F9", outline: "none", boxSizing: "border-box",
 };
 const LABEL = { fontSize: 11, fontWeight: 700, color: "var(--text-tertiary)", display: "block", marginBottom: 5 };
+
+function FieldError({ message }) {
+  return message ? <p role="alert" style={{ fontSize: 11, color: "#f87171", marginTop: 4 }}>{message}</p> : null;
+}
+
+/** 17: same rules as ComplianceProgramSerializer. Returns { field: message }. */
+export function validateProgramForm(form, t) {
+  const K = "enterprise.compliance.programs.form.errors.";
+  const errs = {};
+  if (!form.name.trim()) errs.name = t(`${K}required`);
+  else if (form.name.trim().length > 200) errs.name = t(`${K}tooLong`, { max: 200 });
+  if (!form.code.trim()) errs.code = t(`${K}required`);
+  else if (form.code.trim().length > 50) errs.code = t(`${K}tooLong`, { max: 50 });
+  if (form.effective_date && form.expiry_date && form.expiry_date <= form.effective_date) errs.expiry_date = t(`${K}expiryAfterEffective`);
+  if (form.validity_days !== "" && intInRange(form.validity_days, 0, 3650)) errs.validity_days = t(`${K}range`, { min: 0, max: 3650 });
+  if (form.requires_score) {
+    const score = Number(form.passing_score);
+    if (form.passing_score === "" || !Number.isFinite(score) || score < 0 || score > 100) errs.passing_score = t(`${K}range`, { min: 0, max: 100 });
+  }
+  return errs;
+}
 
 function useComplianceTypes() {
   const { t } = useLanguage();
@@ -39,7 +62,7 @@ function useFrequencies() {
 
 // ─── Shared program form fields (used by create modal here, and by the edit
 // form on ComplianceProgramDetail) ──────────────────────────────────────────
-export function ProgramFormFields({ form, onChange }) {
+export function ProgramFormFields({ form, onChange, errors = {} }) {
   const { t } = useLanguage();
   const COMPLIANCE_TYPES = useComplianceTypes();
   const FREQUENCIES = useFrequencies();
@@ -49,11 +72,13 @@ export function ProgramFormFields({ form, onChange }) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <div>
           <label style={LABEL} htmlFor="cp-name">{t("enterprise.compliance.programs.form.name")} *</label>
-          <input id="cp-name" style={INPUT} value={form.name} onChange={(e) => set("name", e.target.value)} required />
+          <input id="cp-name" style={INPUT} maxLength={200} value={form.name} onChange={(e) => set("name", e.target.value)} />
+          <FieldError message={errors.name} />
         </div>
         <div>
           <label style={LABEL} htmlFor="cp-code">{t("enterprise.compliance.programs.form.code")} *</label>
-          <input id="cp-code" style={{ ...INPUT, fontFamily: "monospace" }} placeholder={t("enterprise.compliance.programs.form.codePlaceholder")} value={form.code} onChange={(e) => set("code", e.target.value)} required />
+          <input id="cp-code" style={{ ...INPUT, fontFamily: "monospace" }} placeholder={t("enterprise.compliance.programs.form.codePlaceholder")} maxLength={50} value={form.code} onChange={(e) => set("code", e.target.value)} />
+          <FieldError message={errors.code} />
         </div>
       </div>
 
@@ -81,16 +106,19 @@ export function ProgramFormFields({ form, onChange }) {
         <div>
           <label style={LABEL} htmlFor="cp-effective">{t("enterprise.compliance.programs.form.effectiveDate")}</label>
           <input id="cp-effective" type="date" style={{ ...INPUT, colorScheme: "dark" }} value={form.effective_date} onChange={(e) => set("effective_date", e.target.value)} />
+          <FieldError message={errors.effective_date} />
         </div>
         <div>
           <label style={LABEL} htmlFor="cp-expiry">{t("enterprise.compliance.programs.form.expiryDate")}</label>
-          <input id="cp-expiry" type="date" style={{ ...INPUT, colorScheme: "dark" }} value={form.expiry_date} onChange={(e) => set("expiry_date", e.target.value)} />
+          <input id="cp-expiry" type="date" style={{ ...INPUT, colorScheme: "dark" }} min={form.effective_date || undefined} value={form.expiry_date} onChange={(e) => set("expiry_date", e.target.value)} />
+          <FieldError message={errors.expiry_date} />
         </div>
       </div>
 
       <div>
         <label style={LABEL} htmlFor="cp-validity">{t("enterprise.compliance.programs.form.validity")}</label>
-        <input id="cp-validity" type="number" min="1" style={INPUT} value={form.validity_days} onChange={(e) => set("validity_days", e.target.value)} />
+        <input id="cp-validity" type="number" min="0" max="3650" step="1" {...noWheel} style={INPUT} value={form.validity_days} onChange={(e) => set("validity_days", e.target.value)} />
+        <FieldError message={errors.validity_days} />
         <p style={{ fontSize: 11, color: "var(--text-tertiary)", marginTop: 4 }}>{t("enterprise.compliance.programs.form.validityHint")}</p>
       </div>
 
@@ -107,7 +135,8 @@ export function ProgramFormFields({ form, onChange }) {
         {form.requires_score && (
           <div>
             <label style={LABEL} htmlFor="cp-passing-score">{t("enterprise.compliance.programs.form.passingScore")}</label>
-            <input id="cp-passing-score" type="number" min="0" max="100" style={INPUT} value={form.passing_score} onChange={(e) => set("passing_score", e.target.value)} />
+            <input id="cp-passing-score" type="number" min="0" max="100" {...noWheel} style={INPUT} value={form.passing_score} onChange={(e) => set("passing_score", e.target.value)} />
+            <FieldError message={errors.passing_score} />
           </div>
         )}
       </div>
@@ -163,17 +192,23 @@ function CreateProgramModal({ onClose, onCreated }) {
   const [form, setForm] = useState(emptyProgramForm());
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [errors, setErrors] = useState({});
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.name.trim() || !form.code.trim()) { setError(t("enterprise.compliance.programs.form.nameCodeRequired")); return; }
+    if (saving) return;
+    const local = validateProgramForm(form, t);
+    setErrors(local);
+    if (Object.keys(local).length) { setError(""); return; }
     setSaving(true);
     setError("");
     try {
       const created = await complianceApi.createProgram(programFormToPayload(form));
       onCreated(created);
     } catch (err) {
-      setError(err?.detail || err?.code?.[0] || err?.name?.[0] || err?.non_field_errors?.[0] || t("enterprise.compliance.programs.form.createError"));
+      const { fields, general } = mapApiErrors(err);
+      setErrors(fields);
+      setError(general || (Object.keys(fields).length ? "" : t("enterprise.compliance.programs.form.createError")));
     } finally { setSaving(false); }
   };
 
@@ -186,8 +221,8 @@ function CreateProgramModal({ onClose, onCreated }) {
             <XMarkIcon className="h-5 w-5" />
           </button>
         </div>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <ProgramFormFields form={form} onChange={setForm} />
+        <form onSubmit={handleSubmit} noValidate className="space-y-4">
+          <ProgramFormFields form={form} onChange={setForm} errors={errors} />
           {error && <p style={{ fontSize: 12, color: "#f87171" }}>{error}</p>}
           <div className="flex justify-end gap-2 pt-1">
             <button type="button" onClick={onClose} className="ank-btn-ghost text-xs">{t("enterprise.compliance.programs.cancel")}</button>

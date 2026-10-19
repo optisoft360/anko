@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import authService from "../services/authService";
 import rbacService from "../services/rbacService";
 import { setAuthToken } from "../services/api";
+import { isAuthFailure } from "@/utils/authErrors";
 
 const AuthContext = createContext(null);
 
@@ -12,13 +13,14 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 // fetch must not permanently blank the sidebar for the rest of the session — this
 // is on the critical path for basic navigation, so retry a couple of times with a
 // short backoff before giving up.
-async function withRetry(fn, { attempts = 3, delayMs = 1500 } = {}) {
+async function withRetry(fn, { attempts = 3, delayMs = 1500, stopIf } = {}) {
   let lastErr;
   for (let i = 0; i < attempts; i++) {
     try {
       return await fn();
     } catch (err) {
       lastErr = err;
+      if (stopIf?.(err)) break;
       if (i < attempts - 1) await sleep(delayMs * (i + 1));
     }
   }
@@ -82,12 +84,23 @@ export function AuthProvider({ children }) {
       }
       try {
         setAuthToken(token);
-        const me = await authService.me();
+        // F-07: a throttled/failed /auth/me/ used to delete the token and sign the user out.
+        // Retry transient errors; only an invalid/expired token ends the session.
+        const me = await withRetry(async () => {
+          try {
+            return await authService.me();
+          } catch (err) {
+            if (isAuthFailure(err)) err.fatal = true;
+            throw err;
+          }
+        }, { attempts: 3, delayMs: 1000, stopIf: (err) => err?.fatal });
         if (mounted) await refreshRbacAndContext();
         if (mounted) setUser(me);
       } catch (err) {
-        localStorage.removeItem("token");
-        setAuthToken(null);
+        if (isAuthFailure(err)) {
+          localStorage.removeItem("token");
+          setAuthToken(null);
+        }
         if (mounted) setUser(null);
       } finally {
         if (mounted) setLoading(false);

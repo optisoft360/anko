@@ -1,3 +1,5 @@
+import { formatDate } from "@/utils/calendarDate";
+import { noWheel } from "@/utils/numberInput";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { XMarkIcon, CheckIcon, ArrowPathIcon } from "@heroicons/react/24/outline";
@@ -15,7 +17,7 @@ const INPUT = {
 // ─── Mark Complete Modal ─────────────────────────────────────────────────────
 
 function CompleteAssignmentModal({ assignment, onClose, onDone }) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [score, setScore] = useState("");
   const [notes, setNotes] = useState("");
   const [saving, setSaving] = useState(false);
@@ -48,7 +50,7 @@ function CompleteAssignmentModal({ assignment, onClose, onDone }) {
         <form onSubmit={handleSubmit} className="space-y-3">
           <div>
             <label style={{ fontSize: 11, fontWeight: 700, color: "var(--text-tertiary)", display: "block", marginBottom: 5 }} htmlFor="ca-score">{t("enterprise.compliance.assignments.completeModal.scoreLabel")}</label>
-            <input id="ca-score" type="number" min="0" max="100" style={INPUT} value={score} onChange={(e) => setScore(e.target.value)} />
+            <input id="ca-score" type="number" {...noWheel} min="0" max="100" style={INPUT} value={score} onChange={(e) => setScore(e.target.value)} />
           </div>
           <div>
             <label style={{ fontSize: 11, fontWeight: 700, color: "var(--text-tertiary)", display: "block", marginBottom: 5 }} htmlFor="ca-notes">{t("enterprise.compliance.assignments.completeModal.notesLabel")}</label>
@@ -71,7 +73,7 @@ function CompleteAssignmentModal({ assignment, onClose, onDone }) {
 
 export function MyCompliance() {
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [summary, setSummary] = useState(null);
   const [assignments, setAssignments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -150,7 +152,7 @@ export function MyCompliance() {
                 <p style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary)" }}>{a.program_name}</p>
                 <div className="flex items-center gap-3 mt-1.5 flex-wrap">
                   <StatusBadge status={a.status} />
-                  {a.due_date && <span style={{ fontSize: 11, color: "var(--text-tertiary)" }}>{t("enterprise.compliance.programDetail.due", { date: a.due_date })}</span>}
+                  {a.due_date && <span style={{ fontSize: 11, color: "var(--text-tertiary)" }}>{t("enterprise.compliance.programDetail.due", { date: formatDate(a.due_date, language) })}</span>}
                   {a.expires_at && <span style={{ fontSize: 11, color: "var(--text-tertiary)" }}>{t("enterprise.compliance.myCompliance.expires", { date: a.expires_at })}</span>}
                   {a.score !== null && a.score !== undefined && (
                     <span style={{ fontSize: 11, fontWeight: 700, color: "var(--text-secondary)" }}>{t("enterprise.compliance.myCompliance.scorePct", { n: a.score })}</span>

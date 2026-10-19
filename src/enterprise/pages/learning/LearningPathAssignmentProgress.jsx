@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { enumLabel, useKnowledgeEnumLabels } from "@/utils/enumLabel";
+import { bestAttemptPercent } from "@/utils/batteryProgress";
 import { useNavigate } from "react-router-dom";
 import {
   CheckCircleIcon, LockClosedIcon, PlayIcon,
@@ -209,7 +210,7 @@ function ReadOnlyDeckRow({ deck, onLearn, onStudy }) {
 function ReadOnlyBatteryRow({ battery, onSimulate }) {
   const { t } = useLanguage();
   const questionCount = battery.question_count ?? 0;
-  const pct = battery.last_attempt?.percent ?? null;
+  const pct = bestAttemptPercent(battery);  // 14: same rule as the process view
   const hasAttempt = pct !== null;
   const pctRounded = hasAttempt ? Math.round(pct) : 0;
   const pctColor = pctRounded >= 80 ? "#4ade80" : pctRounded >= 50 ? "#f59e0b" : "#818CF8";
@@ -317,7 +318,7 @@ function ReadOnlyTopicSection({ topic, index, decks, batteries, isLast, onStudy,
             {expanded ? <ChevronRightIcon style={{ width: 13, height: 13, transform: "rotate(90deg)" }} /> : <ChevronRightIcon style={{ width: 13, height: 13 }} />}
           </button>
           <span style={{ fontWeight: 700, color: "#F1F5F9", fontSize: 13, flexShrink: 0 }}>{t("enterprise.learning.progress.topicLabel", { n: index + 1 })}</span>
-          <span style={{ padding: "1px 7px", borderRadius: 20, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.09)", color: "#64748B", fontSize: 10, fontWeight: 600, flexShrink: 0 }}>{t("enterprise.learning.progress.topicsCount", { n: tagCount })}</span>
+          <span style={{ padding: "1px 7px", borderRadius: 20, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.09)", color: "#64748B", fontSize: 10, fontWeight: 600, flexShrink: 0 }}>{t("enterprise.learning.progress.tagsCount", { n: tagCount })}</span>
           <span style={{ fontSize: 11, color: "#64748B", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1, minWidth: 0 }}>{description}</span>
         </div>
         {expanded && (
@@ -389,8 +390,7 @@ function ProcessKnowledgeView({ ksId, moduleId, assignmentId, alreadyCompleted, 
   const avgBatteryPercent = useMemo(() => {
     const allBatteries = Object.values(contentByTopic).flatMap((c) => c.batteries || []);
     if (allBatteries.length === 0) return null;
-    const withAttempts = allBatteries.filter((b) => b.last_attempt?.percent != null);
-    const sum = withAttempts.reduce((s, b) => s + Number(b.last_attempt.percent), 0);
+    const sum = allBatteries.reduce((s, b) => s + (bestAttemptPercent(b) ?? 0), 0);
     return Math.round(sum / allBatteries.length);
   }, [contentByTopic]);
 

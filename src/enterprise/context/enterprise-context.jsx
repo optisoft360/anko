@@ -22,6 +22,7 @@ export function EnterpriseProvider({ children }) {
   );
   const [membership, setMembership] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(null);
   const [initialized, setInitialized] = useState(false);
 
   const isPlatformAdmin = !!(user?.is_staff);
@@ -53,8 +54,11 @@ export function EnterpriseProvider({ children }) {
         setActiveCompanyId(null);
         setMembership(null);
       }
-    } catch {
-      setCompanies([]);
+      setLoadError(null);
+    } catch (err) {
+      // F-07: a failed request is not "no companies" — keep what we had and let the UI offer a retry
+      // instead of sending a member to onboarding.
+      setLoadError(err || true);
     } finally {
       setLoading(false);
       setInitialized(true);
@@ -97,6 +101,7 @@ export function EnterpriseProvider({ children }) {
     loading: loading || authLoading,
     initialized,
     isEnterpriseMember,
+    loadError,
     isPlatformAdmin,
     switchCompany,
     hasRole,

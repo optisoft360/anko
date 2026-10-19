@@ -15,3 +15,23 @@ export function formatCalendarDate(value, language = "en") {
   if (!date) return null;
   return date.toLocaleDateString(language === "es" ? "es" : "en-US", { day: "2-digit", month: "short", year: "numeric" });
 }
+
+/**
+ * 13: the one date formatter for the app.
+ * - "YYYY-MM-DD" (calendar dates: due/effective/expiry dates) is read as a local
+ *   calendar day — never through `new Date("YYYY-MM-DD")`, which means UTC midnight
+ *   and shows the previous day west of UTC.
+ * - An ISO timestamp with a time (issued_at, created_at…) is shown in the user's timezone.
+ * `timeZone` is only for tests / explicit overrides.
+ */
+export function formatDate(value, language = "en", { timeZone } = {}) {
+  if (value === null || value === undefined || value === "") return null;
+  const locale = language === "es" ? "es" : "en-US";
+  const options = { day: "2-digit", month: "short", year: "numeric" };
+  if (typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return parseCalendarDate(value).toLocaleDateString(locale, options);
+  }
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  return date.toLocaleDateString(locale, timeZone ? { ...options, timeZone } : options);
+}
