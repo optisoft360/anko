@@ -981,6 +981,13 @@ export const en = {
         password_requirements: "It should have at least 8 characters, including letters and numbers."
     },
     enterprise: {
+        onboarding: {
+            loadErrorTitle: "We could not load your company",
+            loadErrorHint: "Your session is still active. Please try again in a moment.",
+            retry: "Retry",
+            noCompanyTitle: "You are not part of a company yet",
+            noCompanyHint: "Ask your company administrator to send you an invitation."
+        },
         roles: {
             owner: "Owner",
             admin: "Admin",

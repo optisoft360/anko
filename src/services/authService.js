@@ -63,6 +63,8 @@ const authService = {
   },
 
   logout() {
+    // C3: also delete the token on the server (best effort; never blocks signing out locally).
+    if (localStorage.getItem("token")) api.post(`${BASE}logout/`).catch(() => {});
     setAuthToken(null);
   },
 
@@ -105,6 +107,8 @@ const authService = {
   async changePassword(data) {
     try {
       const res = await api.post(`${BASE}change-password/`, data);
+      // C3: the API invalidates every token and returns a fresh one for this session.
+      if (res.data?.token) setAuthToken(res.data.token);
       return res.data;
     } catch (err) {
       throw err?.response?.data || { error: "Password change failed" };

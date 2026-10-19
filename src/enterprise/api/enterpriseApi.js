@@ -1,3 +1,4 @@
+import { isAuthFailure } from "@/utils/authErrors";
 import axios from "axios";
 import { API_BASE } from "@/services/api";
 
@@ -14,11 +15,11 @@ enterpriseApi.interceptors.request.use((config) => {
   return config;
 });
 
-// 401 → redirect to sign-in
+// 401 with an invalid/missing token → sign-in. Other errors never end the session (C3 / F-07).
 enterpriseApi.interceptors.response.use(
   (res) => res,
   (err) => {
-    if (err?.response?.status === 401) {
+    if (isAuthFailure(err)) {
       localStorage.removeItem("token");
       window.location.href = "/auth/sign-in";
     }

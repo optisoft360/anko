@@ -347,7 +347,7 @@ function EmployeeDashboard({ activeCompany, role }) {
 export function EnterpriseDashboard() {
   const navigate = useNavigate();
   const { t } = useLanguage();
-  const { isEnterpriseMember, initialized, loading, isPlatformAdmin, activeCompany, role } = useEnterprise();
+  const { isEnterpriseMember, initialized, loading, isPlatformAdmin, activeCompany, role, loadError, refresh } = useEnterprise();
   const { data: metrics, loadingMetrics } = useMetrics(role !== "employee");
 
   if (!initialized || loading) {
@@ -358,6 +358,16 @@ export function EnterpriseDashboard() {
     );
   }
 
+  // F-07: could not load the companies (429/5xx/network) -> retry, never onboarding.
+  if (loadError && !isEnterpriseMember) {
+    return (
+      <div role="alert" style={{ maxWidth: 420, margin: "80px auto", textAlign: "center", color: "var(--text-secondary)" }}>
+        <p style={{ fontWeight: 700, color: "var(--text-primary)", marginBottom: 8 }}>{t("enterprise.onboarding.loadErrorTitle")}</p>
+        <p style={{ fontSize: 13, marginBottom: 16 }}>{t("enterprise.onboarding.loadErrorHint")}</p>
+        <button onClick={() => refresh()} className="ank-btn-accent text-xs">{t("enterprise.onboarding.retry")}</button>
+      </div>
+    );
+  }
   if (isPlatformAdmin && !isEnterpriseMember) return <Navigate to="/platform-admin/companies" replace />;
   if (!isEnterpriseMember) return <Navigate to="/enterprise/onboarding/company" replace />;
 
