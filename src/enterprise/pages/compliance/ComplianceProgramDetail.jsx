@@ -1,3 +1,4 @@
+import { formatDate } from "@/utils/calendarDate";
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { apiErrorMessage, mapApiErrors } from "@/utils/apiError";
 import { useParams, useNavigate } from "react-router-dom";
@@ -25,7 +26,7 @@ const MODAL_BACKDROP = { position: "fixed", inset: 0, background: "rgba(0,0,0,0.
 const MODAL_CARD = { background: "#0F172A", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 16, width: "100%", maxWidth: 460, boxShadow: "0 20px 60px rgba(0,0,0,0.7)" };
 
 function useTypeLabels() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   return {
     regulatory: t("enterprise.compliance.programs.types.regulatory"),
     internal: t("enterprise.compliance.programs.types.internal"),
@@ -35,7 +36,7 @@ function useTypeLabels() {
   };
 }
 function useFreqLabels() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   return {
     one_time: t("enterprise.compliance.programs.frequencies.oneTime"),
     monthly: t("enterprise.compliance.programs.frequencies.monthly"),
@@ -49,7 +50,7 @@ function useFreqLabels() {
 // ─── Edit Program Form ───────────────────────────────────────────────────────
 
 function EditProgramForm({ program, onSaved, onCancel }) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [form, setForm] = useState(() => programToForm(program));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -91,7 +92,7 @@ function EditProgramForm({ program, onSaved, onCancel }) {
 // ─── Add Requirement Modal ───────────────────────────────────────────────────
 
 function AddRequirementModal({ program, existingPathIds, onClose, onAdded }) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [paths, setPaths] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedPathId, setSelectedPathId] = useState("");
@@ -190,7 +191,7 @@ function AddRequirementModal({ program, existingPathIds, onClose, onAdded }) {
 // ─── Requirement row ─────────────────────────────────────────────────────────
 
 function RequirementRow({ req, index, onRemoved, canRemove }) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [removing, setRemoving] = useState(false);
 
   const handleRemove = async () => {
@@ -230,7 +231,7 @@ function RequirementRow({ req, index, onRemoved, canRemove }) {
 // ─── Assign Modal (user or team) ─────────────────────────────────────────────
 
 function AssignModal({ program, companyId, onClose, onAssigned }) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [tab, setTab] = useState("user");
   const [members, setMembers] = useState([]);
   const [teams, setTeams] = useState([]);
@@ -378,7 +379,7 @@ function AssignModal({ program, companyId, onClose, onAssigned }) {
 export function ComplianceProgramDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { activeCompanyId } = useEnterprise();
   const { user } = useAuth();
   const { hasMinRole } = useCompanyRole();
@@ -645,7 +646,7 @@ export function ComplianceProgramDetail() {
                     {a.team && !a.user && <span style={{ fontSize: 9, fontWeight: 700, color: "var(--text-tertiary)" }}>{t("enterprise.compliance.programDetail.teamTag")}</span>}
                   </div>
                   <div className="flex items-center gap-3 flex-shrink-0">
-                    {a.due_date && <span style={{ fontSize: 11, color: "var(--text-tertiary)" }}>{t("enterprise.compliance.programDetail.due", { date: a.due_date })}</span>}
+                    {a.due_date && <span style={{ fontSize: 11, color: "var(--text-tertiary)" }}>{t("enterprise.compliance.programDetail.due", { date: formatDate(a.due_date, language) })}</span>}
                     <StatusBadge status={a.status} />
                   </div>
                 </div>

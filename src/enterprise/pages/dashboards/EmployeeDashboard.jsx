@@ -1,3 +1,4 @@
+import { formatDate } from "@/utils/calendarDate";
 import React, { useEffect, useState } from "react";
 import { Typography, Card, CardBody, Progress } from "@material-tailwind/react";
 import {
@@ -19,7 +20,7 @@ import {
 } from "@heroicons/react/24/outline";
 
 function useTimeAgo() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   return (dateStr) => {
     if (!dateStr) return "";
     const d = new Date(dateStr);
@@ -32,7 +33,7 @@ function useTimeAgo() {
 }
 
 export function EmployeeDashboard() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const timeAgo = useTimeAgo();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -124,7 +125,7 @@ export function EmployeeDashboard() {
                 <div key={path.id} className="space-y-1">
                   <div className="flex justify-between text-xs font-semibold text-zinc-700">
                     <span className="truncate pr-2">{path.name}</span>
-                    <span className="text-zinc-400 flex-shrink-0">{path.due_date || t("enterprise.dashboards.employee.learning.noDeadline")}</span>
+                    <span className="text-zinc-400 flex-shrink-0">{formatDate(path.due_date, language) || t("enterprise.dashboards.employee.learning.noDeadline")}</span>
                   </div>
                   <Progress value={path.progress ?? 0} size="sm" color="indigo" />
                 </div>

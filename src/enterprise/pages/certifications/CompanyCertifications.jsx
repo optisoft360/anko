@@ -1,3 +1,4 @@
+import { formatDate } from "@/utils/calendarDate";
 import React, { useEffect, useState } from "react";
 import { AcademicCapIcon } from "@heroicons/react/24/outline";
 import { certApi } from "../../api/enterpriseApi";
@@ -7,7 +8,7 @@ import { EmptyState } from "../../components/EmptyState";
 import { TableSkeleton } from "../../components/LoadingSkeleton";
 
 export function CompanyCertifications() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [certs, setCerts] = useState([]);
   const [statusFilter, setStatusFilter] = useState("");
   const [loading, setLoading] = useState(true);
@@ -65,8 +66,8 @@ export function CompanyCertifications() {
                     <td style={{ padding: "12px 16px", color: "var(--text-secondary)" }}>{c.template_name}</td>
                     <td style={{ padding: "12px 16px", fontFamily: "monospace", fontSize: 11, color: "var(--text-tertiary)" }}>#{c.certificate_number}</td>
                     <td style={{ padding: "12px 16px" }}><StatusBadge status={c.status} /></td>
-                    <td style={{ padding: "12px 16px", color: "var(--text-tertiary)", fontSize: 11 }}>{c.issued_at ? new Date(c.issued_at).toLocaleDateString() : "—"}</td>
-                    <td style={{ padding: "12px 16px", color: "var(--text-tertiary)", fontSize: 11 }}>{c.expires_at ? new Date(c.expires_at).toLocaleDateString() : t("enterprise.certifications.myCertifications.noExpiry")}</td>
+                    <td style={{ padding: "12px 16px", color: "var(--text-tertiary)", fontSize: 11 }}>{c.issued_at ? formatDate(c.issued_at, language) : "—"}</td>
+                    <td style={{ padding: "12px 16px", color: "var(--text-tertiary)", fontSize: 11 }}>{c.expires_at ? formatDate(c.expires_at, language) : t("enterprise.certifications.myCertifications.noExpiry")}</td>
                     <td style={{ padding: "12px 16px", fontWeight: 700, color: "#818CF8" }}>{c.score != null ? `${c.score}%` : "—"}</td>
                     <td style={{ padding: "12px 16px" }}>
                       <div className="flex gap-1">

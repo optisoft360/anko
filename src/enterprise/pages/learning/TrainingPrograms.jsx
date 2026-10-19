@@ -1,3 +1,4 @@
+import { formatDate } from "@/utils/calendarDate";
 import React, { useEffect, useState } from "react";
 import { PlusIcon, RectangleStackIcon, XMarkIcon, CheckBadgeIcon } from "@heroicons/react/24/outline";
 import { SparklesIcon } from "@heroicons/react/24/solid";
@@ -207,7 +208,7 @@ function ProgramCard({ program, onPublishVersion }) {
                 {v.is_current && <span style={{ fontSize: 10, fontWeight: 700, color: "#4ade80" }}>{t("enterprise.learning.trainingPrograms.current")}</span>}
                 {v.notes && <span style={{ color: "var(--text-tertiary)", fontSize: 11 }}>· {v.notes}</span>}
                 {v.created_by_username && <span style={{ color: "var(--text-tertiary)", fontSize: 11 }}>· {v.created_by_username}</span>}
-                <span style={{ color: "var(--text-tertiary)", fontSize: 11, marginLeft: "auto" }}>{v.created_at ? new Date(v.created_at).toLocaleDateString(language === "es" ? "es" : "en-US") : "—"}</span>
+                <span style={{ color: "var(--text-tertiary)", fontSize: 11, marginLeft: "auto" }}>{v.created_at ? formatDate(v.created_at, language) : "—"}</span>
               </div>
             ))}
           </div>
