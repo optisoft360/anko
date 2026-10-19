@@ -25,7 +25,7 @@ test("F-10: publish a new Training Program version", async ({ page }) => {
   await page.getByRole("button", { name: "Publish Version" }).click();
 
   await expect(page.getByText("Current: v2")).toBeVisible();
-  await expect(page.getByText("2 version(s)")).toBeVisible();
+  await expect(page.getByText("2 versions")).toBeVisible();
   const publish = calls.find((c) => c.method === "POST" && c.path.endsWith("/publish/"));
   expect(publish.body).toEqual({ learning_path_id: 2, notes: "" });
 });
