@@ -2225,7 +2225,7 @@ export const es = {
                     summary: "{topics} tópicos · {decks} decks · {batteries} baterías",
                     addTopic: "Agregar tópico",
                     completion: "Completitud del proceso",
-                    completedBatteries: "{completed}/{total} baterías ≥ 80%",
+                    completedBatteries: "{completed}/{total} baterías ≥ {passing}%",
                     noStructure: "Sin estructura generada",
                     noStructureHint: "Los tópicos, decks y baterías se generan automáticamente al procesar los documentos con IA.",
                     unclassified: "Sin clasificar",

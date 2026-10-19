@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { enumLabel, useKnowledgeEnumLabels } from "@/utils/enumLabel";
+import { bestAttemptPercent } from "@/utils/batteryProgress";
 import { useNavigate } from "react-router-dom";
 import {
   CheckCircleIcon, LockClosedIcon, PlayIcon,
@@ -209,7 +210,7 @@ function ReadOnlyDeckRow({ deck, onLearn, onStudy }) {
 function ReadOnlyBatteryRow({ battery, onSimulate }) {
   const { t } = useLanguage();
   const questionCount = battery.question_count ?? 0;
-  const pct = battery.last_attempt?.percent ?? null;
+  const pct = bestAttemptPercent(battery);  // 14: same rule as the process view
   const hasAttempt = pct !== null;
   const pctRounded = hasAttempt ? Math.round(pct) : 0;
   const pctColor = pctRounded >= 80 ? "#4ade80" : pctRounded >= 50 ? "#f59e0b" : "#818CF8";
@@ -389,8 +390,7 @@ function ProcessKnowledgeView({ ksId, moduleId, assignmentId, alreadyCompleted, 
   const avgBatteryPercent = useMemo(() => {
     const allBatteries = Object.values(contentByTopic).flatMap((c) => c.batteries || []);
     if (allBatteries.length === 0) return null;
-    const withAttempts = allBatteries.filter((b) => b.last_attempt?.percent != null);
-    const sum = withAttempts.reduce((s, b) => s + Number(b.last_attempt.percent), 0);
+    const sum = allBatteries.reduce((s, b) => s + (bestAttemptPercent(b) ?? 0), 0);
     return Math.round(sum / allBatteries.length);
   }, [contentByTopic]);
 

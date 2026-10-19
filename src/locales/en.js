@@ -2224,7 +2224,7 @@ export const en = {
                     summary: "{topics} topics · {decks} decks · {batteries} batteries",
                     addTopic: "Add topic",
                     completion: "Process completion",
-                    completedBatteries: "{completed}/{total} batteries ≥ 80%",
+                    completedBatteries: "{completed}/{total} batteries ≥ {passing}%",
                     noStructure: "No structure generated",
                     noStructureHint: "Topics, decks and batteries are generated automatically when processing documents with AI.",
                     unclassified: "Unclassified",
