@@ -8,7 +8,7 @@ import { companyApi } from "../../api/enterpriseApi";
 import { useEnterprise } from "../../context/enterprise-context";
 import { useLanguage } from "../../../context/language-context";
 
-function useIndustries() {
+export function useIndustries() {
   const { t } = useLanguage();
   return [
     { value: "aviation",      label: t("enterprise.platformAdmin.companies.industries.aviation") },
@@ -22,7 +22,7 @@ function useIndustries() {
   ];
 }
 
-function useCompanySizes() {
+export function useCompanySizes() {
   const { t } = useLanguage();
   return [
     { value: "1_10",      label: t("enterprise.platformAdmin.companies.sizes.s1_10") },

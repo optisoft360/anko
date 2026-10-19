@@ -6,11 +6,18 @@ import { useLanguage } from "../../../context/language-context";
 import { mapApiErrors } from "@/utils/apiError";
 import { intInRange, noWheel } from "@/utils/numberInput";
 
-const TYPES = ["learning_completion", "assessment", "compliance", "custom"];
+// 18: the API's CertificateTemplate.template_type keys (the form used to send an unknown
+// "certificate_type" field, so the type was never saved and the list column was empty).
+export const TEMPLATE_TYPES = ["course_completion", "compliance", "skill_mastery", "certification", "custom"];
+
+export function useTemplateTypeLabels() {
+  const { t } = useLanguage();
+  return Object.fromEntries(TEMPLATE_TYPES.map((key) => [key, t(`enterprise.certifications.templateTypes.${key}`)]));
+}
 
 const EMPTY = {
   code: "", name: "", description: "",
-  certificate_type: "learning_completion",
+  template_type: "course_completion",
   validity_days: 365,
   requires_score: false,
   minimum_score: 70,
@@ -217,6 +224,7 @@ export function CertificateTemplateForm() {
   const isEdit = !!id && id !== "new";
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const TYPE_LABELS = useTemplateTypeLabels();
   const [form, setForm] = useState(EMPTY);
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
@@ -290,8 +298,8 @@ export function CertificateTemplateForm() {
 
         <div>
           <label style={LABEL}>{t("enterprise.certifications.templateForm.fields.type")}</label>
-          <select style={{ ...INPUT, cursor: "pointer" }} value={form.certificate_type} onChange={setInput("certificate_type")}>
-            {TYPES.map((ty) => <option key={ty} value={ty}>{ty.replace(/_/g, " ")}</option>)}
+          <select style={{ ...INPUT, cursor: "pointer" }} value={form.template_type} onChange={setInput("template_type")}>
+            {TEMPLATE_TYPES.map((ty) => <option key={ty} value={ty}>{TYPE_LABELS[ty]}</option>)}
           </select>
         </div>
 

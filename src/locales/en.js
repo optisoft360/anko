@@ -1238,7 +1238,7 @@ export const en = {
         learning: {
             myAssignments: {
                 title: "My Assignments",
-                assignedCount: "{count} learning path{plural} assigned to you",
+                assignedCount: { one: "{count} learning path assigned to you", other: "{count} learning paths assigned to you" },
                 completedCount: "{count} completed",
                 empty: "No assignments",
                 emptyMessage: "Your manager or trainer will assign Learning Paths here.",
@@ -1279,19 +1279,20 @@ export const en = {
                 openOriginal: "Open original file",
                 noSections: "No sections extracted for this document.",
                 noTitle: "No title",
-                cardsCount: "{n} cards",
+                cardsCount: { one: "{n} card", other: "{n} cards" },
                 deckDefaultDesc: "Flashcard set for this topic",
                 deckMobileTitle: "Flashcards",
                 deckMobileDesc: "Review key concepts",
                 learnBtn: "Learn",
                 studyBtn: "Study",
-                questionsCount: "{n} questions",
+                questionsCount: { one: "{n} question", other: "{n} questions" },
                 batteryDefaultDesc: "Assessment or practice related to this topic",
                 batteryMobileTitle: "Assessment",
                 batteryMobileDesc: "Test your understanding",
                 simulateBtn: "Simulate",
                 topicLabel: "Topic {n}",
-                topicsCount: "{n} topics",
+                topicsCount: { one: "{n} topic", other: "{n} topics" },
+                tagsCount: { one: "{n} tag", other: "{n} tags" },
                 noTopicContent: "No content generated for this topic yet.",
                 notLinked: "This process isn't linked to a knowledge source yet.",
                 knowledgeStructure: "Knowledge structure",
@@ -1315,7 +1316,7 @@ export const en = {
                 newPath: "New Learning Path",
                 empty: "No Learning Paths",
                 emptyMessage: "Create your first Learning Path to organize your Processes into a training sequence.",
-                count: "{count} learning path{plural}",
+                count: { one: "{count} learning path", other: "{count} learning paths" },
                 status: {
                     draft: "Draft",
                     published: "Published",
@@ -1331,7 +1332,7 @@ export const en = {
                 },
                 card: {
                     confirmDelete: "Delete \"{name}\"? The processes won't be deleted.",
-                    processCount: "{count} process{plural}"
+                    processCount: { one: "{count} process", other: "{count} processes" }
                 },
                 wizard: {
                     nameRequired: "Name is required.",
@@ -1347,7 +1348,7 @@ export const en = {
                     searchProcesses: "Search processes…",
                     noProcessesYet: "No processes created yet.",
                     noResults: "No results.",
-                    selectedCount: "{count} process{plural} selected",
+                    selectedCount: { one: "{count} process selected", other: "{count} processes selected" },
                     back: "Back",
                     creating: "Creating…",
                     createPath: "Create Learning Path",
@@ -1371,7 +1372,7 @@ export const en = {
                 notFound: "Learning Path not found",
                 back: "Back",
                 backToPaths: "Back to Learning Paths",
-                processCount: "{count} process{plural}",
+                processCount: { one: "{count} process", other: "{count} processes" },
                 finalBattery: "Final battery",
                 edit: "Edit",
                 assign: "Assign",
@@ -1399,7 +1400,7 @@ export const en = {
                     unlinkedTitle: "This module isn't linked to a process — created before that link existed.",
                     optional: "Optional",
                     unlinked: "Unlinked",
-                    itemsCount: "{n} items",
+                    itemsCount: { one: "{n} item", other: "{n} items" },
                     passingScore: "Passing: {n}%"
                 },
                 assignModal: {
@@ -1418,7 +1419,7 @@ export const en = {
                     assignedToUser: "Successfully assigned to {name}.",
                     assignedToTeam: "Successfully assigned to team \"{name}\".",
                     error: "Could not assign.",
-                    memberCount: "{n} members"
+                    memberCount: { one: "{n} member", other: "{n} members" }
                 }
             },
             trainingPrograms: {
@@ -1434,7 +1435,7 @@ export const en = {
                 createError: "Could not create program.",
                 selectPath: "Select a learning path.",
                 publishError: "Failed to publish version.",
-                versionCount: "{n} version(s)",
+                versionCount: { one: "{n} version", other: "{n} versions" },
                 currentVersion: "Current: v{n}",
                 newVersion: "New Version",
                 history: "History",
@@ -1457,7 +1458,7 @@ export const en = {
                 newAssignment: "New Assignment",
                 empty: "No assignments",
                 emptyMessage: "Assign Learning Paths to members or teams to start their training.",
-                count: "{count} assignment{plural}",
+                count: { one: "{count} assignment", other: "{count} assignments" },
                 status: {
                     pending: "Pending",
                     inProgress: "In Progress",
@@ -1488,7 +1489,7 @@ export const en = {
                     process: "Process",
                     noPaths: "No Learning Paths created.",
                     noProcesses: "No Processes created.",
-                    processCount: "{n} processes",
+                    processCount: { one: "{n} process", other: "{n} processes" },
                     cancel: "Cancel",
                     next: "Next →",
                     userTab: "User",
@@ -1497,7 +1498,7 @@ export const en = {
                     searchTeam: "Search team…",
                     noMembers: "No members.",
                     noTeams: "No teams.",
-                    memberCount: "{n} members",
+                    memberCount: { one: "{n} member", other: "{n} members" },
                     dueDate: "Due date",
                     assign: "Assign"
                 }
@@ -1530,7 +1531,7 @@ export const en = {
                 complete: "Complete",
                 noReviews: "No {label} reviews",
                 upToDate: "You're all caught up. Check back later.",
-                overdueSince: "Overdue by {n} day{plural} ({date})",
+                overdueSince: { one: "Overdue by {n} day ({date})", other: "Overdue by {n} days ({date})" },
                 dueOn: "Due: {date}",
                 types: {
                     flashcard: "Flashcard Review",
@@ -1677,7 +1678,7 @@ export const en = {
                     searchTeam: "Search team…",
                     noMembers: "No members.",
                     noTeams: "No teams.",
-                    memberCount: "{n} member{plural}",
+                    memberCount: { one: "{n} member", other: "{n} members" },
                     dueDate: "Due Date",
                     close: "Close",
                     assign: "Assign",
@@ -1849,6 +1850,13 @@ export const en = {
             }
         },
         certifications: {
+            templateTypes: {
+                course_completion: "Course completion",
+                compliance: "Compliance",
+                skill_mastery: "Skill mastery",
+                certification: "Professional certification",
+                custom: "Custom"
+            },
             myCertifications: {
                 title: "My Certifications",
                 issued: "Issued:",
@@ -2023,10 +2031,10 @@ export const en = {
                 title: "Processes",
                 subtitle: "Your company's learning modules",
                 newProcess: "New Process",
-                itemCount: "{count} item{plural}",
+                itemCount: { one: "{count} item", other: "{count} items" },
                 minutes: "{n} min",
                 order: "Order: #{n}",
-                processCount: "{count} process{plural}",
+                processCount: { one: "{count} process", other: "{count} processes" },
                 types: {
                     course: "Course",
                     tutorial: "Tutorial",
@@ -2069,14 +2077,14 @@ export const en = {
                 battery: "Battery",
                 batteryDefaultDescription: "Assessment or practice related to this topic",
                 by: "by {name}",
-                cardsCount: "{n} cards",
+                cardsCount: { one: "{n} card", other: "{n} cards" },
                 deckDefaultDescription: "Set of study flashcards for this topic",
                 deleteBatteryTitle: "Delete battery",
                 deleteDeckTitle: "Delete deck",
                 descriptionLabel: "Description",
                 dismiss: "Dismiss",
                 documentsAndSections: "Documents & Sections",
-                documentsCount: "{count} document{plural}",
+                documentsCount: { one: "{count} document", other: "{count} documents" },
                 dragToReorder: "Drag to reorder",
                 dragToReorderLong: "drag to reorder",
                 generateFromDocumentsTitle: "Generate flashcards and batteries from the documents",
@@ -2093,7 +2101,7 @@ export const en = {
                 passingScore: "Passing: {n}%",
                 processNotFound: "Process not found",
                 publicVisibility: "Public visibility",
-                questionsCount: "{n} questions",
+                questionsCount: { one: "{n} question", other: "{n} questions" },
                 ready: "Ready!",
                 reorder: "reorder",
                 sectionsAbbr: "{n} sect.",
@@ -2101,7 +2109,7 @@ export const en = {
                 selectedAbbr: "{n} sel.",
                 simulate: "Simulate",
                 study: "Study",
-                tagsCount: "{n} tags",
+                tagsCount: { one: "{n} tag", other: "{n} tags" },
                 topicLabel: "Topic {n}",
                 unexpectedError: "An unexpected error occurred.",
                 untitled: "Untitled",
@@ -2143,7 +2151,7 @@ export const en = {
                 addDocModal: {
                     title: "Add documents",
                     clickOrDrag: "Click or drag files here",
-                    filesSelected: "{count} file{plural} selected",
+                    filesSelected: { one: "{count} file selected", other: "{count} files selected" },
                     fileTypes: "PDF, DOCX, XLSX, PPTX, TXT, MD — max. 400 MB",
                     uploading: "Uploading…",
                     upload: "Upload",
@@ -2203,7 +2211,7 @@ export const en = {
                     title: "Documents",
                     addDocument: "Add document",
                     searchPlaceholder: "Search documents...",
-                    count: "{count} document{plural}",
+                    count: { one: "{count} document", other: "{count} documents" },
                     empty: "No documents attached.",
                     dragDrop: "Drag and drop documents here",
                     orSelectFiles: "or select files"
@@ -2379,7 +2387,7 @@ export const en = {
                     uploadNote: "PDF, DOCX, XLSX, PPTX, TXT, MD — max. 400 MB per file",
                     skip: "Skip — go to process",
                     finish: "Finish",
-                    finishWithCount: "Finish ({count} doc{plural})"
+                    finishWithCount: { one: "Finish ({count} doc)", other: "Finish ({count} docs)" }
                 }
             },
             sourceDetail: {
@@ -2417,10 +2425,10 @@ export const en = {
                 procedures: {
                     empty: "No procedures extracted yet.",
                     criticalOnly: "Show critical only",
-                    count: "{count} procedures",
+                    count: { one: "{count} procedure", other: "{count} procedures" },
                     critical: "CRITICAL",
-                    steps: "{count} steps",
-                    warnings: "{count} warning(s)"
+                    steps: { one: "{count} step", other: "{count} steps" },
+                    warnings: { one: "{count} warning", other: "{count} warnings" }
                 },
                 graph: {
                     loading: "Loading graph...",
@@ -2500,7 +2508,7 @@ export const en = {
                     confirmRemove: "Remove {name}?",
                     welcomeResent: "Welcome email resent to {name}.",
                     resendError: "Could not resend the email.",
-                    count: "{count} member{plural}",
+                    count: { one: "{count} member", other: "{count} members" },
                     addModal: {
                         title: "Add user",
                         hint: "If the user doesn't have an account, it will be created automatically. They'll need to use \"Forgot my password\" to set their password.",
@@ -2536,10 +2544,10 @@ export const en = {
                     saveError: "Error saving.",
                     create: "Create",
                     confirmDelete: "Delete unit \"{name}\"?",
-                    count: "{count} unit{plural}",
+                    count: { one: "{count} unit", other: "{count} units" },
                     newUnit: "New Unit",
                     empty: "No business units yet.",
-                    teamCount: "{count} team{plural}",
+                    teamCount: { one: "{count} team", other: "{count} teams" },
                     managerSuffix: "Manager: {name}",
                     editModal: {
                         title: "Edit Business Unit",
@@ -2562,11 +2570,11 @@ export const en = {
                     confirmDelete: "Delete team \"{name}\"?",
                     newTeam: "New Team",
                     empty: "No teams yet.",
-                    memberCount: "{count} member{plural}",
+                    memberCount: { one: "{count} member", other: "{count} members" },
                     buSuffix: "BU: {name}",
                     hide: "Hide",
                     members: "Members",
-                    count: "{count} team{plural}",
+                    count: { one: "{count} team", other: "{count} teams" },
                     editModal: {
                         title: "Edit Team",
                         newTitle: "New Team",
@@ -2625,7 +2633,7 @@ export const en = {
                 noneRegistered: "No companies registered",
                 activeInDashboard: "Active company in the Enterprise Dashboard",
                 operateAsCompany: "Operate as this company",
-                userCount: "{count} user{plural}",
+                userCount: { one: "{count} user", other: "{count} users" },
                 activeBadge: "Active",
                 inactiveBadge: "Inactive",
                 view: "View",
@@ -2771,7 +2779,7 @@ export const en = {
                 title: "Learning Trends",
                 empty: "No learning trend data",
                 seriesName: "Completions",
-                tooltipCompletions: "{n} completions"
+                tooltipCompletions: { one: "{n} completion", other: "{n} completions" }
             },
             retentionTrends: {
                 title: "Retention Trends",

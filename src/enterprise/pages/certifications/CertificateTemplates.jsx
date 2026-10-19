@@ -1,3 +1,4 @@
+import { useTemplateTypeLabels } from "./CertificateTemplateForm";
 import { noWheel } from "@/utils/numberInput";
 import React, { useEffect, useState } from "react";
 import { PlusIcon, AcademicCapIcon, XMarkIcon, CheckBadgeIcon } from "@heroicons/react/24/outline";
@@ -111,6 +112,7 @@ function IssueCertModal({ template, onClose, onIssued }) {
 
 export function CertificateTemplates() {
   const { t } = useLanguage();
+  const TYPE_LABELS = useTemplateTypeLabels();
   const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [issuingTemplate, setIssuingTemplate] = useState(null);
@@ -168,7 +170,7 @@ export function CertificateTemplates() {
                   <tr key={tpl.id} style={{ borderBottom: "1px solid var(--border)" }}>
                     <td style={{ padding: "12px 16px", fontFamily: "monospace", fontSize: 11, color: "var(--text-tertiary)" }}>{tpl.code}</td>
                     <td style={{ padding: "12px 16px", fontWeight: 600, color: "var(--text-primary)" }}>{tpl.name}</td>
-                    <td style={{ padding: "12px 16px", color: "var(--text-secondary)", textTransform: "capitalize" }}>{tpl.certificate_type}</td>
+                    <td style={{ padding: "12px 16px", color: "var(--text-secondary)" }}>{TYPE_LABELS[tpl.template_type] || "—"}</td>
                     <td style={{ padding: "12px 16px", color: "var(--text-secondary)" }}>{tpl.validity_days === 0 ? t("enterprise.certifications.myCertifications.noExpiry") : `${tpl.validity_days}d`}</td>
                     <td style={{ padding: "12px 16px", color: "var(--text-secondary)" }}>{tpl.requires_score ? `${tpl.minimum_score}%` : "—"}</td>
                     <td style={{ padding: "12px 16px" }}>

@@ -322,6 +322,12 @@ function NewAssignmentModal({ companyId, onCreated, onClose }) {
 
 // ─── Assignment Row ───────────────────────────────────────────────────────────
 
+// 18: one column definition for the header and every row (path, assignee, status,
+// progress, due date). Rows always render the five cells so a missing progress or
+// due date never shifts STATUS under PROGRESS.
+const COLUMN_FLEX = ["2 1 160px", "2 1 130px", "1 0 100px", "2 1 120px", "1 0 90px"];
+const EMPTY_CELL = <span style={{ fontSize: 11, color: "var(--text-tertiary)" }}>—</span>;
+
 function AssignmentRow({ a, onClick }) {
   const { t, language } = useLanguage();
   const pct = a.progress?.percent_required ?? a.progress?.percent_total ?? 0;
@@ -335,9 +341,9 @@ function AssignmentRow({ a, onClick }) {
       onMouseEnter={(e) => { e.currentTarget.style.background = "var(--bg-elevated)"; }}
       onMouseLeave={(e) => { e.currentTarget.style.background = "var(--bg-surface)"; }}
       onClick={onClick}>
-      <div className="flex items-center gap-3 flex-wrap">
+      <div className="flex items-center gap-3">
         {/* Path */}
-        <div style={{ flex: "2 1 160px", minWidth: 0 }}>
+        <div style={{ flex: COLUMN_FLEX[0], minWidth: 0 }}>
           <p style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)" }} className="truncate">
             {a.learning_path_name || a.path_name || a.name || "—"}
           </p>
@@ -347,7 +353,7 @@ function AssignmentRow({ a, onClick }) {
         </div>
 
         {/* Assignee */}
-        <div style={{ flex: "2 1 130px", minWidth: 0 }}>
+        <div style={{ flex: COLUMN_FLEX[1], minWidth: 0 }}>
           {a.user_username || a.user ? (
             <div className="flex items-center gap-1.5">
               <UsersIcon style={{ width: 11, height: 11, color: "var(--text-tertiary)" }} />
@@ -358,34 +364,34 @@ function AssignmentRow({ a, onClick }) {
               <UserGroupIcon style={{ width: 11, height: 11, color: "#60a5fa" }} />
               <p style={{ fontSize: 12, color: "var(--text-secondary)" }} className="truncate">{a.team_name || t("enterprise.learning.assignmentsManager.row.team", { id: a.team })}</p>
             </div>
-          ) : null}
+          ) : EMPTY_CELL}
         </div>
 
         {/* Status */}
-        <div style={{ flex: "1 0 100px" }}>
+        <div style={{ flex: COLUMN_FLEX[2], minWidth: 0 }}>
           <StatusPill status={isOverdue ? "overdue" : a.status} />
         </div>
 
         {/* Progress */}
-        {totalMods > 0 && (
-          <div style={{ flex: "2 1 120px" }}>
+        <div style={{ flex: COLUMN_FLEX[3], minWidth: 0 }}>
+          {totalMods > 0 ? (
             <div className="flex items-center gap-2">
               <ProgressBar value={pct} />
               <span style={{ fontSize: 10, fontWeight: 700, color: "var(--text-tertiary)", flexShrink: 0 }}>
                 {completedMods}/{totalMods}
               </span>
             </div>
-          </div>
-        )}
+          ) : EMPTY_CELL}
+        </div>
 
         {/* Due date */}
-        {dueStr && (
-          <div style={{ flex: "1 0 90px" }}>
+        <div style={{ flex: COLUMN_FLEX[4], minWidth: 0 }}>
+          {dueStr ? (
             <p style={{ fontSize: 11, color: isOverdue ? "#f87171" : "var(--text-tertiary)" }} className="flex items-center gap-1">
               <ClockIcon style={{ width: 10, height: 10 }} /> {dueStr}
             </p>
-          </div>
-        )}
+          ) : EMPTY_CELL}
+        </div>
       </div>
     </div>
   );
@@ -457,9 +463,9 @@ export function AssignmentsManager() {
 
       {/* Column labels */}
       {!loading && filtered.length > 0 && (
-        <div style={{ display: "flex", gap: 12, padding: "0 16px" }}>
+        <div data-testid="assignments-header" style={{ display: "flex", gap: 12, padding: "0 17px" }}>
           {columnHeaders.map((h, i) => (
-            <p key={h} style={{ flex: i < 2 ? "2 1 130px" : "1 0 90px", fontSize: 10, fontWeight: 700, color: "var(--text-tertiary)", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+            <p key={h} style={{ flex: COLUMN_FLEX[i], minWidth: 0, fontSize: 10, fontWeight: 700, color: "var(--text-tertiary)", textTransform: "uppercase", letterSpacing: "0.06em" }}>
               {h}
             </p>
           ))}

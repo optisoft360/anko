@@ -1,3 +1,4 @@
+import { useCompanySizes, useIndustries } from "../platform-admin/PlatformAdminCompanies";
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import {
   PlusIcon, XMarkIcon, EllipsisHorizontalIcon, TrashIcon,
@@ -177,6 +178,8 @@ function InfoTab({ company, companyId }) {
   const { t } = useLanguage();
   const { refresh } = useEnterprise();
   const [form, setForm] = useState({ name: "", website: "", industry: "", company_size: "", description: "" });
+  const INDUSTRIES = useIndustries();
+  const SIZES = useCompanySizes();
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
@@ -204,8 +207,17 @@ function InfoTab({ company, companyId }) {
       <FieldInput label={t("enterprise.settings.company.info.nameLabel")} value={form.name} onChange={set("name")} required />
       <FieldInput label={t("enterprise.settings.company.info.websiteLabel")} value={form.website} onChange={set("website")} placeholder="https://…" />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <FieldInput label={t("enterprise.settings.company.info.industryLabel")} value={form.industry} onChange={set("industry")} />
-        <FieldInput label={t("enterprise.settings.company.info.sizeLabel")} value={form.company_size} onChange={set("company_size")} placeholder={t("enterprise.settings.company.info.sizePlaceholder")} />
+        {/* 18: Industry / Size are enum keys ("healthcare", "11_50"): choose them from translated options. */}
+        <FieldSelect label={t("enterprise.settings.company.info.industryLabel")} value={form.industry} onChange={(v) => setForm((f) => ({ ...f, industry: v }))}>
+          <option value="">—</option>
+          {INDUSTRIES.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+          {form.industry && !INDUSTRIES.some((o) => o.value === form.industry) && <option value={form.industry}>{form.industry}</option>}
+        </FieldSelect>
+        <FieldSelect label={t("enterprise.settings.company.info.sizeLabel")} value={form.company_size} onChange={(v) => setForm((f) => ({ ...f, company_size: v }))}>
+          <option value="">{t("enterprise.settings.company.info.sizePlaceholder")}</option>
+          {SIZES.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+          {form.company_size && !SIZES.some((o) => o.value === form.company_size) && <option value={form.company_size}>{form.company_size}</option>}
+        </FieldSelect>
       </div>
       <FieldTextarea label={t("enterprise.settings.company.info.descriptionLabel")} value={form.description} onChange={set("description")} rows={3} />
       {error && <p style={{ color: "#f87171", fontSize: 12 }}>{error}</p>}

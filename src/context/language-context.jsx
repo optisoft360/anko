@@ -26,6 +26,13 @@ export function LanguageProvider({ children }) {
             if (value === undefined) break;
         }
 
+        // 18: plural forms — { one, other } chosen by Intl.PluralRules from params.count / params.n.
+        if (value && typeof value === "object" && ("one" in value || "other" in value)) {
+            const n = Number(params?.count ?? params?.n);
+            const form = Number.isFinite(n) ? new Intl.PluralRules(language === "es" ? "es" : "en").select(n) : "other";
+            value = value[form] ?? value.other ?? value.one;
+        }
+
         if (typeof value === "string" && params && typeof params === "object") {
             Object.keys(params).forEach(paramKey => {
                 value = value.replace(new RegExp(`{${paramKey}}`, "g"), params[paramKey]);

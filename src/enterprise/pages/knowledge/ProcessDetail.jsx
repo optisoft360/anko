@@ -85,6 +85,10 @@ function useStageLabels() {
   return {
     prepare: t("enterprise.knowledge.processDetail.stages.prepare"),
     preflight: t("enterprise.knowledge.processDetail.stages.preflight"),
+    // 18: the real step keys sent by the API (AUTO_STAGE_KEYS); without them the banner fell
+    // back to the server's status text, which could arrive translated into another language.
+    prepare_inputs: t("enterprise.knowledge.processDetail.stages.prepare"),
+    preflight_reconciliation: t("enterprise.knowledge.processDetail.stages.preflight"),
     process_document: t("enterprise.knowledge.processDetail.stages.processDocument"),
     aggregate_unique_tags: t("enterprise.knowledge.processDetail.stages.aggregateTags"),
     partition_tags: t("enterprise.knowledge.processDetail.stages.partitionTags"),
@@ -1233,7 +1237,7 @@ function DeckRowItem({ deck, index, onStudy, onLearn, dragHandleProps, onAddDeck
         >
           + {t("enterprise.knowledge.processDetail.addDeck")}
         </button>
-        <button style={{ color: "#475569", fontSize: 11, fontWeight: 600, cursor: "pointer", background: "none", border: "none", flexShrink: 0 }}>{t("enterprise.knowledge.processDetail.more")}</button>
+        {/* 18: the "More" button had no menu; hidden until one exists. */}
         <button
           onClick={() => onDelete?.(deck)}
           title={t("enterprise.knowledge.processDetail.deleteDeckTitle")}
@@ -1428,7 +1432,7 @@ function TopicTreeItem({
               <Bars3Icon style={{ width: 11, height: 11 }} /> {t("enterprise.knowledge.processDetail.dragToReorderLong")}
             </span>
           )}
-          <button style={{ color: "#475569", fontSize: 11, fontWeight: 600, cursor: "pointer", background: "none", border: "none", flexShrink: 0, whiteSpace: "nowrap" }}>{t("enterprise.knowledge.processDetail.more")}</button>
+          {/* 18: the "More" button had no menu; hidden until one exists. */}
           <button
             onClick={deleteTopic}
             title={t("enterprise.knowledge.processDetail.deleteDialog.titleTopic")}
