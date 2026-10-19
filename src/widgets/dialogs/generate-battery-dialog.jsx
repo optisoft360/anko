@@ -1,3 +1,4 @@
+import { noWheel } from "@/utils/numberInput";
 import React, { useState, useEffect, useMemo } from "react";
 import PropTypes from "prop-types";
 import {
@@ -639,7 +640,7 @@ export function GenerateBatteryDialog({
                                         {language === "es" ? "Cantidad de Preguntas" : "Number of Questions"}
                                     </Typography>
                                     <Input
-                                        type="number"
+                                        type="number" {...noWheel}
                                         min="1"
                                         max="15"
                                         className="!border-zinc-200 focus:!border-indigo-600 !bg-zinc-50/50 rounded-xl"

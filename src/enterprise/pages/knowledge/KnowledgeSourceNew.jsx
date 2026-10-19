@@ -13,6 +13,21 @@ import { useEnterprise } from "../../context/enterprise-context";
 import { useLanguage } from "../../../context/language-context";
 import { applyUploadValidation, UPLOAD_ALLOWED_FILE_TYPES, MAX_UPLOAD_BYTES, uploadHelpText } from "@/utils/fileValidation";
 import { API_BASE } from "@/services/api";
+import { mapApiErrors } from "@/utils/apiError";
+import { intInRange, noWheel } from "@/utils/numberInput";
+
+// 17: bounds shared with the API (KnowledgeSourceCreateSerializer).
+const NUMBER_FIELDS = {
+  minimum_passing_score: [0, 100],
+  estimated_duration_minutes: [1, 100000],
+  cards_per_group: [1, 500],
+  questions_per_group: [1, 500],
+};
+const STEP2_FIELDS = new Set(Object.keys(NUMBER_FIELDS).concat(["question_format", "process_type", "difficulty"]));
+
+function FieldError({ message }) {
+  return message ? <p role="alert" style={{ color: "#f87171", fontSize: 11, marginTop: 4 }}>{message}</p> : null;
+}
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -186,7 +201,7 @@ function Step1({ form, onChange, onNext, onCancel }) {
 
 // ─── Step 2: Configuración ────────────────────────────────────────────────────
 
-function Step2({ form, onChange, onBack, onNext, saving, error }) {
+function Step2({ form, onChange, onBack, onNext, saving, error, fieldErrors = {} }) {
   const { t } = useLanguage();
   const PROCESS_TYPES = useProcessTypes();
   const DIFFICULTIES = useDifficulties();
@@ -249,29 +264,31 @@ function Step2({ form, onChange, onBack, onNext, saving, error }) {
           <p style={{ color: "var(--text-primary)", fontWeight: 600, fontSize: 13, marginBottom: 6 }}>{t("enterprise.knowledge.sourceNew.minScoreLabel")}</p>
           <div className="flex items-center gap-2">
             <input
-              type="number" min="0" max="100"
+              type="number" min="0" max="100" step="1" name="minimum_passing_score" {...noWheel}
               value={form.minimum_passing_score}
-              onChange={(e) => onChange("minimum_passing_score", parseInt(e.target.value) || 0)}
+              onChange={(e) => onChange("minimum_passing_score", e.target.value)}
               style={inputStyle}
               onFocus={(e) => (e.target.style.borderColor = "var(--accent)")}
               onBlur={(e) => (e.target.style.borderColor = "var(--border)")}
             />
             <span style={{ color: "var(--text-tertiary)", fontSize: 13, flexShrink: 0 }}>%</span>
           </div>
+          <FieldError message={fieldErrors.minimum_passing_score} />
         </div>
         <div>
           <p style={{ color: "var(--text-primary)", fontWeight: 600, fontSize: 13, marginBottom: 6 }}>{t("enterprise.knowledge.sourceNew.durationLabel")}</p>
           <div className="flex items-center gap-2">
             <input
-              type="number" min="1" placeholder={t("enterprise.knowledge.sourceNew.durationPlaceholder")}
-              value={form.estimated_duration_minutes || ""}
-              onChange={(e) => onChange("estimated_duration_minutes", e.target.value ? parseInt(e.target.value) : null)}
+              type="number" min="1" step="1" name="estimated_duration_minutes" {...noWheel} placeholder={t("enterprise.knowledge.sourceNew.durationPlaceholder")}
+              value={form.estimated_duration_minutes ?? ""}
+              onChange={(e) => onChange("estimated_duration_minutes", e.target.value === "" ? null : e.target.value)}
               style={inputStyle}
               onFocus={(e) => (e.target.style.borderColor = "var(--accent)")}
               onBlur={(e) => (e.target.style.borderColor = "var(--border)")}
             />
             <span style={{ color: "var(--text-tertiary)", fontSize: 13, flexShrink: 0 }}>{t("enterprise.knowledge.sourceNew.minutesAbbr")}</span>
           </div>
+          <FieldError message={fieldErrors.estimated_duration_minutes} />
         </div>
       </div>
 
@@ -282,24 +299,26 @@ function Step2({ form, onChange, onBack, onNext, saving, error }) {
           <div>
             <p style={{ color: "var(--text-secondary)", fontSize: 11, marginBottom: 6 }}>{t("enterprise.knowledge.sourceNew.cardsPerGroupLabel")}</p>
             <input
-              type="number" min="1"
+              type="number" min="1" max="500" step="1" name="cards_per_group" {...noWheel}
               value={form.cards_per_group}
-              onChange={(e) => onChange("cards_per_group", parseInt(e.target.value) || 1)}
+              onChange={(e) => onChange("cards_per_group", e.target.value)}
               style={inputStyle}
               onFocus={(e) => (e.target.style.borderColor = "var(--accent)")}
               onBlur={(e) => (e.target.style.borderColor = "var(--border)")}
             />
+            <FieldError message={fieldErrors.cards_per_group} />
           </div>
           <div>
             <p style={{ color: "var(--text-secondary)", fontSize: 11, marginBottom: 6 }}>{t("enterprise.knowledge.sourceNew.questionsPerGroupLabel")}</p>
             <input
-              type="number" min="1"
+              type="number" min="1" max="500" step="1" name="questions_per_group" {...noWheel}
               value={form.questions_per_group}
-              onChange={(e) => onChange("questions_per_group", parseInt(e.target.value) || 1)}
+              onChange={(e) => onChange("questions_per_group", e.target.value)}
               style={inputStyle}
               onFocus={(e) => (e.target.style.borderColor = "var(--accent)")}
               onBlur={(e) => (e.target.style.borderColor = "var(--border)")}
             />
+            <FieldError message={fieldErrors.questions_per_group} />
           </div>
           <div>
             <p style={{ color: "var(--text-secondary)", fontSize: 11, marginBottom: 6 }}>{t("enterprise.knowledge.sourceNew.questionFormatLabel")}</p>
@@ -442,6 +461,7 @@ export function KnowledgeSourceNew() {
   const [step, setStep] = useState(1);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState({});
   const [createdKsId, setCreatedKsId] = useState(null);
 
   const [form, setForm] = useState({
@@ -460,10 +480,28 @@ export function KnowledgeSourceNew() {
     question_format: "multiple_choice",
   });
 
-  const onChange = (field, value) => setForm((f) => ({ ...f, [field]: value }));
+  const onChange = (field, value) => {
+    setForm((f) => ({ ...f, [field]: value }));
+    setFieldErrors((errs) => (errs[field] ? { ...errs, [field]: undefined } : errs));
+  };
+
+  const validateNumbers = () => {
+    const errs = {};
+    for (const [field, [min, max]] of Object.entries(NUMBER_FIELDS)) {
+      const value = form[field];
+      if (field === "estimated_duration_minutes" && (value === null || value === "")) continue;
+      const problem = intInRange(value, min, max);
+      if (problem) errs[field] = t(`enterprise.knowledge.sourceNew.numberError.${problem}`, { min, max });
+    }
+    return errs;
+  };
 
   const handleCreateKS = async () => {
+    if (saving) return;
     if (!form.name.trim()) { setError(t("enterprise.knowledge.sourceNew.nameRequiredShort")); return; }
+    const errs = validateNumbers();
+    setFieldErrors(errs);
+    if (Object.keys(errs).length) { setError(""); return; }
     setSaving(true); setError("");
     try {
       const payload = {
@@ -472,20 +510,25 @@ export function KnowledgeSourceNew() {
         source_type: form.source_type,
         process_type: form.process_type,
         difficulty: form.difficulty,
-        minimum_passing_score: form.minimum_passing_score,
-        ...(form.estimated_duration_minutes && { estimated_duration_minutes: form.estimated_duration_minutes }),
-        cards_per_group: form.cards_per_group,
-        questions_per_group: form.questions_per_group,
+        minimum_passing_score: Number(form.minimum_passing_score),
+        ...(form.estimated_duration_minutes && { estimated_duration_minutes: Number(form.estimated_duration_minutes) }),
+        cards_per_group: Number(form.cards_per_group),
+        questions_per_group: Number(form.questions_per_group),
         question_format: form.question_format,
       };
       const created = await knowledgeApi.create(payload);
       setCreatedKsId(created.id);
       setStep(3);
     } catch (err) {
+      // 17: show DRF errors next to their field; anything else (e.g. title) in the banner.
+      const { fields, general } = mapApiErrors(err, { title: "name" });
+      const onStep2 = Object.fromEntries(Object.entries(fields).filter(([k]) => STEP2_FIELDS.has(k)));
+      const elsewhere = Object.entries(fields).filter(([k]) => !STEP2_FIELDS.has(k));
+      setFieldErrors(onStep2);
       setError(
-        err?.response?.data?.title?.[0] ||
-        err?.response?.data?.detail ||
-        t("enterprise.knowledge.sourceNew.createError")
+        general
+        || (elsewhere[0] && `${elsewhere[0][0] === "name" ? t("enterprise.knowledge.sourceNew.nameLabel") : elsewhere[0][0]}: ${elsewhere[0][1]}`)
+        || (Object.keys(onStep2).length ? "" : t("enterprise.knowledge.sourceNew.createError"))
       );
     } finally {
       setSaving(false);
@@ -540,6 +583,7 @@ export function KnowledgeSourceNew() {
             onNext={handleCreateKS}
             saving={saving}
             error={error}
+            fieldErrors={fieldErrors}
           />
         )}
         {step === 3 && createdKsId && (

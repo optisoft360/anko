@@ -1,3 +1,4 @@
+import { noWheel } from "@/utils/numberInput";
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import {
@@ -115,7 +116,7 @@ export function EditTopicDialog({ open, onClose, onSave, topic, availableDocumen
 
                     <div>
                         <Input
-                            type="number"
+                            type="number" {...noWheel}
                             label={`${language === "es" ? "Cantidad de Preguntas" : "Questions Count"} *`}
                             name="question_count_target"
                             value={formData.question_count_target}

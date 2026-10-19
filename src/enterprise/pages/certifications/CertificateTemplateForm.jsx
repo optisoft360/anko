@@ -3,6 +3,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import { certApi, learningApi, complianceApi } from "../../api/enterpriseApi";
 import { useLanguage } from "../../../context/language-context";
+import { mapApiErrors } from "@/utils/apiError";
+import { intInRange, noWheel } from "@/utils/numberInput";
 
 const TYPES = ["learning_completion", "assessment", "compliance", "custom"];
 
@@ -24,6 +26,31 @@ const INPUT = {
   fontFamily: "inherit",
 };
 const LABEL = { fontSize: 11, fontWeight: 700, color: "var(--text-tertiary)", display: "block", marginBottom: 5 };
+
+function FieldError({ message }) {
+  return message ? <p role="alert" style={{ fontSize: 11, color: "#f87171", marginTop: 4 }}>{message}</p> : null;
+}
+
+/** 17: same rules as CertificateTemplateSerializer. Returns { field: message }. */
+export function validateTemplateForm(form, t) {
+  const K = "enterprise.compliance.programs.form.errors.";
+  const errs = {};
+  const text = (v) => String(v ?? "").trim();
+  if (!text(form.code)) errs.code = t(`${K}required`);
+  else if (text(form.code).length > 50) errs.code = t(`${K}tooLong`, { max: 50 });
+  if (!text(form.name)) errs.name = t(`${K}required`);
+  else if (text(form.name).length > 200) errs.name = t(`${K}tooLong`, { max: 200 });
+  if (form.validity_days !== "" && form.validity_days !== null && intInRange(form.validity_days, 0, 3650)) {
+    errs.validity_days = t(`${K}range`, { min: 0, max: 3650 });
+  }
+  if (form.requires_score) {
+    const score = Number(form.minimum_score);
+    if (form.minimum_score === "" || form.minimum_score === null || !Number.isFinite(score) || score < 0 || score > 100) {
+      errs.minimum_score = t(`${K}range`, { min: 0, max: 100 });
+    }
+  }
+  return errs;
+}
 
 function ToggleSwitch({ checked, onChange }) {
   return (
@@ -160,7 +187,7 @@ function RequirementsSection({ templateId }) {
                 <option value="">{t("enterprise.certifications.templateForm.requirements.selectPlaceholder")}</option>
                 {options.map((o) => <option key={o.id} value={o.id}>{o.name}</option>)}
               </select>
-              <input style={INPUT_SM} type="number" min="0" max="100" placeholder={t("enterprise.certifications.templateForm.requirements.minScorePlaceholder")} value={minScore} onChange={(e) => setMinScore(e.target.value)} />
+              <input style={INPUT_SM} type="number" min="0" max="100" {...noWheel} placeholder={t("enterprise.certifications.templateForm.requirements.minScorePlaceholder")} value={minScore} onChange={(e) => setMinScore(e.target.value)} />
             </div>
 
             <div className="flex items-center justify-between">
@@ -194,6 +221,7 @@ export function CertificateTemplateForm() {
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     if (!isEdit) return;
@@ -204,14 +232,27 @@ export function CertificateTemplateForm() {
 
   const submit = async (e) => {
     e.preventDefault();
+    if (saving) return;
+    const local = validateTemplateForm(form, t);  // 17
+    setErrors(local);
+    if (Object.keys(local).length) { setError(""); return; }
     setSaving(true);
     setError("");
+    const payload = {
+      ...form,
+      code: String(form.code).trim(),
+      name: String(form.name).trim(),
+      validity_days: form.validity_days === "" || form.validity_days === null ? null : Number(form.validity_days),
+      minimum_score: form.requires_score ? Number(form.minimum_score) : form.minimum_score,
+    };
     try {
-      if (isEdit) await certApi.updateTemplate(id, form);
-      else await certApi.createTemplate(form);
+      if (isEdit) await certApi.updateTemplate(id, payload);
+      else await certApi.createTemplate(payload);
       navigate("/enterprise/certifications/templates");
     } catch (err) {
-      setError(err?.detail || err?.message || t("enterprise.certifications.templateForm.saveFailed"));
+      const { fields, general } = mapApiErrors(err);
+      setErrors(fields);
+      setError(general || (Object.keys(fields).length ? "" : t("enterprise.certifications.templateForm.saveFailed")));
     } finally { setSaving(false); }
   };
 
@@ -233,15 +274,17 @@ export function CertificateTemplateForm() {
         </div>
       )}
 
-      <form onSubmit={submit} style={{ background: "var(--bg-surface)", border: "1px solid var(--border)", borderRadius: 12, padding: 22 }} className="space-y-5">
+      <form onSubmit={submit} noValidate style={{ background: "var(--bg-surface)", border: "1px solid var(--border)", borderRadius: 12, padding: 22 }} className="space-y-5">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label style={LABEL}>{t("enterprise.certifications.templateForm.fields.code")}</label>
-            <input style={{ ...INPUT, opacity: isEdit ? 0.6 : 1 }} value={form.code} onChange={setInput("code")} required disabled={isEdit} />
+            <input style={{ ...INPUT, opacity: isEdit ? 0.6 : 1 }} maxLength={50} value={form.code} onChange={setInput("code")} disabled={isEdit} />
+            <FieldError message={errors.code} />
           </div>
           <div>
             <label style={LABEL}>{t("enterprise.certifications.templateForm.fields.name")}</label>
-            <input style={INPUT} value={form.name} onChange={setInput("name")} required />
+            <input style={INPUT} maxLength={200} value={form.name} onChange={setInput("name")} />
+            <FieldError message={errors.name} />
           </div>
         </div>
 
@@ -254,7 +297,8 @@ export function CertificateTemplateForm() {
 
         <div>
           <label style={LABEL}>{t("enterprise.certifications.templateForm.fields.validity")}</label>
-          <input style={INPUT} type="number" min="0" value={form.validity_days} onChange={setInput("validity_days")} />
+          <input style={INPUT} type="number" min="0" max="3650" step="1" {...noWheel} value={form.validity_days ?? ""} onChange={setInput("validity_days")} />
+          <FieldError message={errors.validity_days} />
         </div>
 
         <div className="flex items-center gap-3">
@@ -265,7 +309,8 @@ export function CertificateTemplateForm() {
         {form.requires_score && (
           <div>
             <label style={LABEL}>{t("enterprise.certifications.templateForm.fields.minimumScore")}</label>
-            <input style={INPUT} type="number" min="0" max="100" value={form.minimum_score} onChange={setInput("minimum_score")} />
+            <input style={INPUT} type="number" min="0" max="100" {...noWheel} value={form.minimum_score ?? ""} onChange={setInput("minimum_score")} />
+            <FieldError message={errors.minimum_score} />
           </div>
         )}
 

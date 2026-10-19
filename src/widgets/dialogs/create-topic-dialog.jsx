@@ -1,3 +1,4 @@
+import { noWheel } from "@/utils/numberInput";
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import {
@@ -215,7 +216,7 @@ export function CreateTopicDialog({ open, onClose, onCreate, projectId }) {
                             </Typography>
                             <div className="relative">
                                 <Input
-                                    type="number"
+                                    type="number" {...noWheel}
                                     className="!border-zinc-200 focus:!border-indigo-600 !bg-zinc-50/50 rounded-xl !text-zinc-900"
                                     name="question_count_target"
                                     value={formData.question_count_target}

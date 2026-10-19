@@ -14,3 +14,14 @@ describe("apiErrorMessage", () => {
     expect(apiErrorMessage({}, "Could not assign")).toBe("Could not assign");
   });
 });
+
+describe("mapApiErrors (17)", () => {
+  it("maps DRF field errors, aliases and general messages", async () => {
+    const { mapApiErrors } = await import("./apiError");
+    expect(mapApiErrors({ minimum_passing_score: ["Ensure this value is less than or equal to 100."], title: ["Too long."] }, { title: "name" }))
+      .toEqual({ fields: { minimum_passing_score: "Ensure this value is less than or equal to 100.", name: "Too long." }, general: null });
+    expect(mapApiErrors({ response: { data: { detail: "Forbidden." } } })).toEqual({ fields: {}, general: "Forbidden." });
+    expect(mapApiErrors({ flashcards: [{}, { back: ["Required."] }] }).fields.flashcards).toBe("Required.");
+    expect(mapApiErrors(undefined)).toEqual({ fields: {}, general: null });
+  });
+});

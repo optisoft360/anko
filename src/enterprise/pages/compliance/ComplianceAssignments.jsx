@@ -1,3 +1,4 @@
+import { noWheel } from "@/utils/numberInput";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ShieldCheckIcon, CheckIcon, XMarkIcon, ArrowPathIcon } from "@heroicons/react/24/outline";
@@ -64,7 +65,7 @@ function CompleteAssignmentModal({ assignment, onClose, onDone }) {
         <form onSubmit={handleSubmit} className="space-y-3">
           <div>
             <label style={{ fontSize: 11, fontWeight: 700, color: "var(--text-tertiary)", display: "block", marginBottom: 5 }} htmlFor="ma-score">{t("enterprise.compliance.assignments.completeModal.scoreLabel")}</label>
-            <input id="ma-score" type="number" min="0" max="100" style={INPUT} value={score} onChange={(e) => setScore(e.target.value)} />
+            <input id="ma-score" type="number" {...noWheel} min="0" max="100" style={INPUT} value={score} onChange={(e) => setScore(e.target.value)} />
           </div>
           <div>
             <label style={{ fontSize: 11, fontWeight: 700, color: "var(--text-tertiary)", display: "block", marginBottom: 5 }} htmlFor="ma-notes">{t("enterprise.compliance.assignments.completeModal.notesLabel")}</label>

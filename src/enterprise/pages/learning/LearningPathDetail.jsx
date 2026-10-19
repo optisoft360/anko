@@ -1,3 +1,4 @@
+import { noWheel } from "@/utils/numberInput";
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { enumLabel, useKnowledgeEnumLabels } from "@/utils/enumLabel";
 import { apiErrorMessage } from "@/utils/apiError";
@@ -146,7 +147,7 @@ function AddProcesoModal({ pathId, currentModuleIds, onAdded, onClose }) {
         {selectedId && (
           <div className="flex items-center gap-3 mb-4">
             <p style={{ color: "var(--text-secondary)", fontSize: 12 }}>{t("enterprise.learning.pathDetail.addModal.position")}</p>
-            <input type="number" min="1" value={order} onChange={(e) => setOrder(parseInt(e.target.value) || 1)}
+            <input type="number" {...noWheel} min="1" value={order} onChange={(e) => setOrder(parseInt(e.target.value) || 1)}
               style={{ width: 70, background: "var(--bg-elevated)", border: "1px solid var(--border)", borderRadius: 5, padding: "5px 8px", color: "var(--text-primary)", fontSize: 12, outline: "none", textAlign: "center" }} />
           </div>
         )}

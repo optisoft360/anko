@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
-import { apiErrorMessage } from "@/utils/apiError";
+import { apiErrorMessage, mapApiErrors } from "@/utils/apiError";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeftIcon, PencilIcon, CheckIcon, XMarkIcon, PlusIcon, TrashIcon,
@@ -14,7 +14,7 @@ import { useLanguage } from "../../../context/language-context";
 import { StatusBadge } from "../../components/StatusBadge";
 import { LearningPathAssignmentProgress } from "../learning/LearningPathAssignmentProgress";
 import {
-  ProgramFormFields, programToForm, programFormToPayload,
+  ProgramFormFields, programToForm, programFormToPayload, validateProgramForm,
 } from "./CompliancePrograms";
 
 const INPUT = {
@@ -53,24 +53,30 @@ function EditProgramForm({ program, onSaved, onCancel }) {
   const [form, setForm] = useState(() => programToForm(program));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [errors, setErrors] = useState({});
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.name.trim() || !form.code.trim()) { setError(t("enterprise.compliance.programs.form.nameCodeRequired")); return; }
+    if (saving) return;
+    const local = validateProgramForm(form, t);  // 17
+    setErrors(local);
+    if (Object.keys(local).length) { setError(""); return; }
     setSaving(true);
     setError("");
     try {
       const updated = await complianceApi.updateProgram(program.id, programFormToPayload(form));
       onSaved(updated);
     } catch (err) {
-      setError(err?.detail || err?.code?.[0] || err?.name?.[0] || err?.non_field_errors?.[0] || t("enterprise.compliance.programDetail.editForm.saveError"));
+      const { fields, general } = mapApiErrors(err);
+      setErrors(fields);
+      setError(general || (Object.keys(fields).length ? "" : t("enterprise.compliance.programDetail.editForm.saveError")));
       setSaving(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <ProgramFormFields form={form} onChange={setForm} />
+    <form onSubmit={handleSubmit} noValidate className="space-y-4">
+      <ProgramFormFields form={form} onChange={setForm} errors={errors} />
       {error && <p style={{ fontSize: 12, color: "#f87171" }}>{error}</p>}
       <div className="flex justify-end gap-2 pt-1">
         <button type="button" onClick={onCancel} className="ank-btn-ghost text-xs">{t("enterprise.compliance.programs.cancel")}</button>
@@ -427,9 +433,13 @@ export function ComplianceProgramDetail() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [myComplianceAssignment?.id, program?.id]);
 
+  const [actionError, setActionError] = useState("");
   const handleActivate = async () => {
     setBusy(true);
-    try { setProgram(await complianceApi.activateProgram(id)); } finally { setBusy(false); }
+    setActionError("");
+    try { setProgram(await complianceApi.activateProgram(id)); }
+    catch (err) { setActionError(apiErrorMessage(err, t("enterprise.compliance.programs.form.errors.activateError"))); }  // 17: e.g. already expired
+    finally { setBusy(false); }
   };
   const handleArchive = async () => {
     setBusy(true);
@@ -519,6 +529,7 @@ export function ComplianceProgramDetail() {
                 <button onClick={() => navigate(`/enterprise/compliance/programs/${id}/audit`)} className="ank-btn-ghost text-xs">
                   <ChartBarIcon className="h-3.5 w-3.5" /> {t("enterprise.compliance.programDetail.auditReport")}
                 </button>
+                {actionError && <p role="alert" style={{ fontSize: 12, color: "#f87171", alignSelf: "center" }}>{actionError}</p>}
                 {program.status === "draft" && (
                   <button onClick={handleActivate} disabled={busy} className="ank-btn-accent text-xs" style={{ opacity: busy ? 0.7 : 1 }}>
                     {busy ? <ArrowPathIcon className="h-3.5 w-3.5 animate-spin" /> : <><CheckCircleIcon className="h-3.5 w-3.5" /> {t("enterprise.compliance.programs.activate")}</>}

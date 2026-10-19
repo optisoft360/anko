@@ -1,3 +1,4 @@
+import { noWheel } from "@/utils/numberInput";
 import React, { useEffect, useState } from "react";
 import { PlusIcon, AcademicCapIcon, XMarkIcon, CheckBadgeIcon } from "@heroicons/react/24/outline";
 import { useNavigate } from "react-router-dom";
@@ -89,7 +90,7 @@ function IssueCertModal({ template, onClose, onIssued }) {
               <label style={{ fontSize: 11, fontWeight: 700, color: "var(--text-tertiary)", display: "block", marginBottom: 6 }}>
                 {t("enterprise.certifications.templates.issueModal.scoreLabel", { min: template.minimum_score })}
               </label>
-              <input style={INPUT} type="number" min="0" max="100" value={score} onChange={(e) => setScore(e.target.value)} />
+              <input style={INPUT} type="number" {...noWheel} min="0" max="100" value={score} onChange={(e) => setScore(e.target.value)} />
             </div>
           )}
 

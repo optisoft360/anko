@@ -1611,6 +1611,13 @@ export const es = {
                     mandatoryLabel: "Obligatorio para los usuarios/equipos asignados",
                     requiresScoreLabel: "Requiere un puntaje mínimo de aprobación",
                     passingScore: "Puntaje de Aprobación (0–100)",
+                    errors: {
+                        required: "Este campo es obligatorio.",
+                        tooLong: "Usa como máximo {max} caracteres.",
+                        expiryAfterEffective: "La fecha de caducidad debe ser posterior a la de vigencia.",
+                        range: "Introduce un valor entre {min} y {max}.",
+                        activateError: "No se pudo activar el programa."
+                    },
                     nameCodeRequired: "El nombre y el código son obligatorios.",
                     createError: "No se pudo crear el programa."
                 },
@@ -2309,6 +2316,11 @@ export const es = {
                 }
             },
             sourceNew: {
+                numberError: {
+                    required: "Este campo es obligatorio.",
+                    integer: "Introduce un número entero.",
+                    range: "Introduce un valor entre {min} y {max}."
+                },
                 backToProcesses: "Volver a Procesos",
                 subtitle: "Crea un proceso de conocimiento para tu empresa",
                 nameRequired: "El nombre es obligatorio.",

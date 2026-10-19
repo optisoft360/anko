@@ -1610,6 +1610,13 @@ export const en = {
                     mandatoryLabel: "Mandatory for assigned users/teams",
                     requiresScoreLabel: "Requires a minimum passing score",
                     passingScore: "Passing Score (0–100)",
+                    errors: {
+                        required: "This field is required.",
+                        tooLong: "Use {max} characters or fewer.",
+                        expiryAfterEffective: "The expiry date must be after the effective date.",
+                        range: "Enter a value between {min} and {max}.",
+                        activateError: "Could not activate the program."
+                    },
                     nameCodeRequired: "Name and code are required.",
                     createError: "Could not create program."
                 },
@@ -2308,6 +2315,11 @@ export const en = {
                 }
             },
             sourceNew: {
+                numberError: {
+                    required: "This field is required.",
+                    integer: "Enter a whole number.",
+                    range: "Enter a value between {min} and {max}."
+                },
                 backToProcesses: "Back to Processes",
                 subtitle: "Create a knowledge process for your company",
                 nameRequired: "Name is required.",

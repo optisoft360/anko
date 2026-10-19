@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback, useRef, useMemo } from "react";
 import { apiErrorMessage } from "@/utils/apiError";
+import { formatBytes } from "@/utils/numberInput";
 import { enumLabel, useKnowledgeEnumLabels } from "@/utils/enumLabel";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import {
@@ -504,7 +505,7 @@ function DocumentsTab({ docs, onAdd, onAutoGen, genStatus }) {
               <p style={{ fontSize: 13, fontWeight: 500, color: "var(--text-primary)" }} className="truncate">{doc.filename}</p>
               <p style={{ fontSize: 11, color: "var(--text-tertiary)", marginTop: 1 }}>
                 {doc.type?.toUpperCase()}
-                {doc.size ? ` · ${(doc.size / 1024 / 1024).toFixed(1)} MB` : ""}
+                {doc.size ? ` · ${formatBytes(doc.size)}` : ""}
                 {doc.added_by ? ` · por ${doc.added_by}` : ""}
                 {doc.version_note ? ` · ${doc.version_note}` : ""}
               </p>
@@ -1102,7 +1103,7 @@ function DocumentsPanel({ docs, onAdd }) {
                 <p style={{ color: "#F1F5F9", fontWeight: 600, fontSize: 12, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{doc.filename}</p>
                 <p style={{ color: "#475569", fontSize: 10, margin: "2px 0 0" }}>
                   {ext}
-                  {doc.size ? ` · ${(doc.size / 1024 / 1024).toFixed(1)} MB` : " · 0.0 MB"}
+                  {` · ${formatBytes(doc.size || 0)}`}
                   {doc.added_by ? ` · ${t("enterprise.knowledge.processDetail.by", { name: doc.added_by })}` : ""}
                 </p>
               </div>
