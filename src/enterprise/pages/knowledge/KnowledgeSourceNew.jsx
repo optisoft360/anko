@@ -23,7 +23,9 @@ const NUMBER_FIELDS = {
   cards_per_group: [1, 500],
   questions_per_group: [1, 500],
 };
-const STEP2_FIELDS = new Set(Object.keys(NUMBER_FIELDS).concat(["question_format", "process_type", "difficulty"]));
+const STEP2_FIELDS = new Set(Object.keys(NUMBER_FIELDS).concat(["question_format", "process_type", "difficulty", "language"]));
+// 16: languages the API accepts for generated content (LANGUAGE_NAMES in generation_text.py).
+const CONTENT_LANGUAGES = ["es", "en", "pt", "fr", "de", "it", "ca", "nl"];
 
 function FieldError({ message }) {
   return message ? <p role="alert" style={{ color: "#f87171", fontSize: 11, marginTop: 4 }}>{message}</p> : null;
@@ -336,6 +338,23 @@ function Step2({ form, onChange, onBack, onNext, saving, error, fieldErrors = {}
         <p style={{ color: "var(--text-tertiary)", fontSize: 11, marginTop: 6 }}>{t("enterprise.knowledge.sourceNew.autoGenHint")}</p>
       </div>
 
+      {/* 16: language of everything generated for this process ("" = detected from its documents) */}
+      <div>
+        <p style={{ color: "var(--text-primary)", fontWeight: 600, fontSize: 13, marginBottom: 6 }}>{t("enterprise.knowledge.sourceNew.languageLabel")}</p>
+        <select
+          name="language"
+          aria-label={t("enterprise.knowledge.sourceNew.languageLabel")}
+          value={form.language}
+          onChange={(e) => onChange("language", e.target.value)}
+          style={{ ...inputStyle, cursor: "pointer" }}
+        >
+          <option value="">{t("enterprise.knowledge.sourceNew.languageAuto")}</option>
+          {CONTENT_LANGUAGES.map((code) => <option key={code} value={code}>{t(`enterprise.knowledge.sourceNew.languages.${code}`)}</option>)}
+        </select>
+        <p style={{ color: "var(--text-tertiary)", fontSize: 11, marginTop: 6 }}>{t("enterprise.knowledge.sourceNew.languageHint")}</p>
+        <FieldError message={fieldErrors.language} />
+      </div>
+
       {error && (
         <div style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 6, padding: "10px 14px" }}>
           <p style={{ color: "#f87171", fontSize: 12 }}>{error}</p>
@@ -478,6 +497,7 @@ export function KnowledgeSourceNew() {
     cards_per_group: 20,
     questions_per_group: 15,
     question_format: "multiple_choice",
+    language: "",
   });
 
   const onChange = (field, value) => {
@@ -515,6 +535,7 @@ export function KnowledgeSourceNew() {
         cards_per_group: Number(form.cards_per_group),
         questions_per_group: Number(form.questions_per_group),
         question_format: form.question_format,
+        language: form.language,
       };
       const created = await knowledgeApi.create(payload);
       setCreatedKsId(created.id);

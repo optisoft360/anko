@@ -1,6 +1,6 @@
 import React from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 
 afterEach(cleanup);
@@ -47,5 +47,17 @@ describe("New process wizard (17)", () => {
     fireEvent.wheel(input, { deltaY: 100 });
     expect(document.activeElement).not.toBe(input);
     expect(input.value).toBe("15");
+  });
+});
+
+describe("New process wizard — content language (16)", () => {
+  it("sends the chosen language, empty means detected", async () => {
+    api.create.mockReset();
+    api.create.mockResolvedValue({ id: 5 });
+    goToStep2();
+    fireEvent.change(document.querySelector('select[name="language"]'), { target: { value: "es" } });
+    fireEvent.click(screen.getByText(`${K}createProcess`));
+    await waitFor(() => expect(api.create).toHaveBeenCalled());
+    expect(api.create.mock.calls[0][0].language).toBe("es");
   });
 });

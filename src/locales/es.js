@@ -2324,6 +2324,19 @@ export const es = {
                 }
             },
             sourceNew: {
+                languageLabel: "Idioma del contenido generado",
+                languageAuto: "Automático (detectado en los documentos)",
+                languageHint: "Los tópicos, tarjetas, preguntas y explicaciones se escriben en este idioma.",
+                languages: {
+                    es: "Español",
+                    en: "Inglés",
+                    pt: "Portugués",
+                    fr: "Francés",
+                    de: "Alemán",
+                    it: "Italiano",
+                    ca: "Catalán",
+                    nl: "Neerlandés"
+                },
                 numberError: {
                     required: "Este campo es obligatorio.",
                     integer: "Introduce un número entero.",

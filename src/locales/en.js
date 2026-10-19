@@ -2323,6 +2323,19 @@ export const en = {
                 }
             },
             sourceNew: {
+                languageLabel: "Language of the generated content",
+                languageAuto: "Automatic (detected from the documents)",
+                languageHint: "Topics, flashcards, questions and explanations are written in this language.",
+                languages: {
+                    es: "Spanish",
+                    en: "English",
+                    pt: "Portuguese",
+                    fr: "French",
+                    de: "German",
+                    it: "Italian",
+                    ca: "Catalan",
+                    nl: "Dutch"
+                },
                 numberError: {
                     required: "This field is required.",
                     integer: "Enter a whole number.",
