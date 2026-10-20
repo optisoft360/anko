@@ -1787,6 +1787,7 @@ function SectionTree({ scannedDocuments, selectedIds, onToggleDoc, onToggleSecti
             >
               {/* checkbox */}
               <div
+                data-testid={`toggle-doc-${doc.id}`}
                 onClick={(e) => { e.stopPropagation(); onToggleDoc(doc); }}
                 style={{ width: 18, height: 18, borderRadius: 5, border: `1.5px solid ${allSel || someSel ? D.accent : D.border}`, background: allSel ? D.accent : someSel ? D.accentSoft : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, cursor: "pointer" }}
               >
@@ -2685,9 +2686,10 @@ export function ProcessDetail() {
       loadResults();
       loadTagGroups();
     } catch (err) {
+      // Regression fix: the AI branch closed the modal silently on errors (e.g. 404 on the topic).
+      // Rethrow so EnterpriseDeckDialog keeps it open and shows the backend message.
       console.error("Deck creation error:", err);
-      setShowAddDeck(false);
-      setActiveTagGroupId(null);
+      throw err;
     }
   };
 
