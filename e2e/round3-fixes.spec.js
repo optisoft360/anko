@@ -75,3 +75,27 @@ test.describe("Round 3 (fix/data-quality-security-oct-2026)", () => {
     });
   });
 });
+
+test("Regression: a failed AI deck keeps the modal open with the API message", async ({ page }) => {
+  const calls = await setupApp(page, {
+    "GET /enterprise/companies/$": () => COMPANY,
+    "GET /enterprise/knowledge-sources/8/$": () => ({ id: 8, title: "QA-TEST-Claude", status: "processed", documents: [] }),
+    "GET /enterprise/knowledge-sources/8/results/$": () => ({
+      run: { status: "completed" }, topics: [{ id: "3", tags: ["safety"] }],
+      decks: [{ id: 40, title: "QA-TEST Existing deck", tag_group_id: 3, cardsCount: 2 }], batteries: [],
+    }),
+    "GET /enterprise/knowledge-sources/8/documents-with-sections/$": () => ({
+      documents: [{ id: 5, filename: "QA-TEST-procedimiento.md", sections: [{ id: 51, title: "Safety", order: 1 }] }],
+    }),
+    "POST /decks/start-generate/$": () => ({ status: 404, body: { detail: "Some tag groups were not found or are not accessible", missing_tag_group_ids: [3] } }),
+  });
+  await page.goto("/enterprise/knowledge/8");
+  await page.getByRole("button", { name: /add deck/i }).first().click();
+  await page.getByPlaceholder("E.g. Heart Anatomy").fill("QA-TEST AI deck");
+  await page.getByTestId("toggle-doc-5").click();
+  await page.getByRole("button", { name: "Generate Deck", exact: true }).click();
+  await expect(page.getByText("Some tag groups were not found or are not accessible")).toBeVisible();
+  await expect(page.getByPlaceholder("E.g. Heart Anatomy")).toHaveValue("QA-TEST AI deck");
+  const sent = calls.find((c) => c.method === "POST" && c.path.endsWith("/decks/start-generate/"));
+  expect(sent.body.tag_group_ids).toEqual([3]);
+});
