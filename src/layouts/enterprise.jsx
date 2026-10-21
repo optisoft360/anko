@@ -1,7 +1,8 @@
 import { useEffect } from "react";
 import { Routes, Route, Navigate, Link } from "react-router-dom";
 import { ChatBubbleLeftEllipsisIcon, Bars3Icon } from "@heroicons/react/24/solid";
-import { Sidenav, DashboardNavbar, ChatPanel } from "@/widgets/layout";
+import { DashboardNavbar, ChatPanel } from "@/widgets/layout";
+import { EnterpriseSidenav } from "@/widgets/layout/enterprise-sidenav";
 import { EmployeeMobileTabBar } from "@/enterprise/components/EmployeeMobileTabBar";
 import { AdminMobileTabBar } from "@/enterprise/components/AdminMobileTabBar";
 import routes from "@/routes";
@@ -56,7 +57,7 @@ import OnboardingInvite from "@/enterprise/pages/onboarding/OnboardingInvite";
 export function Enterprise() {
   const [, dispatch] = useMaterialTailwindController();
   const { loading, hasCompany, allowedRoutes, isAdmin } = useAuth();
-  const { role } = useEnterprise();
+  const { role, activeCompany } = useEnterprise();
 
   // Light theme (palette C) for the whole enterprise area. On <html> so dialogs rendered in
   // portals get it too; removed on leave, so the personal app keeps its dark theme.
@@ -93,7 +94,7 @@ export function Enterprise() {
 
   return (
     <div className="min-h-screen" style={{ background: "var(--bg-app)" }}>
-      <Sidenav routes={filteredRoutes} />
+      <EnterpriseSidenav routes={filteredRoutes} company={activeCompany} role={role} />
 
       <div
         className="min-h-screen flex flex-col transition-all duration-200 md:ml-[var(--sidebar-w)]"

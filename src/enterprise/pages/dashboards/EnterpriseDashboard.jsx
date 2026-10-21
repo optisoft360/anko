@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, Navigate } from "react-router-dom";
 import {
-  DocumentTextIcon, AcademicCapIcon, ChartBarIcon,
-  UserGroupIcon, Cog6ToothIcon, PlusIcon, ArrowRightIcon,
-  ArrowTrendingUpIcon, ClipboardDocumentListIcon,
-  BookOpenIcon, BoltIcon, SparklesIcon,
-  RocketLaunchIcon, CheckBadgeIcon, ClockIcon,
-  ShieldCheckIcon,
+  DocumentTextIcon, ChartBarIcon, Cog6ToothIcon, PlusIcon, ArrowRightIcon,
+  ArrowTrendingUpIcon, ClipboardDocumentListIcon, BoltIcon, SparklesIcon,
+  CheckBadgeIcon, ClockIcon, ShieldCheckIcon, ShieldExclamationIcon,
+  ArrowUpRightIcon, UserPlusIcon, UsersIcon, MapIcon, RectangleGroupIcon,
+  ChevronRightIcon, CheckCircleIcon,
 } from "@heroicons/react/24/outline";
 import { useEnterprise } from "../../context/enterprise-context";
 import { useLanguage } from "../../../context/language-context";
 import { knowledgeApi, learningApi, analyticsApi } from "../../api/enterpriseApi";
+import { useAuth } from "@/context/auth-context";
+import { useKnowledgeEnumLabels } from "@/utils/enumLabel";
 
 // ─── Role style map ───────────────────────────────────────────────────────────
 
@@ -100,109 +101,16 @@ function KPICard({ icon: Icon, label, value, sub, color, href }) {
   );
 }
 
-// ─── Quick action card ────────────────────────────────────────────────────────
-
-function ActionCard({ icon: Icon, color, title, desc, buttonLabel, href }) {
-  const navigate = useNavigate();
-  return (
-    <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border)", borderRadius: 12, padding: "18px 20px", display: "flex", items: "center", justifyContent: "space-between", gap: 14, alignItems: "center" }}>
-      <div className="flex items-center gap-4 min-w-0">
-        <div style={{ width: 38, height: 38, borderRadius: 10, background: `${color}18`, border: `1px solid ${color}28`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-          <Icon style={{ width: 18, height: 18, color }} />
-        </div>
-        <div className="min-w-0">
-          <p style={{ color: "var(--text-primary)", fontWeight: 600, fontSize: 13 }}>{title}</p>
-          <p style={{ color: "var(--text-secondary)", fontSize: 12, marginTop: 2, lineHeight: 1.4 }}>{desc}</p>
-        </div>
-      </div>
-      <button onClick={() => navigate(href)}
-        style={{ fontSize: 12, fontWeight: 700, color: "#fff", background: `linear-gradient(135deg, ${color}, ${color}CC)`, border: "none", borderRadius: 8, padding: "8px 14px", cursor: "pointer", flexShrink: 0, transition: "opacity 0.15s", display: "flex", alignItems: "center", gap: 6 }}
-        onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.85")}
-        onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}>
-        {buttonLabel} <ArrowRightIcon className="h-3.5 w-3.5" />
-      </button>
-    </div>
-  );
-}
-
-// ─── Quick links grid ─────────────────────────────────────────────────────────
-
-function useNavLinks() {
-  const { t } = useLanguage();
-  return [
-    { label: t("enterprise.dashboard.nav.learningPaths"),  href: "/enterprise/learning/paths",       icon: AcademicCapIcon },
-    { label: t("enterprise.dashboard.nav.myAssignments"),  href: "/enterprise/learning/assignments", icon: ClipboardDocumentListIcon },
-    { label: t("enterprise.dashboard.nav.teamRetention"),  href: "/enterprise/retention/team",        icon: ArrowTrendingUpIcon },
-    { label: t("enterprise.dashboard.nav.compliance"),     href: "/enterprise/compliance/me",         icon: ChartBarIcon },
-    { label: t("enterprise.dashboard.nav.teamMembers"),    href: "/enterprise/settings/members",      icon: UserGroupIcon },
-    { label: t("enterprise.dashboard.nav.knowledgeSources"), href: "/enterprise/knowledge",           icon: DocumentTextIcon },
-  ];
-}
-
-function QuickLinks() {
-  const navigate = useNavigate();
-  const { t } = useLanguage();
-  const navLinks = useNavLinks();
-  return (
-    <div>
-      <p style={{ color: "var(--text-tertiary)", fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 10 }}>{t("enterprise.dashboard.quickAccess")}</p>
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-        {navLinks.map(({ label, href, icon: Icon }) => (
-          <button key={href} onClick={() => navigate(href)}
-            style={{ background: "var(--bg-elevated)", border: "1px solid var(--border)", borderRadius: 8, padding: "11px 12px", textAlign: "left", cursor: "pointer", transition: "border-color 0.15s, background 0.15s", display: "flex", alignItems: "center", gap: 9 }}
-            onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--border-hover)"; e.currentTarget.style.background = "var(--bg-surface)"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.background = "var(--bg-elevated)"; }}>
-            <Icon style={{ width: 13, height: 13, color: "var(--text-secondary)", flexShrink: 0 }} />
-            <span style={{ color: "var(--text-primary)", fontSize: 12, fontWeight: 500 }}>{label}</span>
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// ─── Feature spotlight (shown when no processes yet) ─────────────────────────
-
-function GettingStarted() {
-  const navigate = useNavigate();
-  const { t } = useLanguage();
-  const steps = [
-    { n: "1", icon: DocumentTextIcon, title: t("enterprise.dashboard.getStarted.step1Title"), desc: t("enterprise.dashboard.getStarted.step1Desc") },
-    { n: "2", icon: SparklesIcon, title: t("enterprise.dashboard.getStarted.step2Title"), desc: t("enterprise.dashboard.getStarted.step2Desc") },
-    { n: "3", icon: CheckBadgeIcon, title: t("enterprise.dashboard.getStarted.step3Title"), desc: t("enterprise.dashboard.getStarted.step3Desc") },
-  ];
-  return (
-    <div style={{ background: "var(--bg-surface)", border: "1px solid rgba(99,102,241,0.2)", borderRadius: 14, padding: "24px 22px" }}>
-      <div className="flex items-center gap-3 mb-4">
-        <RocketLaunchIcon className="h-5 w-5" style={{ color: "#818CF8" }} />
-        <p style={{ color: "var(--lt-f1f5f9, #F1F5F9)", fontWeight: 700, fontSize: 14 }}>{t("enterprise.dashboard.getStarted.title")}</p>
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-5">
-        {steps.map(({ n, icon: Icon, title, desc }) => (
-          <div key={n} style={{ background: "var(--bg-elevated)", borderRadius: 10, padding: 14 }}>
-            <div className="flex items-center gap-2 mb-2">
-              <span style={{ fontSize: 10, fontWeight: 800, color: "var(--lt-6366f1, #6366F1)", background: "rgba(99,102,241,0.12)", borderRadius: 4, padding: "1px 6px" }}>{n}</span>
-              <Icon style={{ width: 14, height: 14, color: "var(--text-secondary)" }} />
-            </div>
-            <p style={{ color: "var(--text-primary)", fontWeight: 600, fontSize: 12, marginBottom: 3 }}>{title}</p>
-            <p style={{ color: "var(--text-tertiary)", fontSize: 11, lineHeight: 1.5 }}>{desc}</p>
-          </div>
-        ))}
-      </div>
-      <button onClick={() => navigate("/enterprise/knowledge/new")}
-        style={{ fontSize: 13, fontWeight: 700, color: "#fff", background: "linear-gradient(135deg, #6366F1, #818CF8)", border: "none", borderRadius: 9, padding: "10px 20px", cursor: "pointer", display: "flex", alignItems: "center", gap: 7, transition: "opacity 0.15s" }}
-        onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.88")}
-        onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}>
-        <PlusIcon className="h-4 w-4" /> {t("enterprise.dashboard.getStarted.cta")}
-      </button>
-    </div>
-  );
-}
-
 // ─── Metrics hook ─────────────────────────────────────────────────────────────
 
+/** Processes (knowledge sources) of a list response, most recently updated first. */
+function recentFirst(d) {
+  const items = Array.isArray(d) ? d : Array.isArray(d?.results) ? d.results : [];
+  return [...items].sort((a, b) => new Date(b.updated_at || b.created_at || 0) - new Date(a.updated_at || a.created_at || 0));
+}
+
 function useMetrics(enabled) {
-  const [data, setData] = useState({ processes: "—", learningModules: "—", paths: "—", assignments: "—", sources: "—", compliance: null });
+  const [data, setData] = useState({ processes: "—", learningModules: "—", paths: "—", assignments: "—", sources: "—", compliance: null, certifications: null, recentProcesses: [] });
   const [loadingMetrics, setLoadingMetrics] = useState(true);
 
   useEffect(() => {
@@ -234,6 +142,8 @@ function useMetrics(enabled) {
         assignments: count(assignments),
         sources: processCount,
         compliance: executive?.compliance || null,
+        certifications: executive?.certifications || null,
+        recentProcesses: recentFirst(sources).slice(0, 5),
       });
       setLoadingMetrics(false);
     });
@@ -342,6 +252,383 @@ function EmployeeDashboard({ activeCompany, role }) {
   );
 }
 
+// ─── Owner / admin dashboard (light, palette C) ──────────────────────────────
+// Material Tailwind replaces Tailwind's color scales (no slate/emerald/…), so the
+// palette is written as hex values. Every class string is a literal for the JIT.
+
+const TONES = {
+  indigo:  { icon: "bg-[#EEF2FF] text-[#4F46E5]", hover: "hover:border-[#C7D2FE]", arrow: "group-hover:text-[#4F46E5]", solid: "bg-[#4F46E5]", link: "text-[#4F46E5]" },
+  sky:     { icon: "bg-[#F0F9FF] text-[#0284C7]", hover: "hover:border-[#BAE6FD]", arrow: "group-hover:text-[#0284C7]" },
+  emerald: { icon: "bg-[#ECFDF5] text-[#059669]", hover: "hover:border-[#A7F3D0]", arrow: "group-hover:text-[#059669]", solid: "bg-[#059669]", link: "text-[#059669]" },
+  amber:   { icon: "bg-[#FFFBEB] text-[#D97706]", hover: "hover:border-[#FDE68A]", arrow: "group-hover:text-[#D97706]", solid: "bg-[#F59E0B]", link: "text-[#D97706]" },
+  violet:  { icon: "bg-[#F5F3FF] text-[#7C3AED]", hover: "hover:border-[#DDD6FE]", arrow: "group-hover:text-[#7C3AED]" },
+};
+
+const LIGHT_ROLE = {
+  owner:   "bg-[#EDE9FE] text-[#6D28D9]",
+  admin:   "bg-[#FFE4E6] text-[#BE123C]",
+  manager: "bg-[#E0F2FE] text-[#0369A1]",
+  trainer: "bg-[#DCFCE7] text-[#15803D]",
+  auditor: "bg-[#FEF3C7] text-[#B45309]",
+};
+
+const PROCESS_STATUS = {
+  pending:    { badge: "bg-[#FFFBEB] text-[#B45309]", dot: "bg-[#F59E0B]" },
+  processing: { badge: "bg-[#F0F9FF] text-[#0369A1]", dot: "bg-[#0EA5E9] animate-pulse" },
+  processed:  { badge: "bg-[#ECFDF5] text-[#047857]", dot: "bg-[#10B981]" },
+  failed:     { badge: "bg-[#FFF1F2] text-[#BE123C]", dot: "bg-[#F43F5E]" },
+};
+
+// Compliance below this rate (or with non-compliant assignments) is flagged.
+const COMPLIANCE_TARGET = 80;
+
+const CARD = "rounded-xl border border-[#E2E8F0] bg-white shadow-[0_1px_2px_0_rgb(15_23_42/0.04),0_1px_3px_0_rgb(15_23_42/0.06)]";
+const FOCUS = "focus:outline-none focus-visible:ring-2 focus-visible:ring-[#6366F1] focus-visible:ring-offset-2";
+
+function greetingKey(date = new Date()) {
+  const h = date.getHours();
+  if (h < 12) return "morning";
+  if (h < 19) return "afternoon";
+  return "evening";
+}
+
+function Skeleton({ className = "" }) {
+  return <span className={`block animate-pulse rounded bg-[#F1F5F9] ${className}`} />;
+}
+
+function DashboardHeader({ company, role, userName }) {
+  const navigate = useNavigate();
+  const { t } = useLanguage();
+  const name = company?.company_name || company?.name || t("enterprise.dashboard.yourCompany");
+  return (
+    <section className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+      <div>
+        <p className="text-sm font-medium text-[#4F46E5]">
+          {t(`enterprise.dashboard.home.greeting.${greetingKey()}`, { name: userName })}
+        </p>
+        <h1 className="mt-1 text-2xl font-semibold tracking-tight text-[#0F172A] sm:text-3xl">{t("enterprise.dashboard.title")}</h1>
+        <p className="mt-1 text-sm text-[#64748B]">{t("enterprise.dashboard.adminSubtitle")}</p>
+      </div>
+      <div className="flex flex-wrap items-center gap-2">
+        <span className={`inline-flex items-center gap-2 rounded-lg border border-[#E2E8F0] bg-white px-3 py-2 text-sm shadow-[0_1px_2px_0_rgb(15_23_42/0.04)]`}>
+          <span className="grid h-5 w-5 place-items-center rounded bg-[#4F46E5] text-[10px] font-bold text-white">{name.charAt(0).toUpperCase()}</span>
+          <span className="max-w-[160px] truncate font-medium text-[#0F172A]">{name}</span>
+          {LIGHT_ROLE[role] && (
+            <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${LIGHT_ROLE[role]}`}>{t(`enterprise.roles.${role}`)}</span>
+          )}
+          <span className="hidden items-center gap-1 text-xs text-[#059669] sm:inline-flex">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#10B981]" />{t("enterprise.dashboard.home.enterpriseActive")}
+          </span>
+        </span>
+        <button type="button" onClick={() => navigate("/enterprise/settings")}
+          className={`inline-flex h-10 cursor-pointer items-center gap-2 rounded-lg border border-[#E2E8F0] bg-white px-4 text-sm font-medium text-[#334155] shadow-[0_1px_2px_0_rgb(15_23_42/0.04)] transition-colors duration-150 hover:bg-[#F8FAFC] ${FOCUS}`}>
+          <Cog6ToothIcon className="h-4 w-4" /> {t("enterprise.dashboard.settingsBtn")}
+        </button>
+        <button type="button" onClick={() => navigate("/enterprise/knowledge/new")}
+          className={`inline-flex h-10 cursor-pointer items-center gap-2 rounded-lg bg-[#4F46E5] px-4 text-sm font-semibold text-white shadow-[0_1px_2px_0_rgb(79_70_229/0.25)] transition-colors duration-150 hover:bg-[#4338CA] ${FOCUS}`}>
+          <PlusIcon className="h-4 w-4" /> {t("enterprise.dashboard.newProcess")}
+        </button>
+      </div>
+    </section>
+  );
+}
+
+function StatCard({ icon: Icon, tone, value, label, sub, href, loading }) {
+  const navigate = useNavigate();
+  const c = TONES[tone];
+  return (
+    <button type="button" onClick={() => navigate(href)}
+      className={`group ${CARD} cursor-pointer p-5 text-left transition duration-200 hover:-translate-y-0.5 hover:shadow-md ${c.hover} ${FOCUS}`}>
+      <div className="flex items-center justify-between">
+        <span className={`grid h-10 w-10 place-items-center rounded-lg ${c.icon}`}><Icon className="h-5 w-5" /></span>
+        <ArrowUpRightIcon className={`h-4 w-4 text-[#CBD5E1] transition-colors ${c.arrow}`} />
+      </div>
+      {loading ? <Skeleton className="mt-4 h-9 w-12" /> : <p className="mt-4 text-3xl font-semibold tabular-nums text-[#0F172A]">{value}</p>}
+      <p className="mt-1 text-sm font-medium text-[#334155]">{label}</p>
+      <p className="text-xs text-[#64748B]">{sub}</p>
+    </button>
+  );
+}
+
+function ComplianceStatCard({ compliance, loading }) {
+  const navigate = useNavigate();
+  const { t } = useLanguage();
+  const total = compliance?.total ?? 0;
+  const rate = compliance?.rate != null ? Number(compliance.rate) : null;
+  const hasData = !loading && compliance && total > 0;
+  const atRisk = hasData && ((compliance.non_compliant || 0) > 0 || rate < COMPLIANCE_TARGET);
+  const pct = Math.max(0, Math.min(100, rate || 0));
+  return (
+    <button type="button" onClick={() => navigate("/enterprise/compliance/company")}
+      className={`group rounded-xl border p-5 text-left shadow-[0_1px_2px_0_rgb(15_23_42/0.04),0_1px_3px_0_rgb(15_23_42/0.06)] transition duration-200 hover:-translate-y-0.5 hover:shadow-md cursor-pointer ${FOCUS} ${atRisk ? "border-[#FECDD3] bg-[#FFF1F2]/40" : "border-[#E2E8F0] bg-white hover:border-[#A7F3D0]"}`}>
+      <div className="flex items-center justify-between">
+        <span className={`grid h-10 w-10 place-items-center rounded-lg ${atRisk ? "bg-[#FFE4E6] text-[#E11D48]" : "bg-[#ECFDF5] text-[#059669]"}`}>
+          {atRisk ? <ShieldExclamationIcon className="h-5 w-5" /> : <ShieldCheckIcon className="h-5 w-5" />}
+        </span>
+        {atRisk && <span className="whitespace-nowrap rounded-full bg-[#FFE4E6] px-2 py-0.5 text-[11px] font-semibold text-[#BE123C]">{t("enterprise.dashboard.home.requiresAttention")}</span>}
+        {hasData && !atRisk && <span className="whitespace-nowrap rounded-full bg-[#DCFCE7] px-2 py-0.5 text-[11px] font-semibold text-[#15803D]">{t("enterprise.dashboard.home.onTrack")}</span>}
+      </div>
+      {loading ? <Skeleton className="mt-4 h-9 w-14" /> : <p className="mt-4 text-3xl font-semibold tabular-nums text-[#0F172A]">{rate != null ? `${rate}%` : "—"}</p>}
+      <p className="mt-1 text-sm font-medium text-[#334155]">{t("enterprise.dashboard.nav.compliance")}</p>
+      <div className={`mt-2 h-1.5 w-full overflow-hidden rounded-full ${atRisk ? "bg-[#FFE4E6]" : "bg-[#F1F5F9]"}`}
+        role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100} aria-label={t("enterprise.dashboard.nav.compliance")}>
+        <div className={`h-full rounded-full ${atRisk ? "bg-[#F43F5E]" : "bg-[#10B981]"}`} style={{ width: `${pct}%` }} />
+      </div>
+      <p className="mt-1.5 text-xs text-[#64748B]">
+        {loading ? "…" : t("enterprise.dashboard.home.compliantOf", { compliant: compliance?.compliant ?? 0, count: total })}
+      </p>
+    </button>
+  );
+}
+
+function QuickActions() {
+  const navigate = useNavigate();
+  const { t } = useLanguage();
+  const actions = [
+    { icon: BoltIcon, tone: "indigo", title: t("enterprise.dashboard.action1Title"), desc: t("enterprise.dashboard.action1Desc"), cta: t("enterprise.dashboard.action1Btn"), href: "/enterprise/knowledge/new" },
+    { icon: UserPlusIcon, tone: "emerald", title: t("enterprise.dashboard.action2Title"), desc: t("enterprise.dashboard.action2Desc"), cta: t("enterprise.dashboard.action2Btn"), href: "/enterprise/learning/paths" },
+    { icon: ShieldCheckIcon, tone: "amber", title: t("enterprise.dashboard.home.complianceActionTitle"), desc: t("enterprise.dashboard.home.complianceActionDesc"), cta: t("enterprise.dashboard.home.complianceActionBtn"), href: "/enterprise/compliance/programs" },
+  ];
+  return (
+    <div className={CARD}>
+      <div className="border-b border-[#F1F5F9] px-6 py-4">
+        <h2 className="text-base font-semibold text-[#0F172A]">{t("enterprise.dashboard.home.quickActions")}</h2>
+        <p className="text-sm text-[#64748B]">{t("enterprise.dashboard.home.quickActionsSub")}</p>
+      </div>
+      <div className="grid grid-cols-1 divide-y divide-[#F1F5F9] md:grid-cols-3 md:divide-x md:divide-y-0">
+        {actions.map(({ icon: Icon, tone, title, desc, cta, href }) => (
+          <button key={href} type="button" onClick={() => navigate(href)}
+            className={`group flex cursor-pointer flex-col gap-3 p-6 text-left transition-colors duration-150 hover:bg-[#F8FAFC] first:rounded-bl-xl last:rounded-br-xl ${FOCUS}`}>
+            <span className={`grid h-10 w-10 place-items-center rounded-lg text-white ${TONES[tone].solid}`}><Icon className="h-5 w-5" /></span>
+            <div>
+              <p className="font-medium text-[#0F172A]">{title}</p>
+              <p className="mt-1 text-sm text-[#64748B]">{desc}</p>
+            </div>
+            <span className={`mt-auto inline-flex items-center gap-1 text-sm font-medium ${TONES[tone].link}`}>
+              {cta} <ArrowRightIcon className="h-4 w-4 transition-transform duration-150 group-hover:translate-x-0.5" />
+            </span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function RecentProcesses({ processes, loading }) {
+  const navigate = useNavigate();
+  const { t, language } = useLanguage();
+  const { processType } = useKnowledgeEnumLabels();
+  const fmtDate = (v) => (v ? new Date(v).toLocaleDateString(language === "es" ? "es" : "en", { day: "2-digit", month: "short", year: "numeric" }) : "—");
+  const head = "px-6 py-3 font-medium";
+  return (
+    <div className={CARD}>
+      <div className="flex items-center justify-between border-b border-[#F1F5F9] px-6 py-4">
+        <h2 className="text-base font-semibold text-[#0F172A]">{t("enterprise.dashboard.home.recentProcesses")}</h2>
+        <button type="button" onClick={() => navigate("/enterprise/knowledge")}
+          className={`cursor-pointer rounded text-sm font-medium text-[#4F46E5] hover:text-[#4338CA] ${FOCUS}`}>
+          {t("enterprise.dashboard.home.viewAll")}
+        </button>
+      </div>
+      {!loading && processes.length === 0 ? (
+        <div className="flex flex-col items-center px-6 py-10 text-center">
+          <span className="grid h-12 w-12 place-items-center rounded-full bg-[#F1F5F9] text-[#94A3B8]"><DocumentTextIcon className="h-6 w-6" /></span>
+          <p className="mt-3 text-sm font-medium text-[#0F172A]">{t("enterprise.dashboard.home.noProcesses")}</p>
+          <p className="mt-1 max-w-xs text-sm text-[#64748B]">{t("enterprise.dashboard.home.noProcessesHint")}</p>
+          <button type="button" onClick={() => navigate("/enterprise/knowledge/new")}
+            className={`mt-4 inline-flex h-9 cursor-pointer items-center gap-2 rounded-lg bg-[#4F46E5] px-4 text-sm font-semibold text-white hover:bg-[#4338CA] ${FOCUS}`}>
+            <PlusIcon className="h-4 w-4" /> {t("enterprise.dashboard.getStarted.cta")}
+          </button>
+        </div>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-sm">
+            <thead className="bg-[#F8FAFC] text-xs uppercase tracking-wide text-[#64748B]">
+              <tr>
+                <th scope="col" className={head}>{t("enterprise.dashboard.home.colProcess")}</th>
+                <th scope="col" className={head}>{t("enterprise.dashboard.home.colSource")}</th>
+                <th scope="col" className={head}>{t("enterprise.dashboard.home.colStatus")}</th>
+                <th scope="col" className={head}>{t("enterprise.dashboard.home.colUpdated")}</th>
+                <th scope="col" className="px-6 py-3"><span className="sr-only">{t("enterprise.dashboard.home.open")}</span></th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[#F1F5F9]">
+              {loading
+                ? [0, 1, 2].map((i) => (
+                  <tr key={i}>
+                    <td className="px-6 py-4"><Skeleton className="h-5 w-40" /></td>
+                    <td className="px-6 py-4"><Skeleton className="h-4 w-20" /></td>
+                    <td className="px-6 py-4"><Skeleton className="h-5 w-20" /></td>
+                    <td className="px-6 py-4"><Skeleton className="h-4 w-20" /></td>
+                    <td />
+                  </tr>
+                ))
+                : processes.map((p) => {
+                  const st = PROCESS_STATUS[p.status];
+                  return (
+                    <tr key={p.id} onClick={() => navigate(`/enterprise/knowledge/${p.id}`)} className="cursor-pointer transition-colors duration-150 hover:bg-[#F8FAFC]">
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-md bg-[#EEF2FF] text-[#4F46E5]"><DocumentTextIcon className="h-4 w-4" /></span>
+                          <span className="max-w-[260px] truncate font-medium text-[#0F172A]" title={p.title}>{p.title}</span>
+                        </div>
+                      </td>
+                      <td className="whitespace-nowrap px-6 py-4 text-[#64748B]">{processType(p.process_type) || "—"}</td>
+                      <td className="whitespace-nowrap px-6 py-4">
+                        {st ? (
+                          <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${st.badge}`}>
+                            <span className={`h-1.5 w-1.5 rounded-full ${st.dot}`} />{t(`enterprise.dashboard.home.status.${p.status}`)}
+                          </span>
+                        ) : "—"}
+                      </td>
+                      <td className="whitespace-nowrap px-6 py-4 text-[#64748B]">{fmtDate(p.updated_at || p.created_at)}</td>
+                      <td className="px-6 py-4 text-right">
+                        <button type="button" aria-label={t("enterprise.dashboard.home.openProcess", { name: p.title })}
+                          onClick={(e) => { e.stopPropagation(); navigate(`/enterprise/knowledge/${p.id}`); }}
+                          className={`cursor-pointer rounded-md p-1.5 text-[#94A3B8] hover:bg-[#F1F5F9] hover:text-[#475569] ${FOCUS}`}>
+                          <ChevronRightIcon className="h-4 w-4" />
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ComplianceStatus({ compliance, loading }) {
+  const navigate = useNavigate();
+  const { t } = useLanguage();
+  const total = compliance?.total ?? 0;
+  const rate = compliance?.rate != null ? Number(compliance.rate) : 0;
+  const pct = Math.max(0, Math.min(100, rate));
+  const atRisk = total > 0 && ((compliance?.non_compliant || 0) > 0 || rate < COMPLIANCE_TARGET);
+  const rows = [
+    { dot: "bg-[#10B981]", label: t("enterprise.dashboard.home.compliant"), value: compliance?.compliant ?? 0 },
+    { dot: "bg-[#F43F5E]", label: t("enterprise.dashboard.home.nonCompliant"), value: compliance?.non_compliant ?? 0 },
+    { dot: "bg-[#94A3B8]", label: t("enterprise.dashboard.home.totalAssignments"), value: total },
+  ];
+  return (
+    <div className={`${CARD} p-6`}>
+      <div className="flex items-center justify-between">
+        <h2 className="text-base font-semibold text-[#0F172A]">{t("enterprise.dashboard.home.complianceStatus")}</h2>
+        <button type="button" onClick={() => navigate("/enterprise/compliance/company")}
+          className={`cursor-pointer rounded text-sm font-medium text-[#4F46E5] hover:text-[#4338CA] ${FOCUS}`}>
+          {t("enterprise.dashboard.home.details")}
+        </button>
+      </div>
+      {loading ? (
+        <div className="mt-6 flex items-center gap-6"><Skeleton className="h-28 w-28 rounded-full" /><div className="flex-1 space-y-3"><Skeleton className="h-4" /><Skeleton className="h-4" /><Skeleton className="h-4" /></div></div>
+      ) : !compliance || total === 0 ? (
+        <p className="mt-4 text-sm text-[#64748B]">{t("enterprise.dashboard.home.noComplianceData")}</p>
+      ) : (
+        <div className="mt-6 flex items-center gap-6">
+          <div className="relative h-28 w-28 shrink-0">
+            <svg viewBox="0 0 36 36" className="h-full w-full -rotate-90" aria-hidden="true">
+              <circle cx="18" cy="18" r="15.9" fill="none" stroke="#F1F5F9" strokeWidth="3.2" />
+              {pct > 0 && <circle cx="18" cy="18" r="15.9" fill="none" stroke={atRisk ? "#F43F5E" : "#10B981"} strokeWidth="3.2" strokeLinecap="round" strokeDasharray={`${pct} 100`} />}
+            </svg>
+            <div className="absolute inset-0 grid place-items-center text-center">
+              <div><p className="text-2xl font-semibold text-[#0F172A]">{rate}%</p><p className="text-[11px] text-[#64748B]">{t("enterprise.dashboard.home.compliantShort")}</p></div>
+            </div>
+          </div>
+          <dl className="flex-1 space-y-3 text-sm">
+            {rows.map(({ dot, label, value }) => (
+              <div key={label} className="flex items-center gap-2">
+                <span className={`h-2 w-2 shrink-0 rounded-full ${dot}`} />
+                <dt className="text-[#64748B]">{label}</dt>
+                <dd className="ml-auto pl-4 font-semibold tabular-nums text-[#0F172A]">{value}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function SetupChecklist({ metrics, loading }) {
+  const navigate = useNavigate();
+  const { t } = useLanguage();
+  const has = (v) => typeof v === "number" && v > 0;
+  const steps = [
+    { key: "process",       done: has(metrics.processes),                    href: "/enterprise/knowledge/new" },
+    { key: "path",          done: has(metrics.paths),                        href: "/enterprise/learning/paths" },
+    { key: "assignment",    done: has(metrics.assignments),                  href: "/enterprise/learning/manage-assignments" },
+    { key: "compliance",    done: has(metrics.compliance?.total),            href: "/enterprise/compliance/programs" },
+    { key: "certification", done: has(metrics.certifications?.active),       href: "/enterprise/certifications/templates" },
+  ];
+  const done = steps.filter((s) => s.done).length;
+  return (
+    <div className={`${CARD} p-6`}>
+      <div className="flex items-center justify-between">
+        <h2 className="text-base font-semibold text-[#0F172A]">{t("enterprise.dashboard.home.setupTitle")}</h2>
+        <span className="text-sm font-medium tabular-nums text-[#64748B]">{loading ? "…" : `${done} / ${steps.length}`}</span>
+      </div>
+      <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-[#F1F5F9]" role="progressbar"
+        aria-valuenow={done} aria-valuemin={0} aria-valuemax={steps.length} aria-label={t("enterprise.dashboard.home.setupTitle")}>
+        <div className="h-full rounded-full bg-[#4F46E5] transition-[width] duration-300" style={{ width: loading ? 0 : `${(done / steps.length) * 100}%` }} />
+      </div>
+      <ul className="mt-5 space-y-3 text-sm">
+        {steps.map(({ key, done: ok, href }) => (
+          <li key={key} className="flex items-center gap-3">
+            {ok
+              ? <CheckCircleIcon className="h-5 w-5 shrink-0 text-[#10B981]" aria-hidden="true" />
+              : <span className="h-5 w-5 shrink-0 rounded-full border-2 border-[#CBD5E1]" aria-hidden="true" />}
+            {ok || loading
+              ? <span className={ok ? "text-[#94A3B8] line-through" : "text-[#475569]"}>{t(`enterprise.dashboard.home.setup.${key}`)}</span>
+              : (
+                <button type="button" onClick={() => navigate(href)}
+                  className={`cursor-pointer rounded text-left font-medium text-[#0F172A] hover:text-[#4F46E5] ${FOCUS}`}>
+                  {t(`enterprise.dashboard.home.setup.${key}`)}
+                </button>
+              )}
+            <span className="sr-only">{ok ? t("enterprise.dashboard.home.stepDone") : t("enterprise.dashboard.home.stepPending")}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function AdminDashboard({ activeCompany, role, metrics, loadingMetrics }) {
+  const { t } = useLanguage();
+  const { user } = useAuth();
+  const userName = user?.first_name || user?.username || "";
+  const fmt = (v) => (loadingMetrics ? "…" : v);
+  return (
+    <div className="mx-auto w-full max-w-screen-2xl space-y-8 md:py-2">
+      <DashboardHeader company={activeCompany} role={role} userName={userName} />
+
+      <section aria-labelledby="kpi-title">
+        <h2 id="kpi-title" className="sr-only">{t("enterprise.dashboard.metrics")}</h2>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-6">
+          <StatCard icon={RectangleGroupIcon} tone="indigo" loading={loadingMetrics} value={fmt(metrics.processes)} label={t("enterprise.dashboard.processes")} sub={t("enterprise.dashboard.processesSub")} href="/enterprise/knowledge" />
+          <StatCard icon={SparklesIcon} tone="sky" loading={loadingMetrics} value={fmt(metrics.learningModules)} label={t("enterprise.dashboard.learningModules")} sub={t("enterprise.dashboard.learningModulesSub")} href="/enterprise/knowledge" />
+          <StatCard icon={MapIcon} tone="emerald" loading={loadingMetrics} value={fmt(metrics.paths)} label={t("enterprise.dashboard.nav.learningPaths")} sub={t("enterprise.dashboard.learningRoutes")} href="/enterprise/learning/paths" />
+          <StatCard icon={UsersIcon} tone="amber" loading={loadingMetrics} value={fmt(metrics.assignments)} label={t("enterprise.dashboard.assignments")} sub={t("enterprise.dashboard.activeTrainings")} href="/enterprise/learning/manage-assignments" />
+          <StatCard icon={DocumentTextIcon} tone="violet" loading={loadingMetrics} value={fmt(metrics.sources)} label={t("enterprise.dashboard.sources")} sub={t("enterprise.dashboard.nav.knowledgeSources")} href="/enterprise/knowledge" />
+          <ComplianceStatCard compliance={metrics.compliance} loading={loadingMetrics} />
+        </div>
+      </section>
+
+      <section className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+        <div className="min-w-0 space-y-6 xl:col-span-2">
+          <QuickActions />
+          <RecentProcesses processes={metrics.recentProcesses || []} loading={loadingMetrics} />
+        </div>
+        <aside className="space-y-6">
+          <ComplianceStatus compliance={metrics.compliance} loading={loadingMetrics} />
+          <SetupChecklist metrics={metrics} loading={loadingMetrics} />
+        </aside>
+      </section>
+    </div>
+  );
+}
+
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 export function EnterpriseDashboard() {
@@ -375,76 +662,7 @@ export function EnterpriseDashboard() {
     return <EmployeeDashboard activeCompany={activeCompany} role={role} />;
   }
 
-  const fmt = (v) => (loadingMetrics ? "…" : v);
-  const noProcesses = !loadingMetrics && metrics.processes === 0;
-  const compliance = metrics.compliance || {};
-
-  return (
-    <div className="space-y-5 max-w-4xl">
-      {/* Page header */}
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <div>
-          <h1 style={{ color: "var(--text-primary)", fontSize: 20, fontWeight: 800 }}>{t("enterprise.dashboard.title")}</h1>
-          <p style={{ color: "var(--text-secondary)", fontSize: 13, marginTop: 2 }}>
-            {t("enterprise.dashboard.adminSubtitle")}
-          </p>
-        </div>
-        <button onClick={() => navigate("/enterprise/knowledge/new")}
-          style={{ fontSize: 12, fontWeight: 700, color: "#fff", background: "linear-gradient(135deg, #6366F1, #818CF8)", border: "none", borderRadius: 9, padding: "9px 16px", cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>
-          <PlusIcon className="h-3.5 w-3.5" /> {t("enterprise.dashboard.newProcess")}
-        </button>
-      </div>
-
-      {/* Company banner */}
-      <CompanyBanner company={activeCompany} role={role} />
-
-      {/* KPI grid */}
-      <div>
-        <p style={{ color: "var(--text-tertiary)", fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 10 }}>{t("enterprise.dashboard.metrics")}</p>
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
-          <KPICard icon={BookOpenIcon} label={t("enterprise.dashboard.processes")} value={fmt(metrics.processes)} sub={t("enterprise.dashboard.processesSub")} color="#6366F1" href="/enterprise/knowledge" />
-          <KPICard icon={SparklesIcon} label={t("enterprise.dashboard.learningModules")} value={fmt(metrics.learningModules)} sub={t("enterprise.dashboard.learningModulesSub")} color="#38BDF8" href="/enterprise/knowledge" />
-          <KPICard icon={ShieldCheckIcon} label={t("enterprise.dashboard.nav.compliance")} value={fmt(compliance.rate != null ? `${compliance.rate}%` : "—")} sub={t("enterprise.dashboard.programsRatio", { compliant: fmt(compliance.compliant ?? "—"), total: fmt(compliance.total ?? "—") })} color="#818CF8" href="/enterprise/compliance/company" />
-          <KPICard icon={AcademicCapIcon} label={t("enterprise.dashboard.nav.learningPaths")} value={fmt(metrics.paths)} sub={t("enterprise.dashboard.learningRoutes")} color="#22C55E" href="/enterprise/learning/paths" />
-          <KPICard icon={ClipboardDocumentListIcon} label={t("enterprise.dashboard.assignments")} value={fmt(metrics.assignments)} sub={t("enterprise.dashboard.activeTrainings")} color="#F59E0B" href="/enterprise/learning/assignments" />
-          <KPICard icon={DocumentTextIcon} label={t("enterprise.dashboard.sources")} value={fmt(metrics.sources)} sub={t("enterprise.dashboard.nav.knowledgeSources")} color="#C084FC" href="/enterprise/knowledge" />
-        </div>
-      </div>
-
-      {/* Getting started or action cards */}
-      {noProcesses ? (
-        <GettingStarted />
-      ) : (
-        <div className="space-y-3">
-          <p style={{ color: "var(--text-tertiary)", fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" }}>{t("enterprise.dashboard.actions")}</p>
-          <ActionCard
-            icon={BoltIcon} color="#6366F1"
-            title={t("enterprise.dashboard.action1Title")}
-            desc={t("enterprise.dashboard.action1Desc")}
-            buttonLabel={t("enterprise.dashboard.action1Btn")}
-            href="/enterprise/knowledge/new"
-          />
-          <ActionCard
-            icon={AcademicCapIcon} color="#22C55E"
-            title={t("enterprise.dashboard.action2Title")}
-            desc={t("enterprise.dashboard.action2Desc")}
-            buttonLabel={t("enterprise.dashboard.action2Btn")}
-            href="/enterprise/learning/paths"
-          />
-          <ActionCard
-            icon={ChartBarIcon} color="#F59E0B"
-            title={t("enterprise.dashboard.action3Title")}
-            desc={t("enterprise.dashboard.action3Desc")}
-            buttonLabel={t("enterprise.dashboard.action3Btn")}
-            href="/enterprise/compliance/me"
-          />
-        </div>
-      )}
-
-      {/* Quick links */}
-      <QuickLinks />
-    </div>
-  );
+  return <AdminDashboard activeCompany={activeCompany} role={role} metrics={metrics} loadingMetrics={loadingMetrics} />;
 }
 
 export default EnterpriseDashboard;

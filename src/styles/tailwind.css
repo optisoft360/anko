@@ -313,6 +313,7 @@ html.theme-light {
   /* Sidebar */
   --sidebar-bg:     #FFFFFF;
   --sidebar-border: #E2E8F0;
+  --sidebar-w:      256px;
 
   /* Elevation */
   --shadow-card: 0 1px 2px rgba(15,23,42,0.04), 0 1px 3px rgba(15,23,42,0.06);
