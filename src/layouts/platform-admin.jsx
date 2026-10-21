@@ -1,6 +1,8 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { ChatBubbleLeftEllipsisIcon } from "@heroicons/react/24/solid";
-import { Sidenav, DashboardNavbar, ChatPanel } from "@/widgets/layout";
+import { DashboardNavbar, ChatPanel } from "@/widgets/layout";
+import { EnterpriseSidenav } from "@/widgets/layout/enterprise-sidenav";
+import { useLightTheme } from "@/hooks/useLightTheme";
 import { MobileTabBar } from "@/widgets/layout/mobile-tab-bar";
 import routes from "@/routes";
 import { useMaterialTailwindController, setOpenConfigurator } from "@/context";
@@ -13,8 +15,9 @@ import PlatformAdminInvitations from "@/enterprise/pages/platform-admin/Platform
 
 export function PlatformAdmin() {
   const [, dispatch] = useMaterialTailwindController();
-  const { isPlatformAdmin, initialized } = useEnterprise();
+  const { isPlatformAdmin, initialized, activeCompany, role } = useEnterprise();
   const { allowedRoutes } = useAuth();
+  useLightTheme();
 
   if (initialized && !isPlatformAdmin) {
     return <Navigate to="/enterprise/dashboard" replace />;
@@ -40,7 +43,7 @@ export function PlatformAdmin() {
 
   return (
     <div className="min-h-screen" style={{ background: "var(--bg-app)" }}>
-      <Sidenav routes={filteredRoutes} />
+      <EnterpriseSidenav routes={filteredRoutes} company={activeCompany} role={role} />
 
       <div
         className="min-h-screen flex flex-col transition-all duration-200 md:ml-[var(--sidebar-w)]"

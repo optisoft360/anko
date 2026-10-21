@@ -308,10 +308,10 @@ export function Projects() {
     // };
 
     const CARD_THEMES = [
-        { bg: "linear-gradient(135deg, #1e1b4b, #312e81)", orb1: "rgba(129,140,248,.55)", orb2: "rgba(57,73,171,.3)", avatar: "linear-gradient(135deg, #3949AB, #818cf8)" },
-        { bg: "linear-gradient(135deg, #042f2e, #0f766e)", orb1: "rgba(45,212,191,.4)", orb2: "rgba(20,184,166,.25)", avatar: "linear-gradient(135deg, #0f766e, #2dd4bf)" },
-        { bg: "linear-gradient(135deg, #2e1065, #6b21a8)", orb1: "rgba(192,132,252,.45)", orb2: "rgba(139,92,246,.25)", avatar: "linear-gradient(135deg, #7c3aed, #a78bfa)" },
-        { bg: "linear-gradient(135deg, #4c0519, #9f1239)", orb1: "rgba(251,113,133,.45)", orb2: "rgba(244,63,94,.25)", avatar: "linear-gradient(135deg, #be123c, #fb7185)" },
+        { bg: "linear-gradient(135deg, #4F46E5, #6366F1)", orb1: "rgba(129,140,248,.55)", orb2: "rgba(57,73,171,.3)", avatar: "linear-gradient(135deg, #3949AB, #818cf8)" },
+        { bg: "linear-gradient(135deg, #0D9488, #14B8A6)", orb1: "rgba(45,212,191,.4)", orb2: "rgba(20,184,166,.25)", avatar: "linear-gradient(135deg, #0f766e, #2dd4bf)" },
+        { bg: "linear-gradient(135deg, #7C3AED, #8B5CF6)", orb1: "rgba(192,132,252,.45)", orb2: "rgba(139,92,246,.25)", avatar: "linear-gradient(135deg, #7c3aed, #a78bfa)" },
+        { bg: "linear-gradient(135deg, #E11D48, #F43F5E)", orb1: "rgba(251,113,133,.45)", orb2: "rgba(244,63,94,.25)", avatar: "linear-gradient(135deg, #be123c, #fb7185)" },
     ];
 
     const deskTotalBatteries = projects.reduce((sum, p) => sum + (mobileCounts[p.id]?.batteries ?? p.batteries_count ?? 0), 0);

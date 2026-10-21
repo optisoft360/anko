@@ -7,8 +7,8 @@ import { useLanguage } from "@/context/language-context";
 
 /* ── Design tokens ── */
 const INPUT = {
-  width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)",
-  borderRadius: 10, padding: "10px 13px", fontSize: 13, color: "#F1F5F9",
+  width: "100%", background: "var(--lt-rgba-255-255-255-0-05, rgba(255,255,255,0.05))", border: "1px solid var(--lt-rgba-255-255-255-0-12, rgba(255,255,255,0.12))",
+  borderRadius: 10, padding: "10px 13px", fontSize: 13, color: "var(--lt-f1f5f9, #F1F5F9)",
   outline: "none", fontFamily: "inherit", boxSizing: "border-box", transition: "border-color 0.2s, box-shadow 0.2s",
 };
 const SELECT_S = {
@@ -16,18 +16,18 @@ const SELECT_S = {
   backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%2364748B' viewBox='0 0 20 20'%3E%3Cpath fill-rule='evenodd' d='M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z' clip-rule='evenodd'/%3E%3C/svg%3E")`,
   backgroundRepeat: "no-repeat", backgroundPosition: "right 10px center", backgroundSize: 16, paddingRight: 36,
 };
-const LBL = { fontSize: 11, fontWeight: 700, color: "#94A3B8", display: "block", marginBottom: 5, letterSpacing: "0.03em" };
+const LBL = { fontSize: 11, fontWeight: 700, color: "var(--lt-94a3b8, #94A3B8)", display: "block", marginBottom: 5, letterSpacing: "0.03em" };
 const focusIn  = (e) => { e.target.style.borderColor = "rgba(99,102,241,0.7)"; e.target.style.boxShadow = "0 0 0 3px rgba(99,102,241,0.12)"; };
 const focusOut = (e) => { e.target.style.borderColor = "rgba(255,255,255,0.12)"; e.target.style.boxShadow = "none"; };
 
 function Spin({ size = 18 }) {
-  return <div style={{ width: size, height: size, borderRadius: "50%", border: "2px solid rgba(255,255,255,0.15)", borderTopColor: "#818CF8" }} className="animate-spin" />;
+  return <div style={{ width: size, height: size, borderRadius: "50%", border: "2px solid var(--lt-rgba-255-255-255-0-15, rgba(255,255,255,0.15))", borderTopColor: "#818CF8" }} className="animate-spin" />;
 }
 
 function StatusBadge({ status }) {
   const cfg = status === "Ready"
-    ? { bg: "rgba(34,197,94,0.1)", border: "rgba(34,197,94,0.25)", color: "#4ADE80" }
-    : { bg: "rgba(100,116,139,0.12)", border: "rgba(100,116,139,0.25)", color: "#94A3B8" };
+    ? { bg: "rgba(34,197,94,0.1)", border: "rgba(34,197,94,0.25)", color: "var(--lt-4ade80, #4ADE80)" }
+    : { bg: "rgba(100,116,139,0.12)", border: "rgba(100,116,139,0.25)", color: "var(--lt-94a3b8, #94A3B8)" };
   return (
     <span style={{ display: "inline-flex", alignItems: "center", padding: "2px 9px", borderRadius: 999, background: cfg.bg, border: `1px solid ${cfg.border}`, fontSize: 10, fontWeight: 700, color: cfg.color, letterSpacing: "0.04em" }}>
       {status}
@@ -37,9 +37,9 @@ function StatusBadge({ status }) {
 
 function DiffBadge({ diff }) {
   const cfg = diff === "Easy"
-    ? { bg: "rgba(34,197,94,0.1)",   border: "rgba(34,197,94,0.25)",   color: "#4ADE80" }
+    ? { bg: "rgba(34,197,94,0.1)",   border: "rgba(34,197,94,0.25)",   color: "var(--lt-4ade80, #4ADE80)" }
     : diff === "Hard"
-    ? { bg: "rgba(239,68,68,0.1)",   border: "rgba(239,68,68,0.25)",   color: "#F87171" }
+    ? { bg: "rgba(239,68,68,0.1)",   border: "rgba(239,68,68,0.25)",   color: "var(--lt-f87171, #F87171)" }
     : { bg: "rgba(245,158,11,0.1)", border: "rgba(245,158,11,0.25)", color: "#FCD34D" };
   return (
     <span style={{ display: "inline-flex", alignItems: "center", padding: "2px 9px", borderRadius: 999, background: cfg.bg, border: `1px solid ${cfg.border}`, fontSize: 10, fontWeight: 700, color: cfg.color, letterSpacing: "0.04em" }}>
@@ -188,11 +188,11 @@ export function GlobalBatteries() {
     <div style={{ marginTop: 48, display: "flex", flexDirection: "column" }}>
 
       {/* ── Main Card ── */}
-      <div style={{ background: "#0F172A", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 20, overflow: "hidden", boxShadow: "0 4px 24px rgba(0,0,0,0.4)" }}>
+      <div style={{ background: "var(--lt-0f172a, #0F172A)", border: "1px solid var(--lt-rgba-255-255-255-0-08, rgba(255,255,255,0.08))", borderRadius: 20, overflow: "hidden", boxShadow: "0 4px 24px var(--lt-rgba-0-0-0-0-4, rgba(0,0,0,0.4))" }}>
         <div style={{ height: 3, background: "linear-gradient(90deg, #6366F1, #818CF8, #A78BFA)" }} />
 
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "18px 24px", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
-          <p style={{ fontSize: 15, fontWeight: 800, color: "#F1F5F9", letterSpacing: "-0.01em" }}>{t("global.batteries.title")}</p>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "18px 24px", borderBottom: "1px solid var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))" }}>
+          <p style={{ fontSize: 15, fontWeight: 800, color: "var(--lt-f1f5f9, #F1F5F9)", letterSpacing: "-0.01em" }}>{t("global.batteries.title")}</p>
         </div>
 
         {error && (
@@ -205,12 +205,12 @@ export function GlobalBatteries() {
           {isLoading ? (
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "56px 0", gap: 14 }}>
               <Spin size={28} />
-              <span style={{ fontSize: 11, color: "#475569" }}>{t("global.batteries.loading")}</span>
+              <span style={{ fontSize: 11, color: "var(--lt-475569, #475569)" }}>{t("global.batteries.loading")}</span>
             </div>
           ) : (
             <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 1100 }}>
               <thead>
-                <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                <tr style={{ borderBottom: "1px solid var(--lt-rgba-255-255-255-0-06, rgba(255,255,255,0.06))" }}>
                   {COLS.map(col => (
                     <th key={col} style={{ padding: "10px 20px", textAlign: "left", fontSize: 10, fontWeight: 700, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.07em", whiteSpace: "nowrap" }}>{col}</th>
                   ))}
@@ -218,7 +218,7 @@ export function GlobalBatteries() {
               </thead>
               <tbody>
                 {batteries.length === 0 ? (
-                  <tr><td colSpan={8} style={{ padding: "48px 0", textAlign: "center", fontSize: 13, color: "#475569" }}>{t("global.batteries.no_batteries")}</td></tr>
+                  <tr><td colSpan={8} style={{ padding: "48px 0", textAlign: "center", fontSize: 13, color: "var(--lt-475569, #475569)" }}>{t("global.batteries.no_batteries")}</td></tr>
                 ) : batteries.map((b, key) => {
                   const projectId = getBatteryProjectId(b);
                   const ruleId = getBatteryRuleId(b);
@@ -231,13 +231,13 @@ export function GlobalBatteries() {
                     <tr key={b.id} style={{ borderBottom: key < batteries.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none", transition: "background 0.1s" }}
                       onMouseEnter={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.02)"}
                       onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}>
-                      <td style={{ padding: "12px 20px", fontSize: 12, fontWeight: 700, color: "#E2E8F0" }}>{b.name}</td>
+                      <td style={{ padding: "12px 20px", fontSize: 12, fontWeight: 700, color: "var(--lt-e2e8f0, #E2E8F0)" }}>{b.name}</td>
                       <td style={{ padding: "12px 20px" }}><StatusBadge status={status} /></td>
                       <td style={{ padding: "12px 20px" }}><DiffBadge diff={difficulty} /></td>
-                      <td style={{ padding: "12px 20px", fontSize: 12, color: "#94A3B8", fontWeight: 600 }}>{getProjectName(projectId)}</td>
-                      <td style={{ padding: "12px 20px", fontSize: 12, color: "#94A3B8" }}>{getRuleName(ruleId)}</td>
-                      <td style={{ padding: "12px 20px", fontSize: 12, color: "#94A3B8" }}>{getTopicName(topicScopeId)}</td>
-                      <td style={{ padding: "12px 20px", fontSize: 13, fontWeight: 800, color: "#818CF8" }}>{questionsCount}</td>
+                      <td style={{ padding: "12px 20px", fontSize: 12, color: "var(--lt-94a3b8, #94A3B8)", fontWeight: 600 }}>{getProjectName(projectId)}</td>
+                      <td style={{ padding: "12px 20px", fontSize: 12, color: "var(--lt-94a3b8, #94A3B8)" }}>{getRuleName(ruleId)}</td>
+                      <td style={{ padding: "12px 20px", fontSize: 12, color: "var(--lt-94a3b8, #94A3B8)" }}>{getTopicName(topicScopeId)}</td>
+                      <td style={{ padding: "12px 20px", fontSize: 13, fontWeight: 800, color: "var(--lt-818cf8, #818CF8)" }}>{questionsCount}</td>
                       <td style={{ padding: "12px 20px" }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
                           <button onClick={() => openEdit(b)} disabled={busy} title={language === "es" ? "Editar" : "Edit"}
@@ -268,7 +268,7 @@ export function GlobalBatteries() {
       {/* bottom-14 on mobile clears the fixed MobileTabBar (56px, z-[9000]) below
           md; left-0 there too since the sidebar is off-canvas on mobile. */}
       <div className="fixed bottom-14 right-0 left-0 md:bottom-0 md:left-[var(--sidebar-w)] px-4 py-2.5 md:pr-[88px] md:pl-8 md:py-2.5"
-        style={{ zIndex: 30, background: "rgba(6,13,26,0.92)", backdropFilter: "blur(12px)", borderTop: "1px solid rgba(255,255,255,0.07)", transition: "left 0.3s" }}>
+        style={{ zIndex: 30, background: "var(--lt-footer, rgba(6,13,26,0.92))", backdropFilter: "blur(12px)", borderTop: "1px solid var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))", transition: "left 0.3s" }}>
         <AppPagination
           page={page} pageSize={pageSize} totalCount={totalCount}
           onPageChange={(p) => setPage(p)}
@@ -279,15 +279,15 @@ export function GlobalBatteries() {
 
       {/* ── Edit Modal ── */}
       {editOpen && (
-        <div style={{ position: "fixed", inset: 0, zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: 16, background: "rgba(0,0,0,0.78)", backdropFilter: "blur(5px)" }}
+        <div style={{ position: "fixed", inset: 0, zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: 16, background: "var(--lt-rgba-0-0-0-0-78, rgba(0,0,0,0.78))", backdropFilter: "blur(5px)" }}
           onClick={closeEdit}>
-          <div style={{ background: "#0F172A", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 20, width: "100%", maxWidth: 460, boxShadow: "0 40px 100px rgba(0,0,0,0.7)", overflow: "hidden", maxHeight: "90vh", display: "flex", flexDirection: "column" }}
+          <div style={{ background: "var(--lt-0f172a, #0F172A)", border: "1px solid var(--lt-rgba-255-255-255-0-1, rgba(255,255,255,0.1))", borderRadius: 20, width: "100%", maxWidth: 460, boxShadow: "0 40px 100px var(--lt-rgba-0-0-0-0-7, rgba(0,0,0,0.7))", overflow: "hidden", maxHeight: "90vh", display: "flex", flexDirection: "column" }}
             onClick={(e) => e.stopPropagation()}>
             <div style={{ height: 3, background: "linear-gradient(90deg, #6366F1, #818CF8, #A78BFA)", flexShrink: 0 }} />
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "18px 22px", borderBottom: "1px solid rgba(255,255,255,0.07)", flexShrink: 0 }}>
-              <p style={{ fontSize: 14, fontWeight: 800, color: "#F1F5F9" }}>{language === "es" ? "Editar Batería" : "Edit Battery"}</p>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "18px 22px", borderBottom: "1px solid var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))", flexShrink: 0 }}>
+              <p style={{ fontSize: 14, fontWeight: 800, color: "var(--lt-f1f5f9, #F1F5F9)" }}>{language === "es" ? "Editar Batería" : "Edit Battery"}</p>
               <button onClick={closeEdit} disabled={savingEdit}
-                style={{ background: "none", border: "none", cursor: "pointer", color: "#475569", padding: 4, display: "flex" }}
+                style={{ background: "none", border: "none", cursor: "pointer", color: "var(--lt-475569, #475569)", padding: 4, display: "flex" }}
                 onMouseEnter={(e) => e.currentTarget.style.color = "#94A3B8"}
                 onMouseLeave={(e) => e.currentTarget.style.color = "#475569"}>
                 <XMarkIcon style={{ width: 18, height: 18 }} />
@@ -302,32 +302,32 @@ export function GlobalBatteries() {
               <div>
                 <label style={LBL}>{t("project_detail.docs.table.status")}</label>
                 <select style={SELECT_S} value={editForm.status} onChange={(e) => setEditForm(p => ({ ...p, status: e.target.value }))} onFocus={focusIn} onBlur={focusOut}>
-                  <option value="Draft" style={{ background: "#0F172A", color: "#F1F5F9" }}>{language === "es" ? "Borrador" : "Draft"}</option>
-                  <option value="Ready" style={{ background: "#0F172A", color: "#F1F5F9" }}>{language === "es" ? "Listo" : "Ready"}</option>
+                  <option value="Draft" style={{ background: "var(--lt-0f172a, #0F172A)", color: "var(--lt-f1f5f9, #F1F5F9)" }}>{language === "es" ? "Borrador" : "Draft"}</option>
+                  <option value="Ready" style={{ background: "var(--lt-0f172a, #0F172A)", color: "var(--lt-f1f5f9, #F1F5F9)" }}>{language === "es" ? "Listo" : "Ready"}</option>
                 </select>
               </div>
               <div>
                 <label style={LBL}>{t("global.batteries.table.difficulty")}</label>
                 <select style={SELECT_S} value={editForm.difficulty} onChange={(e) => setEditForm(p => ({ ...p, difficulty: e.target.value }))} onFocus={focusIn} onBlur={focusOut}>
-                  <option value="Easy"   style={{ background: "#0F172A", color: "#F1F5F9" }}>{language === "es" ? "Fácil" : "Easy"}</option>
-                  <option value="Medium" style={{ background: "#0F172A", color: "#F1F5F9" }}>{language === "es" ? "Medio" : "Medium"}</option>
-                  <option value="Hard"   style={{ background: "#0F172A", color: "#F1F5F9" }}>{language === "es" ? "Difícil" : "Hard"}</option>
+                  <option value="Easy"   style={{ background: "var(--lt-0f172a, #0F172A)", color: "var(--lt-f1f5f9, #F1F5F9)" }}>{language === "es" ? "Fácil" : "Easy"}</option>
+                  <option value="Medium" style={{ background: "var(--lt-0f172a, #0F172A)", color: "var(--lt-f1f5f9, #F1F5F9)" }}>{language === "es" ? "Medio" : "Medium"}</option>
+                  <option value="Hard"   style={{ background: "var(--lt-0f172a, #0F172A)", color: "var(--lt-f1f5f9, #F1F5F9)" }}>{language === "es" ? "Difícil" : "Hard"}</option>
                 </select>
               </div>
               <div>
                 <label style={LBL}>{t("global.batteries.table.rule")}</label>
                 <select style={SELECT_S} value={editForm.rule ? String(editForm.rule) : "null"} onChange={(e) => setEditForm(p => ({ ...p, rule: e.target.value === "null" ? null : Number(e.target.value) }))} onFocus={focusIn} onBlur={focusOut}>
-                  <option value="null" style={{ background: "#0F172A", color: "#F1F5F9" }}>{language === "es" ? "Sin regla" : "No rule"}</option>
-                  {(rules || []).map(r => <option key={r.id} value={String(r.id)} style={{ background: "#0F172A", color: "#F1F5F9" }}>{r.name}</option>)}
+                  <option value="null" style={{ background: "var(--lt-0f172a, #0F172A)", color: "var(--lt-f1f5f9, #F1F5F9)" }}>{language === "es" ? "Sin regla" : "No rule"}</option>
+                  {(rules || []).map(r => <option key={r.id} value={String(r.id)} style={{ background: "var(--lt-0f172a, #0F172A)", color: "var(--lt-f1f5f9, #F1F5F9)" }}>{r.name}</option>)}
                 </select>
               </div>
               {editBattery?.id && (
-                <p style={{ fontSize: 11, color: "#334155" }}>Battery ID: {editBattery.id}</p>
+                <p style={{ fontSize: 11, color: "var(--lt-334155, #334155)" }}>Battery ID: {editBattery.id}</p>
               )}
             </div>
-            <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, padding: "14px 22px", borderTop: "1px solid rgba(255,255,255,0.07)", flexShrink: 0 }}>
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, padding: "14px 22px", borderTop: "1px solid var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))", flexShrink: 0 }}>
               <button onClick={closeEdit} disabled={savingEdit}
-                style={{ padding: "9px 18px", borderRadius: 10, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "#64748B", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
+                style={{ padding: "9px 18px", borderRadius: 10, background: "var(--lt-rgba-255-255-255-0-04, rgba(255,255,255,0.04))", border: "1px solid var(--lt-rgba-255-255-255-0-08, rgba(255,255,255,0.08))", color: "#64748B", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
                 {language === "es" ? "Cancelar" : "Cancel"}
               </button>
               <button onClick={saveEdit} disabled={savingEdit}
@@ -341,29 +341,29 @@ export function GlobalBatteries() {
 
       {/* ── Delete Modal ── */}
       {deleteOpen && (
-        <div style={{ position: "fixed", inset: 0, zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: 16, background: "rgba(0,0,0,0.78)", backdropFilter: "blur(5px)" }}
+        <div style={{ position: "fixed", inset: 0, zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: 16, background: "var(--lt-rgba-0-0-0-0-78, rgba(0,0,0,0.78))", backdropFilter: "blur(5px)" }}
           onClick={closeDelete}>
-          <div style={{ background: "#0F172A", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 20, width: "100%", maxWidth: 420, boxShadow: "0 40px 100px rgba(0,0,0,0.7)", overflow: "hidden" }}
+          <div style={{ background: "var(--lt-0f172a, #0F172A)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 20, width: "100%", maxWidth: 420, boxShadow: "0 40px 100px var(--lt-rgba-0-0-0-0-7, rgba(0,0,0,0.7))", overflow: "hidden" }}
             onClick={(e) => e.stopPropagation()}>
             <div style={{ height: 3, background: "linear-gradient(90deg, #EF4444, #F87171)" }} />
             <div style={{ padding: "22px 24px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14 }}>
                 <div style={{ width: 38, height: 38, borderRadius: 10, background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                  <TrashIcon style={{ width: 18, height: 18, color: "#F87171" }} />
+                  <TrashIcon style={{ width: 18, height: 18, color: "var(--lt-f87171, #F87171)" }} />
                 </div>
-                <p style={{ fontSize: 15, fontWeight: 800, color: "#F1F5F9" }}>{language === "es" ? "Eliminar Batería" : "Delete Battery"}</p>
+                <p style={{ fontSize: 15, fontWeight: 800, color: "var(--lt-f1f5f9, #F1F5F9)" }}>{language === "es" ? "Eliminar Batería" : "Delete Battery"}</p>
               </div>
-              <p style={{ fontSize: 13, color: "#94A3B8", lineHeight: 1.6 }}>
+              <p style={{ fontSize: 13, color: "var(--lt-94a3b8, #94A3B8)", lineHeight: 1.6 }}>
                 {language === "es" ? "¿Estás seguro de que quieres eliminar " : "Are you sure you want to delete "}
-                <span style={{ fontWeight: 700, color: "#F1F5F9" }}>{deleteBattery?.name}</span>?
+                <span style={{ fontWeight: 700, color: "var(--lt-f1f5f9, #F1F5F9)" }}>{deleteBattery?.name}</span>?
               </p>
-              <p style={{ fontSize: 11, color: "#475569", marginTop: 6 }}>
+              <p style={{ fontSize: 11, color: "var(--lt-475569, #475569)", marginTop: 6 }}>
                 {language === "es" ? "Esta acción no se puede deshacer." : "This action cannot be undone."}
               </p>
             </div>
-            <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, padding: "12px 24px 20px", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, padding: "12px 24px 20px", borderTop: "1px solid var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))" }}>
               <button onClick={closeDelete} disabled={deleting}
-                style={{ padding: "9px 18px", borderRadius: 10, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "#64748B", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
+                style={{ padding: "9px 18px", borderRadius: 10, background: "var(--lt-rgba-255-255-255-0-04, rgba(255,255,255,0.04))", border: "1px solid var(--lt-rgba-255-255-255-0-08, rgba(255,255,255,0.08))", color: "#64748B", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
                 {language === "es" ? "Cancelar" : "Cancel"}
               </button>
               <button onClick={confirmDelete} disabled={deleting}

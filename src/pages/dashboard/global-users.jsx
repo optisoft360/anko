@@ -42,15 +42,15 @@ function CompanyMembershipsDialog({ user, onClose }) {
     };
 
     return (
-        <div style={{ position: "fixed", inset: 0, zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.6)" }} onClick={onClose}>
+        <div style={{ position: "fixed", inset: 0, zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", background: "var(--lt-rgba-0-0-0-0-6, rgba(0,0,0,0.6))" }} onClick={onClose}>
             <div
-                style={{ width: "100%", maxWidth: 480, background: "#0F172A", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 16, overflow: "hidden", boxShadow: "0 20px 60px rgba(0,0,0,0.7)" }}
+                style={{ width: "100%", maxWidth: 480, background: "var(--lt-0f172a, #0F172A)", border: "1px solid var(--lt-rgba-255-255-255-0-1, rgba(255,255,255,0.1))", borderRadius: 16, overflow: "hidden", boxShadow: "0 20px 60px var(--lt-rgba-0-0-0-0-7, rgba(0,0,0,0.7))" }}
                 onClick={(e) => e.stopPropagation()}
             >
                 <div style={{ height: 2, background: "linear-gradient(90deg, #6366F1, #818CF8, #A78BFA)" }} />
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 20px", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 20px", borderBottom: "1px solid var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))" }}>
                     <div>
-                        <p style={{ fontSize: 13, fontWeight: 800, color: "#F1F5F9" }}>
+                        <p style={{ fontSize: 13, fontWeight: 800, color: "var(--lt-f1f5f9, #F1F5F9)" }}>
                             {language === "es" ? "Roles por empresa" : "Company roles"}
                         </p>
                         <p style={{ fontSize: 11, color: "#64748B", marginTop: 2 }}>{user.username} — {user.email}</p>
@@ -62,28 +62,28 @@ function CompanyMembershipsDialog({ user, onClose }) {
 
                 <div style={{ padding: "14px 20px 20px", maxHeight: 400, overflowY: "auto" }}>
                     {memberships.length === 0 && (
-                        <p style={{ fontSize: 12, color: "#475569", textAlign: "center", padding: "24px 0" }}>
+                        <p style={{ fontSize: 12, color: "var(--lt-475569, #475569)", textAlign: "center", padding: "24px 0" }}>
                             {language === "es" ? "Este usuario no pertenece a ninguna empresa." : "This user doesn't belong to any company."}
                         </p>
                     )}
 
                     {memberships.map((m) => (
-                        <div key={m.id} style={{ display: "flex", alignItems: "center", gap: 8, padding: "9px 0", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                        <div key={m.id} style={{ display: "flex", alignItems: "center", gap: 8, padding: "9px 0", borderBottom: "1px solid var(--lt-rgba-255-255-255-0-05, rgba(255,255,255,0.05))" }}>
                             <div style={{ flex: 1, minWidth: 0 }}>
-                                <p style={{ fontSize: 12, fontWeight: 700, color: "#E2E8F0", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                <p style={{ fontSize: 12, fontWeight: 700, color: "var(--lt-e2e8f0, #E2E8F0)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                                     {m.company_name}
                                 </p>
-                                <p style={{ fontSize: 10, color: "#475569" }}>{m.status}</p>
+                                <p style={{ fontSize: 10, color: "var(--lt-475569, #475569)" }}>{m.status}</p>
                             </div>
 
                             <select
                                 value={m.role}
                                 disabled={savingId === m.id}
                                 onChange={(e) => handleRoleChange(m.id, e.target.value)}
-                                style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 8, padding: "6px 8px", fontSize: 12, color: "#F1F5F9", outline: "none", cursor: "pointer" }}
+                                style={{ background: "var(--lt-rgba-255-255-255-0-05, rgba(255,255,255,0.05))", border: "1px solid var(--lt-rgba-255-255-255-0-12, rgba(255,255,255,0.12))", borderRadius: 8, padding: "6px 8px", fontSize: 12, color: "var(--lt-f1f5f9, #F1F5F9)", outline: "none", cursor: "pointer" }}
                             >
                                 {COMPANY_ROLES.map((r) => (
-                                    <option key={r} value={r} style={{ background: "#0F172A" }}>{r}</option>
+                                    <option key={r} value={r} style={{ background: "var(--lt-0f172a, #0F172A)" }}>{r}</option>
                                 ))}
                             </select>
 
@@ -98,7 +98,7 @@ function CompanyMembershipsDialog({ user, onClose }) {
                                     </button>
                                     <button
                                         onClick={() => setConfirmDeleteId(null)}
-                                        style={{ fontSize: 11, color: "#94A3B8", background: "none", border: "none", cursor: "pointer", padding: "6px 4px" }}
+                                        style={{ fontSize: 11, color: "var(--lt-94a3b8, #94A3B8)", background: "none", border: "none", cursor: "pointer", padding: "6px 4px" }}
                                     >
                                         {language === "es" ? "Cancelar" : "Cancel"}
                                     </button>

@@ -342,7 +342,7 @@ export function KnowledgeGraph() {
         {/* Graph canvas */}
         <div className="flex-1 relative" style={{ minWidth: 0 }}>
           {loading && (
-            <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(2,6,23,0.75)", borderRadius: 12, zIndex: 10 }}>
+            <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "var(--lt-overlay, rgba(2,6,23,0.75))", borderRadius: 12, zIndex: 10 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10, color: "var(--text-secondary)" }}>
                 <ArrowPathIcon className="animate-spin" style={{ width: 20, height: 20 }} />
                 <span style={{ fontSize: 13 }}>{t("enterprise.knowledge.graph.computingLayout")}</span>

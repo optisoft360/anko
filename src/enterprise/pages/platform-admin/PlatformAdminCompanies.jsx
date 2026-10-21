@@ -376,7 +376,7 @@ export function PlatformAdminCompanies() {
     <div style={{ maxWidth: 860 }}>
       {/* Toast */}
       {toast && (
-        <div style={{ position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)", zIndex: 60, background: "rgba(15,23,42,0.95)", border: "1px solid var(--lt-rgba-255-255-255-0-1, rgba(255,255,255,0.1))", color: "var(--lt-f1f5f9, #F1F5F9)", fontSize: 13, fontWeight: 600, padding: "12px 22px", borderRadius: 12, backdropFilter: "blur(12px)", boxShadow: "0 8px 32px var(--lt-rgba-0-0-0-0-5, rgba(0,0,0,0.5))", whiteSpace: "nowrap" }}>
+        <div style={{ position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)", zIndex: 60, background: "var(--lt-toast, rgba(15,23,42,0.95))", border: "1px solid var(--lt-rgba-255-255-255-0-1, rgba(255,255,255,0.1))", color: "var(--lt-f1f5f9, #F1F5F9)", fontSize: 13, fontWeight: 600, padding: "12px 22px", borderRadius: 12, backdropFilter: "blur(12px)", boxShadow: "0 8px 32px var(--lt-rgba-0-0-0-0-5, rgba(0,0,0,0.5))", whiteSpace: "nowrap" }}>
           {toast}
         </div>
       )}

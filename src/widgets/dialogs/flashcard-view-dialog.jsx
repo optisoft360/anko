@@ -199,7 +199,7 @@ export function FlashcardViewDialog({ open, onClose, deckId, deckTitle }) {
 
                 {/* Footer */}
                 {!loading && flashcards.length > 0 && (
-                    <div style={{ paddingBottom: "max(12px, env(safe-area-inset-bottom, 12px))", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 20px", borderTop: "1px solid var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))", background: "var(--lt-footer, rgba(6,13,26,0.8))", flexShrink: 0 }}>
+                    <div style={{ paddingBottom: "max(12px, env(safe-area-inset-bottom, 12px))", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 20px", borderTop: "1px solid var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))", background: "var(--lt-footer, var(--lt-footer, rgba(6,13,26,0.8)))", flexShrink: 0 }}>
                         <button
                             onClick={handlePrev}
                             disabled={atStart}

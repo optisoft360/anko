@@ -64,7 +64,7 @@ export function UserStatisticsDialog({ open, handler, userId }) {
     const accuracyDonutOptions = {
         chart: { type: "donut", fontFamily: "Inter, system-ui, sans-serif", background: "transparent" },
         labels: [language === "es" ? "Correcto" : "Correct", language === "es" ? "Incorrecto" : "Incorrect"],
-        colors: ["#6366f1", "#1E293B"],
+        colors: ["#6366f1", "#E2E8F0"],
         plotOptions: {
             pie: {
                 donut: {
@@ -151,7 +151,7 @@ export function UserStatisticsDialog({ open, handler, userId }) {
         <div style={{ position: "fixed", inset: 0, zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: "12px", background: "var(--lt-rgba-0-0-0-0-82, rgba(0,0,0,0.82))", backdropFilter: "blur(6px)" }}
             onClick={handler}>
 
-            <div style={{ background: "#0A1628", border: "1px solid var(--lt-rgba-255-255-255-0-1, rgba(255,255,255,0.1))", borderRadius: 22, width: "100%", maxWidth: 900, boxShadow: "0 40px 100px var(--lt-rgba-0-0-0-0-8, rgba(0,0,0,0.8))", overflow: "hidden", maxHeight: "92vh", display: "flex", flexDirection: "column" }}
+            <div style={{ background: "var(--lt-060d1a, #0A1628)", border: "1px solid var(--lt-rgba-255-255-255-0-1, rgba(255,255,255,0.1))", borderRadius: 22, width: "100%", maxWidth: 900, boxShadow: "0 40px 100px var(--lt-rgba-0-0-0-0-8, rgba(0,0,0,0.8))", overflow: "hidden", maxHeight: "92vh", display: "flex", flexDirection: "column" }}
                 onClick={(e) => e.stopPropagation()}>
 
                 {/* Top accent strip */}

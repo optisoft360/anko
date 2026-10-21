@@ -53,7 +53,7 @@ export function AppPagination({ page, pageSize, totalCount, onPageChange, onPage
 
         {pages.map((p, i) =>
           p === "..." ? (
-            <span key={`el-${i}`} style={{ fontSize: 12, color: "#334155", padding: "0 2px" }}>…</span>
+            <span key={`el-${i}`} style={{ fontSize: 12, color: "var(--lt-334155, #334155)", padding: "0 2px" }}>…</span>
           ) : (
             <button key={p} onClick={() => !disabled && onPageChange(p)} disabled={disabled}
               style={pageBtn(p === page, false)}>
@@ -74,8 +74,8 @@ export function AppPagination({ page, pageSize, totalCount, onPageChange, onPage
           {language === "es" ? "Por página:" : "Per page:"}
         </span>
         <select value={pageSize} onChange={(e) => onPageSizeChange(e.target.value)} disabled={disabled}
-          style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "5px 10px", fontSize: 12, fontWeight: 600, color: "#94A3B8", cursor: disabled ? "default" : "pointer", outline: "none", fontFamily: "inherit" }}>
-          {[10, 25, 50, 100].map(v => <option key={v} value={v} style={{ background: "#0F172A", color: "#F1F5F9" }}>{v}</option>)}
+          style={{ background: "var(--lt-rgba-255-255-255-0-06, rgba(255,255,255,0.06))", border: "1px solid var(--lt-rgba-255-255-255-0-1, rgba(255,255,255,0.1))", borderRadius: 8, padding: "5px 10px", fontSize: 12, fontWeight: 600, color: "var(--lt-94a3b8, #94A3B8)", cursor: disabled ? "default" : "pointer", outline: "none", fontFamily: "inherit" }}>
+          {[10, 25, 50, 100].map(v => <option key={v} value={v} style={{ background: "var(--lt-0f172a, #0F172A)", color: "var(--lt-f1f5f9, #F1F5F9)" }}>{v}</option>)}
         </select>
       </div>
     </div>

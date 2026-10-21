@@ -1,8 +1,8 @@
-import { useEffect } from "react";
 import { Routes, Route, Navigate, Link } from "react-router-dom";
 import { ChatBubbleLeftEllipsisIcon, Bars3Icon } from "@heroicons/react/24/solid";
 import { DashboardNavbar, ChatPanel } from "@/widgets/layout";
 import { EnterpriseSidenav } from "@/widgets/layout/enterprise-sidenav";
+import { useLightTheme } from "@/hooks/useLightTheme";
 import { EmployeeMobileTabBar } from "@/enterprise/components/EmployeeMobileTabBar";
 import { AdminMobileTabBar } from "@/enterprise/components/AdminMobileTabBar";
 import routes from "@/routes";
@@ -59,12 +59,7 @@ export function Enterprise() {
   const { loading, hasCompany, allowedRoutes, isAdmin } = useAuth();
   const { role, activeCompany } = useEnterprise();
 
-  // Light theme (palette C) for the whole enterprise area. On <html> so dialogs rendered in
-  // portals get it too; removed on leave, so the personal app keeps its dark theme.
-  useEffect(() => {
-    document.documentElement.classList.add("theme-light");
-    return () => document.documentElement.classList.remove("theme-light");
-  }, []);
+  useLightTheme();
 
   if (loading) return null;
 

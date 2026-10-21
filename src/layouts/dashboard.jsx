@@ -2,7 +2,6 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { ChatBubbleLeftEllipsisIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 import { IconButton } from "@material-tailwind/react";
 import {
-  Sidenav,
   DashboardNavbar,
   ChatPanel,
   Footer,
@@ -12,11 +11,16 @@ import routes from "@/routes";
 import { ProjectDetail, ProjectTopics } from "@/pages/dashboard";
 import { useMaterialTailwindController, setOpenConfigurator, setOpenSidenav } from "@/context";
 import { useAuth } from "@/context/auth-context";
+import { useEnterprise } from "@/enterprise/context/enterprise-context";
+import { EnterpriseSidenav } from "@/widgets/layout/enterprise-sidenav";
+import { useLightTheme } from "@/hooks/useLightTheme";
 
 export function Dashboard() {
   const [controller, dispatch] = useMaterialTailwindController();
   const { sidenavType, openSidenav } = controller;
   const { isAdmin } = useAuth();
+  const { activeCompany, role } = useEnterprise();
+  useLightTheme();
 
   // "admin-area" is platform-wide (Users, Roles, Companies, ...) — gated purely
   // by isAdmin (is_staff/is_superuser/global "admin" role), same rule as in
@@ -28,7 +32,7 @@ export function Dashboard() {
 
   return (
     <div className="min-h-screen" style={{ background: "var(--bg-app)" }}>
-      <Sidenav routes={filteredRoutes} />
+      <EnterpriseSidenav routes={filteredRoutes} company={activeCompany} role={role} />
 
       <div
         className="min-h-screen flex flex-col transition-all duration-200 md:ml-[var(--sidebar-w)]"
