@@ -7,12 +7,12 @@ import authService from "@/services/authService";
 
 /* ── Design tokens ── */
 const INPUT = {
-  background: "rgba(255,255,255,0.05)",
+  background: "var(--lt-rgba-255-255-255-0-05, rgba(255,255,255,0.05))",
   border: "1px solid rgba(255,255,255,0.12)",
   borderRadius: 10,
   padding: "11px 14px",
   fontSize: 13,
-  color: "#F1F5F9",
+  color: "var(--lt-f1f5f9, #F1F5F9)",
   width: "100%",
   outline: "none",
   fontFamily: "inherit",
@@ -21,17 +21,17 @@ const INPUT = {
 };
 const INPUT_DISABLED = {
   ...INPUT,
-  background: "rgba(255,255,255,0.02)",
+  background: "var(--lt-rgba-255-255-255-0-02, rgba(255,255,255,0.02))",
   border: "1px solid rgba(255,255,255,0.06)",
-  color: "#475569",
+  color: "var(--lt-475569, #475569)",
   cursor: "not-allowed",
 };
 const focusIn  = (e) => { e.target.style.borderColor = "rgba(99,102,241,0.7)"; e.target.style.background = "rgba(99,102,241,0.06)"; e.target.style.boxShadow = "0 0 0 3px rgba(99,102,241,0.12)"; };
 const focusOut = (e) => { e.target.style.borderColor = "rgba(255,255,255,0.12)"; e.target.style.background = "rgba(255,255,255,0.05)"; e.target.style.boxShadow = "none"; };
-const LBL = { fontSize: 11, fontWeight: 700, color: "#94A3B8", display: "block", marginBottom: 6, letterSpacing: "0.03em" };
+const LBL = { fontSize: 11, fontWeight: 700, color: "var(--lt-94a3b8, #94A3B8)", display: "block", marginBottom: 6, letterSpacing: "0.03em" };
 
 function Spin() {
-  return <div style={{ width: 14, height: 14, borderRadius: "50%", border: "2px solid rgba(255,255,255,0.25)", borderTopColor: "#fff", flexShrink: 0 }} className="animate-spin" />;
+  return <div style={{ width: 14, height: 14, borderRadius: "50%", border: "2px solid var(--lt-rgba-255-255-255-0-25, rgba(255,255,255,0.25))", borderTopColor: "#fff", flexShrink: 0 }} className="animate-spin" />;
 }
 
 const ROLE_META = {
@@ -122,23 +122,23 @@ export function EditProfileDialog({ open, handler }) {
   ];
 
   return (
-    <div style={{ position: "fixed", inset: 0, zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: "16px", background: "rgba(0,0,0,0.75)", backdropFilter: "blur(6px)" }}
+    <div style={{ position: "fixed", inset: 0, zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: "16px", background: "var(--lt-rgba-0-0-0-0-75, rgba(0,0,0,0.75))", backdropFilter: "blur(6px)" }}
       onClick={handler}>
 
-      <div style={{ background: "#0F172A", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 22, width: "100%", maxWidth: 480, boxShadow: "0 40px 100px rgba(0,0,0,0.7)", overflow: "hidden", maxHeight: "90vh", display: "flex", flexDirection: "column" }}
+      <div style={{ background: "var(--lt-0f172a, #0F172A)", border: "1px solid var(--lt-rgba-255-255-255-0-1, rgba(255,255,255,0.1))", borderRadius: 22, width: "100%", maxWidth: 480, boxShadow: "0 40px 100px var(--lt-rgba-0-0-0-0-7, rgba(0,0,0,0.7))", overflow: "hidden", maxHeight: "90vh", display: "flex", flexDirection: "column" }}
         onClick={(e) => e.stopPropagation()}>
 
         {/* Top accent strip */}
         <div style={{ height: 3, background: "linear-gradient(90deg, #6366F1, #818CF8, #A78BFA)", flexShrink: 0 }} />
 
         {/* Header */}
-        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", padding: "22px 24px 18px", borderBottom: "1px solid rgba(255,255,255,0.07)", flexShrink: 0 }}>
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", padding: "22px 24px 18px", borderBottom: "1px solid var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))", flexShrink: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <div style={{ width: 38, height: 38, borderRadius: 11, background: "linear-gradient(135deg, #6366F1, #818CF8)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 0 20px rgba(99,102,241,0.4)", flexShrink: 0 }}>
               <UserCircleIcon style={{ width: 20, height: 20, color: "#fff" }} />
             </div>
             <div>
-              <p style={{ fontSize: 15, fontWeight: 800, color: "#F1F5F9", letterSpacing: "-0.01em", marginBottom: 2 }}>
+              <p style={{ fontSize: 15, fontWeight: 800, color: "var(--lt-f1f5f9, #F1F5F9)", letterSpacing: "-0.01em", marginBottom: 2 }}>
                 {language === "es" ? "Editar Perfil" : "Edit Profile"}
               </p>
               <p style={{ fontSize: 11, color: "#64748B" }}>
@@ -147,7 +147,7 @@ export function EditProfileDialog({ open, handler }) {
             </div>
           </div>
           <button onClick={handler}
-            style={{ background: "none", border: "none", cursor: "pointer", color: "#475569", padding: 6, borderRadius: 8, display: "flex", flexShrink: 0, transition: "color 0.15s, background 0.15s" }}
+            style={{ background: "none", border: "none", cursor: "pointer", color: "var(--lt-475569, #475569)", padding: 6, borderRadius: 8, display: "flex", flexShrink: 0, transition: "color 0.15s, background 0.15s" }}
             onMouseEnter={(e) => { e.currentTarget.style.color = "#94A3B8"; e.currentTarget.style.background = "rgba(255,255,255,0.06)"; }}
             onMouseLeave={(e) => { e.currentTarget.style.color = "#475569"; e.currentTarget.style.background = "none"; }}>
             <XMarkIcon style={{ width: 18, height: 18 }} />
@@ -183,7 +183,7 @@ export function EditProfileDialog({ open, handler }) {
               )}
               {profileSuccess && (
                 <div style={{ background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.22)", borderRadius: 9, padding: "10px 14px" }}>
-                  <p style={{ fontSize: 12, color: "#4ADE80" }}>{profileSuccess}</p>
+                  <p style={{ fontSize: 12, color: "var(--lt-4ade80, #4ADE80)" }}>{profileSuccess}</p>
                 </div>
               )}
 
@@ -201,7 +201,7 @@ export function EditProfileDialog({ open, handler }) {
               <div>
                 <label style={LBL}>{t("global.pages.users.fields.email") || "Email"}</label>
                 <input style={INPUT_DISABLED} type="email" value={user?.email || ""} disabled />
-                <p style={{ fontSize: 10, color: "#334155", marginTop: 5, fontStyle: "italic" }}>
+                <p style={{ fontSize: 10, color: "var(--lt-334155, #334155)", marginTop: 5, fontStyle: "italic" }}>
                   {language === "es" ? "El correo no se puede modificar" : "Email cannot be changed"}
                 </p>
               </div>
@@ -237,7 +237,7 @@ export function EditProfileDialog({ open, handler }) {
                 style={{ position: "relative", width: "100%", padding: "12px", borderRadius: 11, border: "none", background: profileLoading ? "rgba(99,102,241,0.4)" : "linear-gradient(135deg, #6366F1, #818CF8)", color: "#fff", fontSize: 13, fontWeight: 700, cursor: profileLoading ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, overflow: "hidden", boxShadow: profileLoading ? "none" : "0 4px 20px rgba(99,102,241,0.4), inset 0 1px 0 rgba(255,255,255,0.15)", transition: "all 0.2s" }}
                 onMouseEnter={(e) => { if (!profileLoading) { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 8px 28px rgba(99,102,241,0.5), inset 0 1px 0 rgba(255,255,255,0.15)"; } }}
                 onMouseLeave={(e) => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = !profileLoading ? "0 4px 20px rgba(99,102,241,0.4), inset 0 1px 0 rgba(255,255,255,0.15)" : "none"; }}>
-                <span style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(255,255,255,0.1) 0%, transparent 55%)", pointerEvents: "none", borderRadius: 11 }} />
+                <span style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, var(--lt-rgba-255-255-255-0-1, rgba(255,255,255,0.1)) 0%, transparent 55%)", pointerEvents: "none", borderRadius: 11 }} />
                 <span style={{ position: "relative", display: "inline-flex", alignItems: "center", gap: 8 }}>
                   {profileLoading ? <><Spin /> {language === "es" ? "Guardando..." : "Saving..."}</> : (t("global.crud.save") || (language === "es" ? "Guardar Cambios" : "Save Changes"))}
                 </span>
@@ -255,7 +255,7 @@ export function EditProfileDialog({ open, handler }) {
               )}
               {passwordSuccess && (
                 <div style={{ background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.22)", borderRadius: 9, padding: "10px 14px" }}>
-                  <p style={{ fontSize: 12, color: "#4ADE80" }}>{passwordSuccess}</p>
+                  <p style={{ fontSize: 12, color: "var(--lt-4ade80, #4ADE80)" }}>{passwordSuccess}</p>
                 </div>
               )}
 
@@ -271,14 +271,14 @@ export function EditProfileDialog({ open, handler }) {
                       value={passwordData[name]} onChange={handlePasswordChange}
                       style={{ ...INPUT, paddingRight: 46 }} onFocus={focusIn} onBlur={focusOut} />
                     <button type="button" tabIndex={-1} onClick={() => setShow(!show)}
-                      style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "#475569", display: "flex", padding: 4, transition: "color 0.15s" }}
+                      style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--lt-475569, #475569)", display: "flex", padding: 4, transition: "color 0.15s" }}
                       onMouseEnter={(e) => e.currentTarget.style.color = "#94A3B8"}
                       onMouseLeave={(e) => e.currentTarget.style.color = "#475569"}>
                       {show ? <EyeSlashIcon style={{ width: 17, height: 17 }} /> : <EyeIcon style={{ width: 17, height: 17 }} />}
                     </button>
                   </div>
                   {name === "confirm_password" && passwordData.confirm_password && passwordData.new_password && passwordData.confirm_password !== passwordData.new_password && (
-                    <p style={{ fontSize: 10, color: "#F87171", marginTop: 5 }}>
+                    <p style={{ fontSize: 10, color: "var(--lt-f87171, #F87171)", marginTop: 5 }}>
                       {language === "es" ? "Las contraseñas no coinciden" : "Passwords must match"}
                     </p>
                   )}
@@ -289,7 +289,7 @@ export function EditProfileDialog({ open, handler }) {
                 style={{ position: "relative", width: "100%", padding: "12px", borderRadius: 11, border: "none", background: passwordLoading ? "rgba(99,102,241,0.4)" : "linear-gradient(135deg, #6366F1, #818CF8)", color: "#fff", fontSize: 13, fontWeight: 700, cursor: passwordLoading ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, overflow: "hidden", boxShadow: passwordLoading ? "none" : "0 4px 20px rgba(99,102,241,0.4), inset 0 1px 0 rgba(255,255,255,0.15)", transition: "all 0.2s" }}
                 onMouseEnter={(e) => { if (!passwordLoading) { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 8px 28px rgba(99,102,241,0.5), inset 0 1px 0 rgba(255,255,255,0.15)"; } }}
                 onMouseLeave={(e) => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = !passwordLoading ? "0 4px 20px rgba(99,102,241,0.4), inset 0 1px 0 rgba(255,255,255,0.15)" : "none"; }}>
-                <span style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(255,255,255,0.1) 0%, transparent 55%)", pointerEvents: "none", borderRadius: 11 }} />
+                <span style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, var(--lt-rgba-255-255-255-0-1, rgba(255,255,255,0.1)) 0%, transparent 55%)", pointerEvents: "none", borderRadius: 11 }} />
                 <span style={{ position: "relative", display: "inline-flex", alignItems: "center", gap: 8 }}>
                   {passwordLoading ? <><Spin /> {language === "es" ? "Cambiando..." : "Changing..."}</> : (language === "es" ? "Cambiar Contraseña" : "Change Password")}
                 </span>
@@ -299,9 +299,9 @@ export function EditProfileDialog({ open, handler }) {
         </div>
 
         {/* Footer */}
-        <div style={{ padding: "12px 24px 20px", borderTop: "1px solid rgba(255,255,255,0.07)", flexShrink: 0 }}>
+        <div style={{ padding: "12px 24px 20px", borderTop: "1px solid var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))", flexShrink: 0 }}>
           <button onClick={handler}
-            style={{ width: "100%", padding: "10px", borderRadius: 10, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "#64748B", fontSize: 13, fontWeight: 600, cursor: "pointer", transition: "all 0.15s" }}
+            style={{ width: "100%", padding: "10px", borderRadius: 10, background: "var(--lt-rgba-255-255-255-0-04, rgba(255,255,255,0.04))", border: "1px solid var(--lt-rgba-255-255-255-0-08, rgba(255,255,255,0.08))", color: "#64748B", fontSize: 13, fontWeight: 600, cursor: "pointer", transition: "all 0.15s" }}
             onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.07)"; e.currentTarget.style.color = "#94A3B8"; }}
             onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.04)"; e.currentTarget.style.color = "#64748B"; }}>
             {t("global.crud.cancel") || (language === "es" ? "Cerrar" : "Close")}

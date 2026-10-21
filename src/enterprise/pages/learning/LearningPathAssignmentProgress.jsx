@@ -86,7 +86,7 @@ function DocumentsMiniPanel({ documents, onView }) {
                 <p style={{ fontSize: 13.5, fontWeight: 700, color: "var(--text-primary)" }} className="truncate">{doc.filename}</p>
                 <p style={{ fontSize: 11.5, color: "var(--text-tertiary)", marginTop: 2 }}>{t("enterprise.learning.progress.docSubtitle")}</p>
               </div>
-              <div style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(255,255,255,0.06)", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <div style={{ width: 36, height: 36, borderRadius: "50%", background: "var(--lt-rgba-255-255-255-0-06, rgba(255,255,255,0.06))", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                 <EyeIcon style={{ width: 15, height: 15, color: "var(--text-secondary)" }} />
               </div>
             </button>
@@ -101,31 +101,31 @@ function DocumentViewDialog({ doc, onClose }) {
   const { t } = useLanguage();
   if (!doc) return null;
   return (
-    <div style={{ position: "fixed", inset: 0, zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.6)" }} onClick={onClose}>
-      <div style={{ width: "100%", maxWidth: 560, maxHeight: "80vh", display: "flex", flexDirection: "column", background: "#0F172A", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 16, overflow: "hidden", boxShadow: "0 20px 60px rgba(0,0,0,0.7)" }} onClick={(e) => e.stopPropagation()}>
+    <div style={{ position: "fixed", inset: 0, zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", background: "var(--lt-rgba-0-0-0-0-6, rgba(0,0,0,0.6))" }} onClick={onClose}>
+      <div style={{ width: "100%", maxWidth: 560, maxHeight: "80vh", display: "flex", flexDirection: "column", background: "var(--lt-0f172a, #0F172A)", border: "1px solid var(--lt-rgba-255-255-255-0-1, rgba(255,255,255,0.1))", borderRadius: 16, overflow: "hidden", boxShadow: "0 20px 60px var(--lt-rgba-0-0-0-0-7, rgba(0,0,0,0.7))" }} onClick={(e) => e.stopPropagation()}>
         <div style={{ height: 2, background: "linear-gradient(90deg, #6366F1, #818CF8, #A78BFA)", flexShrink: 0 }} />
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 18px", borderBottom: "1px solid rgba(255,255,255,0.07)", flexShrink: 0 }}>
-          <p style={{ fontSize: 13, fontWeight: 700, color: "#F1F5F9", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{doc.filename}</p>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 18px", borderBottom: "1px solid var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))", flexShrink: 0 }}>
+          <p style={{ fontSize: 13, fontWeight: 700, color: "var(--lt-f1f5f9, #F1F5F9)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{doc.filename}</p>
           <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: "#64748B", flexShrink: 0 }}>
             <XMarkIcon style={{ width: 16, height: 16 }} />
           </button>
         </div>
         {doc.url && (
-          <div style={{ padding: "10px 18px", borderBottom: "1px solid rgba(255,255,255,0.05)", flexShrink: 0 }}>
-            <a href={doc.url} target="_blank" rel="noreferrer" style={{ fontSize: 12, color: "#818CF8", fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 5, textDecoration: "none" }}>
+          <div style={{ padding: "10px 18px", borderBottom: "1px solid var(--lt-rgba-255-255-255-0-05, rgba(255,255,255,0.05))", flexShrink: 0 }}>
+            <a href={doc.url} target="_blank" rel="noreferrer" style={{ fontSize: 12, color: "var(--lt-818cf8, #818CF8)", fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 5, textDecoration: "none" }}>
               {t("enterprise.learning.progress.openOriginal")} <ArrowTopRightOnSquareIcon style={{ width: 12, height: 12 }} />
             </a>
           </div>
         )}
         <div style={{ padding: "14px 18px", overflowY: "auto" }}>
           {(!doc.sections || doc.sections.length === 0) ? (
-            <p style={{ fontSize: 12, color: "#475569", textAlign: "center", padding: "20px 0" }}>{t("enterprise.learning.progress.noSections")}</p>
+            <p style={{ fontSize: 12, color: "var(--lt-475569, #475569)", textAlign: "center", padding: "20px 0" }}>{t("enterprise.learning.progress.noSections")}</p>
           ) : (
             <div className="space-y-3">
               {doc.sections.map((s) => (
                 <div key={s.id}>
-                  <p style={{ fontSize: 12, fontWeight: 700, color: "#E2E8F0", marginBottom: 4 }}>{s.title || t("enterprise.learning.progress.noTitle")}</p>
-                  {s.content && <p style={{ fontSize: 12, color: "#94A3B8", lineHeight: 1.6 }}>{s.content}</p>}
+                  <p style={{ fontSize: 12, fontWeight: 700, color: "var(--lt-e2e8f0, #E2E8F0)", marginBottom: 4 }}>{s.title || t("enterprise.learning.progress.noTitle")}</p>
+                  {s.content && <p style={{ fontSize: 12, color: "var(--lt-94a3b8, #94A3B8)", lineHeight: 1.6 }}>{s.content}</p>}
                 </div>
               ))}
             </div>
@@ -144,15 +144,15 @@ function ReadOnlyDeckRow({ deck, onLearn, onStudy }) {
 
   const icon = (
     <div style={{ width: 26, height: 26, borderRadius: 7, background: "rgba(99,102,241,0.12)", border: "1px solid rgba(99,102,241,0.2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-      <ViewColumnsIcon style={{ width: 13, height: 13, color: "#818CF8" }} />
+      <ViewColumnsIcon style={{ width: 13, height: 13, color: "var(--lt-818cf8, #818CF8)" }} />
     </div>
   );
   const badge = (
-    <span style={{ padding: "1px 7px", borderRadius: 20, background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.15)", color: "#818CF8", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{t("enterprise.learning.progress.cardsCount", { n: cardCount })}</span>
+    <span style={{ padding: "1px 7px", borderRadius: 20, background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.15)", color: "var(--lt-818cf8, #818CF8)", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{t("enterprise.learning.progress.cardsCount", { n: cardCount })}</span>
   );
   const learnBtn = (
     <button onClick={() => onLearn?.(deck)}
-      style={{ padding: "5px 10px", borderRadius: 6, background: "transparent", border: "1px solid rgba(99,102,241,0.25)", color: "#818CF8", fontSize: 11, fontWeight: 700, cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap" }}
+      style={{ padding: "5px 10px", borderRadius: 6, background: "transparent", border: "1px solid rgba(99,102,241,0.25)", color: "var(--lt-818cf8, #818CF8)", fontSize: 11, fontWeight: 700, cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap" }}
       onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(99,102,241,0.1)"; }}
       onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}>
       {t("enterprise.learning.progress.learnBtn")}
@@ -160,7 +160,7 @@ function ReadOnlyDeckRow({ deck, onLearn, onStudy }) {
   );
   const studyBtn = (
     <button onClick={() => onStudy?.(deck)}
-      style={{ padding: "5px 10px", borderRadius: 6, background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.2)", color: "#818CF8", fontSize: 11, fontWeight: 700, cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap" }}
+      style={{ padding: "5px 10px", borderRadius: 6, background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.2)", color: "var(--lt-818cf8, #818CF8)", fontSize: 11, fontWeight: 700, cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap" }}
       onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(99,102,241,0.18)"; }}
       onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(99,102,241,0.1)"; }}>
       {t("enterprise.learning.progress.studyBtn")}
@@ -170,16 +170,16 @@ function ReadOnlyDeckRow({ deck, onLearn, onStudy }) {
   // Mobile-only variants — bigger icon, roomier card, matches the reference mock
   const mobileIcon = (
     <div style={{ width: 48, height: 48, borderRadius: 12, background: "rgba(99,102,241,0.14)", border: "1px solid rgba(99,102,241,0.25)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-      <ViewColumnsIcon style={{ width: 21, height: 21, color: "#818CF8" }} />
+      <ViewColumnsIcon style={{ width: 21, height: 21, color: "var(--lt-818cf8, #818CF8)" }} />
     </div>
   );
 
   return (
     <>
       {/* Tablet/desktop — original single-row layout, unchanged */}
-      <div className="hidden sm:flex sm:items-center sm:gap-2" style={{ background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 8, marginBottom: 6, padding: "8px 12px", minWidth: 0 }}>
+      <div className="hidden sm:flex sm:items-center sm:gap-2" style={{ background: "var(--lt-rgba-255-255-255-0-025, rgba(255,255,255,0.025))", border: "1px solid var(--lt-rgba-255-255-255-0-06, rgba(255,255,255,0.06))", borderRadius: 8, marginBottom: 6, padding: "8px 12px", minWidth: 0 }}>
         {icon}
-        <span style={{ fontSize: 12, fontWeight: 700, color: "#F1F5F9", flexShrink: 0, maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={deck.title}>{deck.title}</span>
+        <span style={{ fontSize: 12, fontWeight: 700, color: "var(--lt-f1f5f9, #F1F5F9)", flexShrink: 0, maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={deck.title}>{deck.title}</span>
         {badge}
         <span style={{ flex: 1, fontSize: 11, color: "#64748B", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", minWidth: 0 }}>
           {deck.description || t("enterprise.learning.progress.deckDefaultDesc")}
@@ -199,7 +199,7 @@ function ReadOnlyDeckRow({ deck, onLearn, onStudy }) {
         </div>
         <button onClick={() => onLearn?.(deck)}
           className="flex items-center gap-1 flex-shrink-0"
-          style={{ padding: "9px 12px 9px 14px", borderRadius: 10, background: "rgba(99,102,241,0.16)", border: "1px solid rgba(99,102,241,0.3)", color: "#818CF8", fontSize: 12.5, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}>
+          style={{ padding: "9px 12px 9px 14px", borderRadius: 10, background: "rgba(99,102,241,0.16)", border: "1px solid rgba(99,102,241,0.3)", color: "var(--lt-818cf8, #818CF8)", fontSize: 12.5, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}>
           {t("enterprise.learning.progress.learnBtn")} <ChevronRightIcon style={{ width: 13, height: 13 }} />
         </button>
       </div>
@@ -217,25 +217,25 @@ function ReadOnlyBatteryRow({ battery, onSimulate }) {
 
   const icon = (
     <div style={{ width: 26, height: 26, borderRadius: 7, background: "rgba(94,106,210,0.12)", border: "1px solid rgba(94,106,210,0.2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-      <BoltIcon style={{ width: 13, height: 13, color: "#818CF8" }} />
+      <BoltIcon style={{ width: 13, height: 13, color: "var(--lt-818cf8, #818CF8)" }} />
     </div>
   );
   const badge = (
-    <span style={{ padding: "1px 7px", borderRadius: 20, background: "rgba(94,106,210,0.1)", border: "1px solid rgba(94,106,210,0.15)", color: "#818CF8", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{t("enterprise.learning.progress.questionsCount", { n: questionCount })}</span>
+    <span style={{ padding: "1px 7px", borderRadius: 20, background: "rgba(94,106,210,0.1)", border: "1px solid rgba(94,106,210,0.15)", color: "var(--lt-818cf8, #818CF8)", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{t("enterprise.learning.progress.questionsCount", { n: questionCount })}</span>
   );
   const progressMini = (
     <div style={{ display: "flex", alignItems: "center", gap: 5, flexShrink: 0 }}>
-      <div style={{ width: 52, height: 4, background: "rgba(255,255,255,0.08)", borderRadius: 2, overflow: "hidden" }}>
+      <div style={{ width: 52, height: 4, background: "var(--lt-rgba-255-255-255-0-08, rgba(255,255,255,0.08))", borderRadius: 2, overflow: "hidden" }}>
         <div style={{ height: "100%", width: `${hasAttempt ? pctRounded : 0}%`, background: pctColor, borderRadius: 2 }} />
       </div>
-      <span style={{ fontSize: 10, fontWeight: 700, color: hasAttempt ? pctColor : "#334155", minWidth: 28, textAlign: "right" }}>
+      <span style={{ fontSize: 10, fontWeight: 700, color: hasAttempt ? pctColor : "var(--lt-334155, #334155)", minWidth: 28, textAlign: "right" }}>
         {hasAttempt ? `${pctRounded}%` : "—"}
       </span>
     </div>
   );
   const simulateBtn = (
     <button onClick={() => onSimulate?.(battery)}
-      style={{ padding: "5px 10px", borderRadius: 6, background: "rgba(94,106,210,0.1)", border: "1px solid rgba(94,106,210,0.2)", color: "#818CF8", fontSize: 11, fontWeight: 700, cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap" }}
+      style={{ padding: "5px 10px", borderRadius: 6, background: "rgba(94,106,210,0.1)", border: "1px solid rgba(94,106,210,0.2)", color: "var(--lt-818cf8, #818CF8)", fontSize: 11, fontWeight: 700, cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap" }}
       onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(94,106,210,0.18)"; }}
       onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(94,106,210,0.1)"; }}>
       {t("enterprise.learning.progress.simulateBtn")}
@@ -245,12 +245,12 @@ function ReadOnlyBatteryRow({ battery, onSimulate }) {
   // Mobile-only variants — bigger icon, roomier card, matches the reference mock
   const mobileIcon = (
     <div style={{ width: 48, height: 48, borderRadius: 12, background: "rgba(94,106,210,0.16)", border: "1px solid rgba(94,106,210,0.28)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-      <BoltIcon style={{ width: 21, height: 21, color: "#818CF8" }} />
+      <BoltIcon style={{ width: 21, height: 21, color: "var(--lt-818cf8, #818CF8)" }} />
     </div>
   );
   const mobileProgressMini = hasAttempt && (
     <div className="flex items-center gap-2 mt-1.5">
-      <div style={{ width: 70, height: 4, background: "rgba(255,255,255,0.08)", borderRadius: 2, overflow: "hidden", flexShrink: 0 }}>
+      <div style={{ width: 70, height: 4, background: "var(--lt-rgba-255-255-255-0-08, rgba(255,255,255,0.08))", borderRadius: 2, overflow: "hidden", flexShrink: 0 }}>
         <div style={{ height: "100%", width: `${pctRounded}%`, background: pctColor, borderRadius: 2 }} />
       </div>
       <span style={{ fontSize: 11, fontWeight: 700, color: pctColor }}>{pctRounded}%</span>
@@ -260,9 +260,9 @@ function ReadOnlyBatteryRow({ battery, onSimulate }) {
   return (
     <>
       {/* Tablet/desktop — original single-row layout, unchanged */}
-      <div className="hidden sm:flex sm:items-center sm:gap-2" style={{ background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 8, marginBottom: 6, padding: "8px 12px", minWidth: 0 }}>
+      <div className="hidden sm:flex sm:items-center sm:gap-2" style={{ background: "var(--lt-rgba-255-255-255-0-025, rgba(255,255,255,0.025))", border: "1px solid var(--lt-rgba-255-255-255-0-06, rgba(255,255,255,0.06))", borderRadius: 8, marginBottom: 6, padding: "8px 12px", minWidth: 0 }}>
         {icon}
-        <span style={{ fontSize: 12, fontWeight: 700, color: "#F1F5F9", flexShrink: 0, maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={battery.name || battery.title}>{battery.name || battery.title}</span>
+        <span style={{ fontSize: 12, fontWeight: 700, color: "var(--lt-f1f5f9, #F1F5F9)", flexShrink: 0, maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={battery.name || battery.title}>{battery.name || battery.title}</span>
         {badge}
         <span style={{ flex: 1, fontSize: 11, color: "#64748B", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", minWidth: 0 }}>
           {battery.description || t("enterprise.learning.progress.batteryDefaultDesc")}
@@ -283,7 +283,7 @@ function ReadOnlyBatteryRow({ battery, onSimulate }) {
         </div>
         <button onClick={() => onSimulate?.(battery)}
           className="flex items-center gap-1 flex-shrink-0"
-          style={{ padding: "9px 12px 9px 14px", borderRadius: 10, background: "rgba(94,106,210,0.18)", border: "1px solid rgba(94,106,210,0.32)", color: "#818CF8", fontSize: 12.5, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}>
+          style={{ padding: "9px 12px 9px 14px", borderRadius: 10, background: "rgba(94,106,210,0.18)", border: "1px solid rgba(94,106,210,0.32)", color: "var(--lt-818cf8, #818CF8)", fontSize: 12.5, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}>
           {t("enterprise.learning.progress.simulateBtn")} <ChevronRightIcon style={{ width: 13, height: 13 }} />
         </button>
       </div>
@@ -303,8 +303,8 @@ function ReadOnlyTopicSection({ topic, index, decks, batteries, isLast, onStudy,
           topic card to the right, leaving dead space on the left where the course/documents cards
           above start flush; the dot moves inline into the header there instead. */}
       <div className="hidden sm:flex" style={{ width: 22, flexDirection: "column", alignItems: "center", marginRight: 14, flexShrink: 0 }}>
-        <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#4ade80", border: "2px solid #0F172A", flexShrink: 0, marginTop: 7 }} />
-        {!isLast && <div style={{ width: 2, flex: 1, background: "rgba(255,255,255,0.08)", minHeight: 24, marginTop: 4 }} />}
+        <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#4ade80", border: "2px solid var(--lt-0f172a, #0F172A)", flexShrink: 0, marginTop: 7 }} />
+        {!isLast && <div style={{ width: 2, flex: 1, background: "var(--lt-rgba-255-255-255-0-08, rgba(255,255,255,0.08))", minHeight: 24, marginTop: 4 }} />}
       </div>
       {/* On mobile the header + rows sit flush-left inside their own bordered card (matches the
           reference mock); on tablet/desktop it stays the plain indented list it always was. */}
@@ -317,8 +317,8 @@ function ReadOnlyTopicSection({ topic, index, decks, batteries, isLast, onStudy,
           <button onClick={() => setExpanded((v) => !v)} style={{ color: "#64748B", cursor: "pointer", padding: 0, background: "none", border: "none", display: "flex", alignItems: "center", flexShrink: 0 }}>
             {expanded ? <ChevronRightIcon style={{ width: 13, height: 13, transform: "rotate(90deg)" }} /> : <ChevronRightIcon style={{ width: 13, height: 13 }} />}
           </button>
-          <span style={{ fontWeight: 700, color: "#F1F5F9", fontSize: 13, flexShrink: 0 }}>{t("enterprise.learning.progress.topicLabel", { n: index + 1 })}</span>
-          <span style={{ padding: "1px 7px", borderRadius: 20, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.09)", color: "#64748B", fontSize: 10, fontWeight: 600, flexShrink: 0 }}>{t("enterprise.learning.progress.tagsCount", { n: tagCount })}</span>
+          <span style={{ fontWeight: 700, color: "var(--lt-f1f5f9, #F1F5F9)", fontSize: 13, flexShrink: 0 }}>{t("enterprise.learning.progress.topicLabel", { n: index + 1 })}</span>
+          <span style={{ padding: "1px 7px", borderRadius: 20, background: "var(--lt-rgba-255-255-255-0-06, rgba(255,255,255,0.06))", border: "1px solid var(--lt-rgba-255-255-255-0-09, rgba(255,255,255,0.09))", color: "#64748B", fontSize: 10, fontWeight: 600, flexShrink: 0 }}>{t("enterprise.learning.progress.tagsCount", { n: tagCount })}</span>
           <span style={{ fontSize: 11, color: "#64748B", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1, minWidth: 0 }}>{description}</span>
         </div>
         {expanded && (
@@ -326,7 +326,7 @@ function ReadOnlyTopicSection({ topic, index, decks, batteries, isLast, onStudy,
             {decks.map((d) => <ReadOnlyDeckRow key={d.id} deck={d} onLearn={onLearn} onStudy={onStudy} />)}
             {batteries.map((b) => <ReadOnlyBatteryRow key={b.id} battery={b} onSimulate={onSimulate} />)}
             {decks.length === 0 && batteries.length === 0 && (
-              <p style={{ fontSize: 11, color: "#475569", padding: "4px 0" }}>{t("enterprise.learning.progress.noTopicContent")}</p>
+              <p style={{ fontSize: 11, color: "var(--lt-475569, #475569)", padding: "4px 0" }}>{t("enterprise.learning.progress.noTopicContent")}</p>
             )}
           </div>
         )}
@@ -463,7 +463,7 @@ function ProcessKnowledgeView({ ksId, moduleId, assignmentId, alreadyCompleted, 
         </div>
       )}
       {isDone && (
-        <div style={{ borderTop: "1px solid var(--border)", padding: "10px 18px", background: "var(--bg-surface)", display: "flex", alignItems: "center", gap: 6, color: "#4ade80", fontSize: 11, fontWeight: 700 }}>
+        <div style={{ borderTop: "1px solid var(--border)", padding: "10px 18px", background: "var(--bg-surface)", display: "flex", alignItems: "center", gap: 6, color: "var(--lt-4ade80, #4ade80)", fontSize: 11, fontWeight: 700 }}>
           <CheckCircleIcon style={{ width: 13, height: 13 }} /> {t("enterprise.learning.progress.completedLabel")}
         </div>
       )}
@@ -481,7 +481,7 @@ function ProcessKnowledgeView({ ksId, moduleId, assignmentId, alreadyCompleted, 
 function NodeIcon({ status, size = 30, iconSize = 14 }) {
   if (status === "completed") return (
     <div style={{ width: size, height: size, borderRadius: "50%", background: "rgba(74,222,128,0.15)", border: "2px solid #4ade80", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-      <CheckCircleIcon style={{ width: iconSize, height: iconSize, color: "#4ade80" }} />
+      <CheckCircleIcon style={{ width: iconSize, height: iconSize, color: "var(--lt-4ade80, #4ade80)" }} />
     </div>
   );
   if (status === "in_progress") return (
@@ -531,7 +531,7 @@ function ProcessNode({ mod, index, status, isLast, isOpen, onClick, assignmentId
             className="hidden sm:block"
             style={{ background: isOpen ? "var(--bg-elevated)" : "var(--bg-surface)", border: `1px solid ${isOpen ? borderColor : "var(--border)"}`, borderRadius: 7, padding: "11px 14px", cursor: locked ? "not-allowed" : "pointer", opacity: locked ? 0.45 : 1, transition: "all 150ms" }}
             onMouseEnter={(e) => { if (!locked) { e.currentTarget.style.borderColor = borderColor; e.currentTarget.style.background = "var(--bg-elevated)"; } }}
-            onMouseLeave={(e) => { if (!locked) { e.currentTarget.style.borderColor = isOpen ? borderColor : "var(--border)"; e.currentTarget.style.background = isOpen ? "var(--bg-elevated)" : "var(--bg-surface)"; } }}>
+            onMouseLeave={(e) => { if (!locked) { e.currentTarget.style.borderColor = isOpen ? borderColor: "var(--border)"; e.currentTarget.style.background = isOpen ? "var(--bg-elevated)" : "var(--bg-surface)"; } }}>
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2 min-w-0">
                 <span style={{ fontSize: 10, fontWeight: 700, color: "var(--text-tertiary)", flexShrink: 0 }}>#{index + 1}</span>
@@ -566,7 +566,7 @@ function ProcessNode({ mod, index, status, isLast, isOpen, onClick, assignmentId
                   </div>
                 </div>
               </div>
-              <div className="flex items-center justify-center flex-shrink-0" style={{ width: 34, height: 34, borderRadius: "50%", background: "rgba(255,255,255,0.06)", border: "1px solid var(--border)" }}>
+              <div className="flex items-center justify-center flex-shrink-0" style={{ width: 34, height: 34, borderRadius: "50%", background: "var(--lt-rgba-255-255-255-0-06, rgba(255,255,255,0.06))", border: "1px solid var(--border)" }}>
                 <ChevronRightIcon style={{ width: 13, height: 13, color: "var(--text-tertiary)", transform: isOpen ? "rotate(-90deg)" : "rotate(90deg)", transition: "transform 200ms" }} />
               </div>
             </div>
@@ -711,7 +711,7 @@ export function LearningPathAssignmentProgress({ assignmentId, onAssignmentLoade
         <div className="space-y-1.5">
           <div className="flex justify-between">
             <span style={{ color: "var(--text-tertiary)", fontSize: 11 }}>{t("enterprise.learning.progress.processesCompleted", { completed: completedCount, total: totalMods })}</span>
-            <span style={{ color: isDone ? "#4ade80" : "var(--accent)", fontSize: 11, fontWeight: 700 }}>
+            <span style={{ color: isDone ? "var(--lt-4ade80, #4ade80)" : "var(--accent)", fontSize: 11, fontWeight: 700 }}>
               {overallBatteryPercent}%
             </span>
           </div>
@@ -767,9 +767,9 @@ export function LearningPathAssignmentProgress({ assignmentId, onAssignmentLoade
       {isDone && (
         <div style={{ background: "rgba(74,222,128,0.06)", border: "1px solid rgba(74,222,128,0.25)", borderRadius: 8, padding: "16px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
           <div className="flex items-center gap-2.5">
-            <CheckCircleIcon style={{ width: 18, height: 18, color: "#4ade80", flexShrink: 0 }} />
+            <CheckCircleIcon style={{ width: 18, height: 18, color: "var(--lt-4ade80, #4ade80)", flexShrink: 0 }} />
             <div>
-              <p style={{ color: "#4ade80", fontWeight: 700, fontSize: 13 }}>{t("enterprise.learning.progress.completedTitle")}</p>
+              <p style={{ color: "var(--lt-4ade80, #4ade80)", fontWeight: 700, fontSize: 13 }}>{t("enterprise.learning.progress.completedTitle")}</p>
               <p style={{ color: "var(--text-secondary)", fontSize: 12, marginTop: 2 }}>{t("enterprise.learning.progress.completedMessage")}</p>
             </div>
           </div>

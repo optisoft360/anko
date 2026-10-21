@@ -93,13 +93,13 @@ export function KnowledgeGaps() {
                       <div className="flex gap-1.5">
                         {g.status === "open" && (
                           <button disabled={acting === g.id} onClick={() => act(g.id, "acknowledge")}
-                            style={{ fontSize: 11, fontWeight: 700, color: "#f59e0b", background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.25)", borderRadius: 6, padding: "5px 9px", cursor: "pointer", display: "flex", alignItems: "center", gap: 4, opacity: acting === g.id ? 0.6 : 1 }}>
+                            style={{ fontSize: 11, fontWeight: 700, color: "var(--lt-f59e0b, #f59e0b)", background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.25)", borderRadius: 6, padding: "5px 9px", cursor: "pointer", display: "flex", alignItems: "center", gap: 4, opacity: acting === g.id ? 0.6 : 1 }}>
                             {acting === g.id ? <ArrowPathIcon className="animate-spin" style={{ width: 11, height: 11 }} /> : t("enterprise.learning.knowledgeGaps.acknowledge")}
                           </button>
                         )}
                         {g.status !== "resolved" && (
                           <button disabled={acting === g.id} onClick={() => act(g.id, "resolve")}
-                            style={{ fontSize: 11, fontWeight: 700, color: "#4ade80", background: "rgba(74,222,128,0.1)", border: "1px solid rgba(74,222,128,0.25)", borderRadius: 6, padding: "5px 9px", cursor: "pointer", display: "flex", alignItems: "center", gap: 4, opacity: acting === g.id ? 0.6 : 1 }}>
+                            style={{ fontSize: 11, fontWeight: 700, color: "var(--lt-4ade80, #4ade80)", background: "rgba(74,222,128,0.1)", border: "1px solid rgba(74,222,128,0.25)", borderRadius: 6, padding: "5px 9px", cursor: "pointer", display: "flex", alignItems: "center", gap: 4, opacity: acting === g.id ? 0.6 : 1 }}>
                             {acting === g.id ? <ArrowPathIcon className="animate-spin" style={{ width: 11, height: 11 }} /> : t("enterprise.learning.knowledgeGaps.resolve")}
                           </button>
                         )}

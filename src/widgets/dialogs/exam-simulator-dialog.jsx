@@ -18,24 +18,24 @@ import { DocumentViewerDialog } from "./document-viewer-dialog";
 
 // ─── Dark theme tokens ────────────────────────────────────────────────────────
 const T = {
-  bg:          "#0F172A",
-  bgElevated:  "#1E293B",
-  bgCard:      "#162032",
-  border:      "rgba(255,255,255,0.07)",
-  borderStrong:"rgba(255,255,255,0.12)",
-  textPrimary: "#F1F5F9",
-  textMuted:   "#94A3B8",
-  textDim:     "#64748B",
+  bg:          "var(--lt-0f172a, #0F172A)",
+  bgElevated:  "var(--lt-1e293b, #1E293B)",
+  bgCard:      "var(--lt-162032, #162032)",
+  border: "var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))",
+  borderStrong:"var(--lt-rgba-255-255-255-0-12, rgba(255,255,255,0.12))",
+  textPrimary: "var(--lt-f1f5f9, #F1F5F9)",
+  textMuted:   "var(--lt-94a3b8, #94A3B8)",
+  textDim:     "var(--lt-64748b, #64748B)",
   accent:      "#6366F1",
   accentBg:    "rgba(99,102,241,0.12)",
   accentBorder:"rgba(99,102,241,0.35)",
-  green:       "#22C55E",
+  green:       "var(--lt-22c55e, #22C55E)",
   greenBg:     "rgba(34,197,94,0.10)",
   greenBorder: "rgba(34,197,94,0.35)",
-  red:         "#EF4444",
+  red:         "var(--lt-ef4444, #EF4444)",
   redBg:       "rgba(239,68,68,0.10)",
   redBorder:   "rgba(239,68,68,0.35)",
-  amber:       "#F59E0B",
+  amber:       "var(--lt-f59e0b, #F59E0B)",
   amberBg:     "rgba(245,158,11,0.08)",
   amberBorder: "rgba(245,158,11,0.25)",
 };
@@ -266,7 +266,7 @@ export function ExamSimulatorDialog({ open, handler, battery: initialBattery, on
   // ─── Loading ──────────────────────────────────────────────────────────────
   if (loadingBattery) {
     return (
-      <Dialog open={open} handler={handler} size="lg" className={`!bg-[#0F172A] !rounded-2xl`}>
+      <Dialog open={open} handler={handler} size="lg" className={`!bg-[var(--lt-0f172a,#0F172A)] !rounded-2xl`}>
         <div className="flex flex-col items-center justify-center py-24 gap-4">
           <Spinner />
           <p style={{ fontSize: 14, color: T.textMuted, fontWeight: 500 }}>
@@ -280,7 +280,7 @@ export function ExamSimulatorDialog({ open, handler, battery: initialBattery, on
   // ─── Empty ────────────────────────────────────────────────────────────────
   if (!currentQuestion && !isFinished) {
     return (
-      <Dialog open={open} handler={handler} size="lg" className="!bg-[#0F172A] !rounded-2xl">
+      <Dialog open={open} handler={handler} size="lg" className="!bg-[var(--lt-0f172a,#0F172A)] !rounded-2xl">
         <div className="flex flex-col items-center justify-center py-20 px-6 gap-5">
           <div style={{ width: 56, height: 56, borderRadius: "50%", background: T.accentBg, display: "flex", alignItems: "center", justifyContent: "center" }}>
             <LightBulbIcon className="h-7 w-7" style={{ color: T.accent }} />
@@ -308,7 +308,7 @@ export function ExamSimulatorDialog({ open, handler, battery: initialBattery, on
 
     return (
       <Dialog open={open} handler={handler} size="lg"
-        className="!bg-[#0F172A] !mx-0 !my-0 !rounded-none !max-w-full !w-full !h-[100dvh] md:!mx-auto md:!my-8 md:!rounded-2xl md:!max-w-lg md:!h-auto">
+        className="!bg-[var(--lt-0f172a,#0F172A)] !mx-0 !my-0 !rounded-none !max-w-full !w-full !h-[100dvh] md:!mx-auto md:!my-8 md:!rounded-2xl md:!max-w-lg md:!h-auto">
         <div className="flex flex-col h-[100dvh] md:h-auto" style={{ background: T.bg }}>
 
           {/* Header */}

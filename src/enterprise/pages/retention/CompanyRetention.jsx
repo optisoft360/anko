@@ -29,7 +29,7 @@ export function CompanyRetention() {
     yaxis: { min: 0, max: 100, labels: { formatter: (v) => `${v}%`, style: { colors: "#64748B" } } },
     legend: { position: "top", labels: { colors: "#94A3B8" } },
     dataLabels: { enabled: false },
-    grid: { borderColor: "rgba(255,255,255,0.07)" },
+    grid: { borderColor: "var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))" },
     tooltip: { theme: "dark", shared: true, y: { formatter: (v) => `${v}%` } },
   };
 

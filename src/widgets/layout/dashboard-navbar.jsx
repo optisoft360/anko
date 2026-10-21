@@ -209,7 +209,7 @@ export function DashboardNavbar() {
             <div style={{ position: "relative" }}>
               <button
                 onClick={() => { setNotifOpen(v => { if (!v && !notifLoading) fetchNotifications(); return !v; }); }}
-                style={{ position: "relative", width: 36, height: 36, borderRadius: "50%", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#94A3B8", transition: "background 0.15s, color 0.15s" }}
+                style={{ position: "relative", width: 36, height: 36, borderRadius: "50%", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--lt-94a3b8, #94A3B8)", transition: "background 0.15s, color 0.15s" }}
                 onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.07)"; e.currentTarget.style.color = "#F1F5F9"; }}
                 onMouseLeave={(e) => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "#94A3B8"; }}>
                 <BellIcon className="h-5 w-5" />
@@ -223,20 +223,20 @@ export function DashboardNavbar() {
               {notifOpen && (
                 <>
                   <div style={{ position: "fixed", inset: 0, zIndex: 40 }} onClick={() => setNotifOpen(false)} />
-                  <div style={{ position: "absolute", right: 0, top: 46, zIndex: 50, background: "#0F172A", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 16, width: 320, boxShadow: "0 20px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(99,102,241,0.08)", overflow: "hidden" }}>
+                  <div style={{ position: "absolute", right: 0, top: 46, zIndex: 50, background: "var(--lt-0f172a, #0F172A)", border: "1px solid var(--lt-rgba-255-255-255-0-1, rgba(255,255,255,0.1))", borderRadius: 16, width: 320, boxShadow: "0 20px 60px var(--lt-rgba-0-0-0-0-7, rgba(0,0,0,0.7)), 0 0 0 1px rgba(99,102,241,0.08)", overflow: "hidden" }}>
                     {/* Top accent strip */}
                     <div style={{ height: 2, background: "linear-gradient(90deg, #6366F1, #818CF8, #A78BFA)" }} />
 
                     {/* Header */}
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 16px 12px", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 16px 12px", borderBottom: "1px solid var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <BellIcon style={{ width: 15, height: 15, color: "#818CF8" }} />
-                        <span style={{ fontSize: 12, fontWeight: 800, color: "#F1F5F9" }}>
+                        <BellIcon style={{ width: 15, height: 15, color: "var(--lt-818cf8, #818CF8)" }} />
+                        <span style={{ fontSize: 12, fontWeight: 800, color: "var(--lt-f1f5f9, #F1F5F9)" }}>
                           {language === "es" ? "Notificaciones" : "Notifications"}
                         </span>
                       </div>
                       {unreadCount > 0 && (
-                        <span style={{ minWidth: 20, height: 20, borderRadius: 999, background: "rgba(99,102,241,0.2)", border: "1px solid rgba(99,102,241,0.35)", color: "#818CF8", fontSize: 10, fontWeight: 800, display: "inline-flex", alignItems: "center", justifyContent: "center", padding: "0 6px" }}>
+                        <span style={{ minWidth: 20, height: 20, borderRadius: 999, background: "rgba(99,102,241,0.2)", border: "1px solid rgba(99,102,241,0.35)", color: "var(--lt-818cf8, #818CF8)", fontSize: 10, fontWeight: 800, display: "inline-flex", alignItems: "center", justifyContent: "center", padding: "0 6px" }}>
                           {unreadCount}
                         </span>
                       )}
@@ -246,8 +246,8 @@ export function DashboardNavbar() {
                     <div style={{ maxHeight: 340, overflowY: "auto", padding: "6px" }}>
                       {notifLoading && (
                         <div style={{ padding: "32px 0", display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
-                          <div style={{ width: 22, height: 22, borderRadius: "50%", border: "2px solid rgba(255,255,255,0.1)", borderTopColor: "#818CF8" }} className="animate-spin" />
-                          <span style={{ fontSize: 10, fontWeight: 700, color: "#475569", textTransform: "uppercase", letterSpacing: "0.07em" }}>
+                          <div style={{ width: 22, height: 22, borderRadius: "50%", border: "2px solid var(--lt-rgba-255-255-255-0-1, rgba(255,255,255,0.1))", borderTopColor: "#818CF8" }} className="animate-spin" />
+                          <span style={{ fontSize: 10, fontWeight: 700, color: "var(--lt-475569, #475569)", textTransform: "uppercase", letterSpacing: "0.07em" }}>
                             {language === "es" ? "Cargando..." : "Loading..."}
                           </span>
                         </div>
@@ -255,8 +255,8 @@ export function DashboardNavbar() {
 
                       {!notifLoading && notifications.length === 0 && (
                         <div style={{ padding: "32px 0", display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
-                          <BellIcon style={{ width: 28, height: 28, color: "#334155" }} />
-                          <span style={{ fontSize: 11, color: "#475569" }}>
+                          <BellIcon style={{ width: 28, height: 28, color: "var(--lt-334155, #334155)" }} />
+                          <span style={{ fontSize: 11, color: "var(--lt-475569, #475569)" }}>
                             {language === "es" ? "Sin notificaciones" : "No notifications"}
                           </span>
                         </div>
@@ -291,13 +291,13 @@ export function DashboardNavbar() {
                                 <p style={{ fontSize: 11, color: "#64748B", lineHeight: 1.4, marginBottom: 3 }}>{body}</p>
                               )}
                               {date && (
-                                <p style={{ fontSize: 10, color: "#334155" }}>
+                                <p style={{ fontSize: 10, color: "var(--lt-334155, #334155)" }}>
                                   {new Date(date).toLocaleDateString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
                                 </p>
                               )}
                             </div>
                             <button
-                              style={{ width: 22, height: 22, borderRadius: "50%", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#334155", flexShrink: 0, transition: "background 0.15s, color 0.15s", opacity: 0.7 }}
+                              style={{ width: 22, height: 22, borderRadius: "50%", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--lt-334155, #334155)", flexShrink: 0, transition: "background 0.15s, color 0.15s", opacity: 0.7 }}
                               onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(239,68,68,0.12)"; e.currentTarget.style.color = "#F87171"; e.currentTarget.style.opacity = "1"; }}
                               onMouseLeave={(e) => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "#334155"; e.currentTarget.style.opacity = "0.7"; }}
                               onClick={(e) => { e.stopPropagation(); dismissNotif(notif.id); }}
@@ -321,7 +321,7 @@ export function DashboardNavbar() {
                   style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px", borderRadius: 999, background: "none", border: "none", cursor: "pointer", transition: "background 0.15s" }}
                   onMouseEnter={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.06)"}
                   onMouseLeave={(e) => e.currentTarget.style.background = "none"}>
-                  <div style={{ width: 32, height: 32, borderRadius: "50%", background: "linear-gradient(135deg, #6366F1, #A78BFA)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 12, border: "1px solid rgba(255,255,255,0.2)", boxShadow: "0 0 12px rgba(99,102,241,0.4)", flexShrink: 0 }}>
+                  <div style={{ width: 32, height: 32, borderRadius: "50%", background: "linear-gradient(135deg, #6366F1, #A78BFA)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 12, border: "1px solid var(--lt-rgba-255-255-255-0-2, rgba(255,255,255,0.2))", boxShadow: "0 0 12px rgba(99,102,241,0.4)", flexShrink: 0 }}>
                     {user.first_name?.[0] || user.username?.[0] || "U"}
                   </div>
                   <ChevronDownIcon strokeWidth={3} style={{ width: 12, height: 12, color: "#64748B", transition: "transform 0.2s", transform: showUserMenu ? "rotate(180deg)" : "rotate(0deg)" }} />
@@ -330,21 +330,21 @@ export function DashboardNavbar() {
                 {showUserMenu && (
                   <>
                     <div style={{ position: "fixed", inset: 0, zIndex: 40 }} onClick={() => setShowUserMenu(false)} />
-                    <div style={{ position: "absolute", right: 0, top: 46, zIndex: 50, background: "#0F172A", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 16, overflow: "hidden", minWidth: 210, boxShadow: "0 20px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(99,102,241,0.08)" }}>
+                    <div style={{ position: "absolute", right: 0, top: 46, zIndex: 50, background: "var(--lt-0f172a, #0F172A)", border: "1px solid var(--lt-rgba-255-255-255-0-1, rgba(255,255,255,0.1))", borderRadius: 16, overflow: "hidden", minWidth: 210, boxShadow: "0 20px 60px var(--lt-rgba-0-0-0-0-7, rgba(0,0,0,0.7)), 0 0 0 1px rgba(99,102,241,0.08)" }}>
                       {/* Top accent strip */}
                       <div style={{ height: 2, background: "linear-gradient(90deg, #6366F1, #818CF8, #A78BFA)" }} />
 
                       {/* User info */}
-                      <div style={{ padding: "14px 16px 12px", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
+                      <div style={{ padding: "14px 16px 12px", borderBottom: "1px solid var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))" }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                           <div style={{ width: 34, height: 34, borderRadius: "50%", background: "linear-gradient(135deg, #6366F1, #A78BFA)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 13, flexShrink: 0 }}>
                             {user.first_name?.[0] || user.username?.[0] || "U"}
                           </div>
                           <div style={{ minWidth: 0 }}>
-                            <p style={{ fontSize: 12, fontWeight: 800, color: "#F1F5F9", marginBottom: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                            <p style={{ fontSize: 12, fontWeight: 800, color: "var(--lt-f1f5f9, #F1F5F9)", marginBottom: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                               {user.first_name || user.username}
                             </p>
-                            <p style={{ fontSize: 10, color: "#475569", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                            <p style={{ fontSize: 10, color: "var(--lt-475569, #475569)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                               {user.email}
                             </p>
                           </div>
@@ -358,7 +358,7 @@ export function DashboardNavbar() {
                           { label: language === "es" ? "Estadística" : "Statistics", icon: ChartBarIcon, action: () => { setShowUserMenu(false); setOpenStatsDialog(true); } },
                         ].map(({ label, icon: Icon, action }) => (
                           <button key={label} onClick={action}
-                            style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", borderRadius: 10, background: "none", border: "none", cursor: "pointer", color: "#94A3B8", fontSize: 13, fontWeight: 600, textAlign: "left", transition: "background 0.15s, color 0.15s" }}
+                            style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", borderRadius: 10, background: "none", border: "none", cursor: "pointer", color: "var(--lt-94a3b8, #94A3B8)", fontSize: 13, fontWeight: 600, textAlign: "left", transition: "background 0.15s, color 0.15s" }}
                             onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(99,102,241,0.1)"; e.currentTarget.style.color = "#C7D2FE"; }}
                             onMouseLeave={(e) => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "#94A3B8"; }}>
                             <Icon style={{ width: 16, height: 16, flexShrink: 0 }} />
@@ -366,10 +366,10 @@ export function DashboardNavbar() {
                           </button>
                         ))}
 
-                        <div style={{ height: 1, background: "rgba(255,255,255,0.06)", margin: "4px 6px" }} />
+                        <div style={{ height: 1, background: "var(--lt-rgba-255-255-255-0-06, rgba(255,255,255,0.06))", margin: "4px 6px" }} />
 
                         <button onClick={() => { setShowUserMenu(false); logout(); }}
-                          style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", borderRadius: 10, background: "none", border: "none", cursor: "pointer", color: "#F87171", fontSize: 13, fontWeight: 600, textAlign: "left", transition: "background 0.15s, color 0.15s" }}
+                          style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", borderRadius: 10, background: "none", border: "none", cursor: "pointer", color: "var(--lt-f87171, #F87171)", fontSize: 13, fontWeight: 600, textAlign: "left", transition: "background 0.15s, color 0.15s" }}
                           onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(239,68,68,0.08)"; e.currentTarget.style.color = "#FCA5A5"; }}
                           onMouseLeave={(e) => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "#F87171"; }}>
                           <PowerIcon style={{ width: 16, height: 16, flexShrink: 0 }} />

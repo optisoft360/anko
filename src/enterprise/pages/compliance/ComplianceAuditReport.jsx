@@ -95,11 +95,11 @@ export function ComplianceAuditReport() {
         <p style={{ color: "var(--text-primary)", fontWeight: 700, fontSize: 13, marginBottom: 14 }}>{t("enterprise.compliance.auditReport.reviewResults")}</p>
         <div className="flex gap-8">
           <div style={{ textAlign: "center" }}>
-            <div style={{ fontSize: 22, fontWeight: 800, color: "#4ade80" }}>{report.passed_reviews ?? 0}</div>
+            <div style={{ fontSize: 22, fontWeight: 800, color: "var(--lt-4ade80, #4ade80)" }}>{report.passed_reviews ?? 0}</div>
             <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-tertiary)", marginTop: 4 }}>{t("enterprise.compliance.auditReport.passed")}</div>
           </div>
           <div style={{ textAlign: "center" }}>
-            <div style={{ fontSize: 22, fontWeight: 800, color: "#f87171" }}>{report.failed_reviews ?? 0}</div>
+            <div style={{ fontSize: 22, fontWeight: 800, color: "var(--lt-f87171, #f87171)" }}>{report.failed_reviews ?? 0}</div>
             <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-tertiary)", marginTop: 4 }}>{t("enterprise.compliance.auditReport.failed")}</div>
           </div>
           <div style={{ textAlign: "center" }}>

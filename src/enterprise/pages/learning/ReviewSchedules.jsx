@@ -81,7 +81,7 @@ function ReviewCard({ review, overdue, onComplete, completing }) {
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-2 min-w-0">
           <div style={{ width: 28, height: 28, borderRadius: 8, background: "rgba(99,102,241,0.12)", border: "1px solid rgba(99,102,241,0.2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-            <Icon style={{ width: 14, height: 14, color: "#818CF8" }} />
+            <Icon style={{ width: 14, height: 14, color: "var(--lt-818cf8, #818CF8)" }} />
           </div>
           <p style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
             {review.topic || review.module_name || review.learning_module_name || t("enterprise.learning.reviewSchedules.review")}
@@ -138,7 +138,7 @@ function EmptyReviews({ label }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "56px 20px", textAlign: "center" }}>
       <div style={{ width: 52, height: 52, borderRadius: "50%", background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.2)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
-        <CalendarDaysIcon style={{ width: 24, height: 24, color: "#818CF8" }} />
+        <CalendarDaysIcon style={{ width: 24, height: 24, color: "var(--lt-818cf8, #818CF8)" }} />
       </div>
       <p style={{ fontSize: 14, fontWeight: 700, color: "var(--text-primary)" }}>{t("enterprise.learning.reviewSchedules.noReviews", { label })}</p>
       <p style={{ fontSize: 12, color: "var(--text-tertiary)", marginTop: 4 }}>{t("enterprise.learning.reviewSchedules.upToDate")}</p>

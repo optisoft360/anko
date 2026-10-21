@@ -143,25 +143,25 @@ export function FlashcardLearnDialog({ open, onClose, deckId, deckTitle }) {
             size="xl"
             className="bg-transparent shadow-none !mx-0 !my-0 !rounded-none !max-w-full !w-full !h-[100dvh] md:!mx-auto md:!my-8 md:!rounded-2xl md:!max-w-3xl md:!h-auto"
         >
-            <div style={{ display: "flex", flexDirection: "column", background: "#060D1A", border: "1px solid rgba(255,255,255,0.08)" }}
+            <div style={{ display: "flex", flexDirection: "column", background: "var(--lt-060d1a, #060D1A)", border: "1px solid var(--lt-rgba-255-255-255-0-08, rgba(255,255,255,0.08))" }}
                 className="h-[100dvh] md:h-[85vh] md:max-h-[700px] md:rounded-2xl overflow-hidden">
 
                 {/* Header */}
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 24px", borderBottom: "1px solid rgba(255,255,255,0.07)", flexShrink: 0 }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 24px", borderBottom: "1px solid var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))", flexShrink: 0 }}>
                     <div style={{ minWidth: 0 }}>
-                        <p style={{ color: "#F1F5F9", fontWeight: 700, fontSize: 16, margin: 0 }} className="truncate">{deckTitle}</p>
+                        <p style={{ color: "var(--lt-f1f5f9, #F1F5F9)", fontWeight: 700, fontSize: 16, margin: 0 }} className="truncate">{deckTitle}</p>
                         <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 3 }}>
                             <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#4ade80", display: "inline-block" }} className="animate-pulse" />
-                            <p style={{ color: "#4ade80", fontSize: 11, fontWeight: 600, margin: 0 }}>
+                            <p style={{ color: "var(--lt-4ade80, #4ade80)", fontSize: 11, fontWeight: 600, margin: 0 }}>
                                 {language === "es" ? "Modo Aprendizaje" : "Learning Mode"}
                             </p>
                             {session && session.total > 0 && (
-                                <span data-testid="session-progress" style={{ fontSize: 10, fontWeight: 700, color: "#94A3B8" }}>
+                                <span data-testid="session-progress" style={{ fontSize: 10, fontWeight: 700, color: "var(--lt-94a3b8, #94A3B8)" }}>
                                     {session.learned} / {session.total}
                                 </span>
                             )}
                             {card?.is_review && (
-                                <span data-testid="review-badge" style={{ fontSize: 10, fontWeight: 700, color: "#f59e0b", background: "rgba(245,158,11,0.12)", border: "1px solid rgba(245,158,11,0.3)", borderRadius: 999, padding: "1px 8px" }}>
+                                <span data-testid="review-badge" style={{ fontSize: 10, fontWeight: 700, color: "var(--lt-f59e0b, #f59e0b)", background: "rgba(245,158,11,0.12)", border: "1px solid rgba(245,158,11,0.3)", borderRadius: 999, padding: "1px 8px" }}>
                                     {language === "es" ? "Repaso" : "Review"}
                                 </span>
                             )}
@@ -169,7 +169,7 @@ export function FlashcardLearnDialog({ open, onClose, deckId, deckTitle }) {
                     </div>
                     <button
                         onClick={onClose}
-                        style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: 6, cursor: "pointer", color: "#94A3B8", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "all 150ms" }}
+                        style={{ background: "var(--lt-rgba-255-255-255-0-06, rgba(255,255,255,0.06))", border: "1px solid var(--lt-rgba-255-255-255-0-1, rgba(255,255,255,0.1))", borderRadius: 8, padding: 6, cursor: "pointer", color: "var(--lt-94a3b8, #94A3B8)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "all 150ms" }}
                         onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.1)"; e.currentTarget.style.color = "#F1F5F9"; }}
                         onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.06)"; e.currentTarget.style.color = "#94A3B8"; }}
                     >
@@ -184,7 +184,7 @@ export function FlashcardLearnDialog({ open, onClose, deckId, deckTitle }) {
                     {busy && !card && !finished ? (
                         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
                             <div style={{ width: 36, height: 36, borderRadius: "50%", border: "3px solid rgba(99,102,241,0.25)", borderTopColor: "#6366F1" }} className="animate-spin" />
-                            <p style={{ color: "#94A3B8", fontSize: 13, fontStyle: "italic", margin: 0 }}>
+                            <p style={{ color: "var(--lt-94a3b8, #94A3B8)", fontSize: 13, fontStyle: "italic", margin: 0 }}>
                                 {language === "es" ? "Cargando siguiente…" : "Loading next…"}
                             </p>
                         </div>
@@ -193,17 +193,17 @@ export function FlashcardLearnDialog({ open, onClose, deckId, deckTitle }) {
                         /* Error state */
                         <div style={{ textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: 16, maxWidth: 380 }}>
                             <div style={{ width: 56, height: 56, borderRadius: "50%", background: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.25)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                                <ExclamationTriangleIcon style={{ width: 26, height: 26, color: "#f87171" }} />
+                                <ExclamationTriangleIcon style={{ width: 26, height: 26, color: "var(--lt-f87171, #f87171)" }} />
                             </div>
                             <div>
-                                <p style={{ color: "#F1F5F9", fontWeight: 700, fontSize: 16, margin: "0 0 8px" }}>
+                                <p style={{ color: "var(--lt-f1f5f9, #F1F5F9)", fontWeight: 700, fontSize: 16, margin: "0 0 8px" }}>
                                     {language === "es" ? "No se pudieron cargar las tarjetas" : "Could not load cards"}
                                 </p>
                                 <p style={{ color: "#64748B", fontSize: 12, margin: 0, lineHeight: 1.6 }}>{errorMsg}</p>
                             </div>
                             <button
                                 onClick={onClose}
-                                style={{ padding: "10px 24px", borderRadius: 10, background: "transparent", border: "1px solid rgba(99,102,241,0.3)", color: "#818CF8", fontSize: 13, fontWeight: 700, cursor: "pointer" }}
+                                style={{ padding: "10px 24px", borderRadius: 10, background: "transparent", border: "1px solid rgba(99,102,241,0.3)", color: "var(--lt-818cf8, #818CF8)", fontSize: 13, fontWeight: 700, cursor: "pointer" }}
                             >
                                 {language === "es" ? "Cerrar" : "Close"}
                             </button>
@@ -213,10 +213,10 @@ export function FlashcardLearnDialog({ open, onClose, deckId, deckTitle }) {
                         /* Finished state */
                         <div style={{ textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: 20 }}>
                             <div style={{ width: 64, height: 64, borderRadius: "50%", background: "rgba(74,222,128,0.12)", border: "1px solid rgba(74,222,128,0.25)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                                <CheckCircleIcon style={{ width: 32, height: 32, color: "#4ade80" }} />
+                                <CheckCircleIcon style={{ width: 32, height: 32, color: "var(--lt-4ade80, #4ade80)" }} />
                             </div>
                             <div>
-                                <p style={{ color: "#F1F5F9", fontWeight: 800, fontSize: 20, margin: "0 0 6px" }}>
+                                <p style={{ color: "var(--lt-f1f5f9, #F1F5F9)", fontWeight: 800, fontSize: 20, margin: "0 0 6px" }}>
                                     {language === "es" ? "¡Sesión Completada!" : "Session Complete!"}
                                 </p>
                                 <p style={{ color: "#64748B", fontSize: 13, margin: 0 }}>
@@ -226,7 +226,7 @@ export function FlashcardLearnDialog({ open, onClose, deckId, deckTitle }) {
                             <div style={{ display: "flex", gap: 12 }}>
                                 <button
                                     onClick={onClose}
-                                    style={{ padding: "10px 20px", borderRadius: 10, background: "transparent", border: "1px solid rgba(99,102,241,0.3)", color: "#818CF8", fontSize: 13, fontWeight: 700, cursor: "pointer", transition: "all 150ms" }}
+                                    style={{ padding: "10px 20px", borderRadius: 10, background: "transparent", border: "1px solid rgba(99,102,241,0.3)", color: "var(--lt-818cf8, #818CF8)", fontSize: 13, fontWeight: 700, cursor: "pointer", transition: "all 150ms" }}
                                     onMouseEnter={e => { e.currentTarget.style.background = "rgba(99,102,241,0.1)"; }}
                                     onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
                                 >
@@ -257,26 +257,26 @@ export function FlashcardLearnDialog({ open, onClose, deckId, deckTitle }) {
                                 {/* Front */}
                                 <div style={{
                                     position: "absolute", inset: 0,
-                                    background: "#0F172A",
+                                    background: "var(--lt-0f172a, #0F172A)",
                                     border: "1px solid rgba(99,102,241,0.25)",
                                     borderRadius: 20,
                                     display: "flex", flexDirection: "column",
                                     alignItems: "center", justifyContent: "center",
                                     textAlign: "center", padding: "52px 32px 40px",
-                                    boxShadow: "0 24px 64px rgba(0,0,0,0.5), 0 0 0 1px rgba(99,102,241,0.08) inset",
+                                    boxShadow: "0 24px 64px var(--lt-rgba-0-0-0-0-5, rgba(0,0,0,0.5)), 0 0 0 1px rgba(99,102,241,0.08) inset",
                                 }} className="backface-hidden">
                                     <div style={{ position: "absolute", top: 16, left: 20, display: "flex", alignItems: "center", gap: 6, padding: "4px 12px", borderRadius: 20, background: "rgba(99,102,241,0.12)", border: "1px solid rgba(99,102,241,0.22)" }}>
                                         <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#818CF8", display: "inline-block" }} className="animate-pulse" />
-                                        <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", color: "#818CF8", textTransform: "uppercase" }}>
+                                        <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", color: "var(--lt-818cf8, #818CF8)", textTransform: "uppercase" }}>
                                             {t("global.actions.front") || "FRONT"}
                                         </span>
                                     </div>
 
-                                    <p style={{ fontSize: "clamp(17px, 3vw, 26px)", fontWeight: 700, color: "#F1F5F9", lineHeight: 1.45, wordBreak: "break-word", overflowY: "auto", maxHeight: "100%", margin: 0 }}>
+                                    <p style={{ fontSize: "clamp(17px, 3vw, 26px)", fontWeight: 700, color: "var(--lt-f1f5f9, #F1F5F9)", lineHeight: 1.45, wordBreak: "break-word", overflowY: "auto", maxHeight: "100%", margin: 0 }}>
                                         {card.front || card.question}
                                     </p>
 
-                                    <div style={{ position: "absolute", bottom: 16, display: "flex", alignItems: "center", gap: 6, color: "#334155" }}>
+                                    <div style={{ position: "absolute", bottom: 16, display: "flex", alignItems: "center", gap: 6, color: "var(--lt-334155, #334155)" }}>
                                         <ArrowPathIcon style={{ width: 12, height: 12 }} />
                                         <span style={{ fontSize: 10, fontWeight: 500 }}>
                                             {language === "es" ? "Clic para girar" : "Click to flip"}
@@ -287,16 +287,16 @@ export function FlashcardLearnDialog({ open, onClose, deckId, deckTitle }) {
                                 {/* Back */}
                                 <div style={{
                                     position: "absolute", inset: 0,
-                                    background: "linear-gradient(135deg, #0a1628 0%, #0d1a35 100%)",
+                                    background: "var(--lt-card-back, linear-gradient(135deg, #0a1628 0%, #0d1a35 100%))",
                                     border: "1px solid rgba(74,222,128,0.22)",
                                     borderRadius: 20,
                                     display: "flex", flexDirection: "column",
                                     overflow: "hidden",
-                                    boxShadow: "0 24px 64px rgba(0,0,0,0.5), 0 0 0 1px rgba(74,222,128,0.06) inset",
+                                    boxShadow: "0 24px 64px var(--lt-rgba-0-0-0-0-5, rgba(0,0,0,0.5)), 0 0 0 1px rgba(74,222,128,0.06) inset",
                                 }} className="backface-hidden rotate-y-180">
                                     <div style={{ position: "absolute", top: 16, left: 20, zIndex: 1, display: "flex", alignItems: "center", gap: 6, padding: "4px 12px", borderRadius: 20, background: "rgba(74,222,128,0.1)", border: "1px solid rgba(74,222,128,0.22)" }}>
                                         <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#4ade80", display: "inline-block" }} />
-                                        <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", color: "#4ade80", textTransform: "uppercase" }}>
+                                        <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", color: "var(--lt-4ade80, #4ade80)", textTransform: "uppercase" }}>
                                             {t("global.actions.back") || "BACK"}
                                         </span>
                                     </div>
@@ -308,24 +308,24 @@ export function FlashcardLearnDialog({ open, onClose, deckId, deckTitle }) {
                                             </div>
                                             {card.back && (
                                                 <div style={{ flexShrink: 0, padding: "12px 32px 20px", textAlign: "center", borderTop: "1px solid rgba(74,222,128,0.1)" }}>
-                                                    <p style={{ fontSize: 16, fontWeight: 600, color: "#F1F5F9", lineHeight: 1.4, wordBreak: "break-word", margin: 0 }}>{card.back}</p>
+                                                    <p style={{ fontSize: 16, fontWeight: 600, color: "var(--lt-f1f5f9, #F1F5F9)", lineHeight: 1.4, wordBreak: "break-word", margin: 0 }}>{card.back}</p>
                                                 </div>
                                             )}
                                         </div>
                                     ) : (
                                         <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "52px 32px 24px", textAlign: "center" }}>
-                                            <p style={{ fontSize: "clamp(15px, 2.5vw, 22px)", fontWeight: 600, color: "#F1F5F9", lineHeight: 1.5, wordBreak: "break-word", overflowY: "auto", maxHeight: "55%", margin: "0 0 16px" }}>
+                                            <p style={{ fontSize: "clamp(15px, 2.5vw, 22px)", fontWeight: 600, color: "var(--lt-f1f5f9, #F1F5F9)", lineHeight: 1.5, wordBreak: "break-word", overflowY: "auto", maxHeight: "55%", margin: "0 0 16px" }}>
                                                 {card.back || card.answer}
                                             </p>
                                             {card.explanation && (
                                                 <div style={{ padding: "12px 16px", background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)", borderRadius: 12, width: "100%", overflowY: "auto", maxHeight: 100 }}>
                                                     <div style={{ display: "flex", alignItems: "center", gap: 6, justifyContent: "center", marginBottom: 6 }}>
-                                                        <LightBulbIcon style={{ width: 12, height: 12, color: "#f59e0b" }} />
-                                                        <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.08em", color: "#f59e0b", textTransform: "uppercase" }}>
+                                                        <LightBulbIcon style={{ width: 12, height: 12, color: "var(--lt-f59e0b, #f59e0b)" }} />
+                                                        <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.08em", color: "var(--lt-f59e0b, #f59e0b)", textTransform: "uppercase" }}>
                                                             {t("global.actions.explanation") || "Explanation"}
                                                         </span>
                                                     </div>
-                                                    <p style={{ fontSize: 11, color: "#CBD5E1", lineHeight: 1.6, margin: 0 }}>{card.explanation}</p>
+                                                    <p style={{ fontSize: 11, color: "var(--lt-cbd5e1, #CBD5E1)", lineHeight: 1.6, margin: 0 }}>{card.explanation}</p>
                                                 </div>
                                             )}
                                         </div>
@@ -348,7 +348,7 @@ export function FlashcardLearnDialog({ open, onClose, deckId, deckTitle }) {
                                         <button
                                             onClick={e => { e.stopPropagation(); handleSkip(); }}
                                             disabled={busy}
-                                            style={{ padding: "10px 18px", borderRadius: 30, background: "transparent", border: "1px solid rgba(148,163,184,0.25)", color: "#94A3B8", fontSize: 13, fontWeight: 600, cursor: busy ? "default" : "pointer", opacity: busy ? 0.5 : 1 }}
+                                            style={{ padding: "10px 18px", borderRadius: 30, background: "transparent", border: "1px solid rgba(148,163,184,0.25)", color: "var(--lt-94a3b8, #94A3B8)", fontSize: 13, fontWeight: 600, cursor: busy ? "default" : "pointer", opacity: busy ? 0.5 : 1 }}
                                         >
                                             {language === "es" ? "Saltar" : "Skip"}
                                         </button>

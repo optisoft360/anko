@@ -68,7 +68,7 @@ export function Sidenav({ routes }) {
 
       <aside
         style={{ background: "var(--sidebar-bg)", borderRight: "1px solid var(--sidebar-border)", width: "var(--sidebar-w)" }}
-        className={`fixed inset-y-0 left-0 z-[10000] flex flex-col transition-transform duration-200
+        className={`fixed inset-y-0 left-0 z-[10000] md:z-40 flex flex-col transition-transform duration-200
           ${openSidenav ? "translate-x-0" : "-translate-x-full"}
           md:translate-x-0`}
       >

@@ -68,11 +68,11 @@ export function CompanyCertifications() {
                     <td style={{ padding: "12px 16px" }}><StatusBadge status={c.status} /></td>
                     <td style={{ padding: "12px 16px", color: "var(--text-tertiary)", fontSize: 11 }}>{c.issued_at ? formatDate(c.issued_at, language) : "—"}</td>
                     <td style={{ padding: "12px 16px", color: "var(--text-tertiary)", fontSize: 11 }}>{c.expires_at ? formatDate(c.expires_at, language) : t("enterprise.certifications.myCertifications.noExpiry")}</td>
-                    <td style={{ padding: "12px 16px", fontWeight: 700, color: "#818CF8" }}>{c.score != null ? `${c.score}%` : "—"}</td>
+                    <td style={{ padding: "12px 16px", fontWeight: 700, color: "var(--lt-818cf8, #818CF8)" }}>{c.score != null ? `${c.score}%` : "—"}</td>
                     <td style={{ padding: "12px 16px" }}>
                       <div className="flex gap-1">
-                        <button style={{ ...btn, color: "#818CF8" }}>{t("enterprise.certifications.myCertifications.view")}</button>
-                        {c.status === "active" && <button style={{ ...btn, color: "#f87171" }}>{t("enterprise.certifications.companyCertifications.revoke")}</button>}
+                        <button style={{ ...btn, color: "var(--lt-818cf8, #818CF8)" }}>{t("enterprise.certifications.myCertifications.view")}</button>
+                        {c.status === "active" && <button style={{ ...btn, color: "var(--lt-f87171, #f87171)" }}>{t("enterprise.certifications.companyCertifications.revoke")}</button>}
                       </div>
                     </td>
                   </tr>

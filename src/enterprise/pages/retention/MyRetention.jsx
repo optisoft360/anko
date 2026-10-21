@@ -32,7 +32,7 @@ export function MyRetention() {
     xaxis: { categories: snapshots.map((s) => s.created_at ? new Date(s.created_at).toLocaleDateString() : ""), labels: { style: { fontSize: "10px", colors: "#64748B" } } },
     yaxis: { min: 0, max: 100, labels: { formatter: (v) => `${v}%`, style: { colors: "#64748B" } } },
     dataLabels: { enabled: false },
-    grid: { borderColor: "rgba(255,255,255,0.07)" },
+    grid: { borderColor: "var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))" },
     tooltip: { theme: "dark", y: { formatter: (v) => `${v}%` } },
   };
 
@@ -66,7 +66,7 @@ export function MyRetention() {
       <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border)", borderRadius: 12, padding: 18 }} className="flex items-center justify-between">
         <div>
           <p style={{ fontSize: 11, fontWeight: 600, color: "var(--text-tertiary)" }}>{t("enterprise.retention.myRetention.openGaps")}</p>
-          <div style={{ fontSize: 28, fontWeight: 800, color: (data.open_gaps ?? 0) > 0 ? "#f87171" : "#4ade80" }}>
+          <div style={{ fontSize: 28, fontWeight: 800, color: (data.open_gaps ?? 0) > 0 ? "var(--lt-f87171, #f87171)" : "var(--lt-4ade80, #4ade80)" }}>
             {data.open_gaps ?? 0}
           </div>
         </div>

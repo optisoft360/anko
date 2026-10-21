@@ -127,10 +127,10 @@ function DotMenu({ items }) {
         <EllipsisHorizontalIcon style={{ width: 16, height: 16 }} />
       </button>
       {open && (
-        <div style={{ position: "absolute", right: 0, top: "100%", zIndex: 40, background: "var(--bg-surface)", border: "1px solid var(--border)", borderRadius: 7, minWidth: 160, boxShadow: "0 8px 24px rgba(0,0,0,0.4)", overflow: "hidden" }}>
+        <div style={{ position: "absolute", right: 0, top: "100%", zIndex: 40, background: "var(--bg-surface)", border: "1px solid var(--border)", borderRadius: 7, minWidth: 160, boxShadow: "0 8px 24px var(--lt-rgba-0-0-0-0-4, rgba(0,0,0,0.4))", overflow: "hidden" }}>
           {items.map((item, i) => (
             <button key={i} onClick={() => { item.action(); setOpen(false); }}
-              style={{ width: "100%", textAlign: "left", padding: "8px 14px", fontSize: 12.5, color: item.danger ? "#f87171" : "var(--text-primary)", cursor: "pointer", transition: "background 150ms" }}
+              style={{ width: "100%", textAlign: "left", padding: "8px 14px", fontSize: 12.5, color: item.danger ? "var(--lt-f87171, #f87171)" : "var(--text-primary)", cursor: "pointer", transition: "background 150ms" }}
               onMouseEnter={(e) => { e.currentTarget.style.background = item.danger ? "rgba(239,68,68,0.08)" : "var(--bg-elevated)"; }}
               onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}>
               {item.label}
@@ -146,9 +146,9 @@ function DotMenu({ items }) {
 
 function Modal({ title, onClose, children, width = 420 }) {
   return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.65)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}
+    <div style={{ position: "fixed", inset: 0, background: "var(--lt-rgba-0-0-0-0-65, rgba(0,0,0,0.65))", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}
       onClick={onClose}>
-      <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border)", borderRadius: 10, width: "100%", maxWidth: width, padding: 22, boxShadow: "0 20px 60px rgba(0,0,0,0.5)" }}
+      <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border)", borderRadius: 10, width: "100%", maxWidth: width, padding: 22, boxShadow: "0 20px 60px var(--lt-rgba-0-0-0-0-5, rgba(0,0,0,0.5))" }}
         onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-4">
           <p style={{ color: "var(--text-primary)", fontWeight: 700, fontSize: 14 }}>{title}</p>
@@ -220,11 +220,11 @@ function InfoTab({ company, companyId }) {
         </FieldSelect>
       </div>
       <FieldTextarea label={t("enterprise.settings.company.info.descriptionLabel")} value={form.description} onChange={set("description")} rows={3} />
-      {error && <p style={{ color: "#f87171", fontSize: 12 }}>{error}</p>}
+      {error && <p style={{ color: "var(--lt-f87171, #f87171)", fontSize: 12 }}>{error}</p>}
       {success && (
         <div className="flex items-center gap-2">
-          <CheckCircleIcon style={{ width: 14, height: 14, color: "#4ade80" }} />
-          <p style={{ color: "#4ade80", fontSize: 12, fontWeight: 600 }}>{t("enterprise.settings.company.info.saved")}</p>
+          <CheckCircleIcon style={{ width: 14, height: 14, color: "var(--lt-4ade80, #4ade80)" }} />
+          <p style={{ color: "var(--lt-4ade80, #4ade80)", fontSize: 12, fontWeight: 600 }}>{t("enterprise.settings.company.info.saved")}</p>
         </div>
       )}
       <button type="submit" disabled={saving} className="ank-btn-accent text-xs" style={{ opacity: saving ? 0.7 : 1 }}>
@@ -272,7 +272,7 @@ function AddMemberModal({ companyId, availableRoles, onAdded, onClose }) {
         <FieldSelect label={t("enterprise.settings.company.members.addModal.stageLabel")} value={form.employee_stage} onChange={set("employee_stage")} required>
           {STAGES.map((s) => <option key={s} value={s}>{STAGE_LABELS[s]}</option>)}
         </FieldSelect>
-        {error && <p style={{ color: "#f87171", fontSize: 12 }}>{error}</p>}
+        {error && <p style={{ color: "var(--lt-f87171, #f87171)", fontSize: 12 }}>{error}</p>}
         <div className="flex justify-end gap-2 pt-1">
           <button type="button" onClick={onClose} className="ank-btn-ghost text-xs">{t("enterprise.compliance.programs.cancel")}</button>
           <button type="submit" disabled={saving} className="ank-btn-accent text-xs" style={{ opacity: saving ? 0.7 : 1 }}>
@@ -381,7 +381,7 @@ function MembersTab({ companyId }) {
         <div style={{
           background: resendMsg.type === "ok" ? "rgba(74,222,128,0.1)" : "rgba(248,113,113,0.1)",
           border: `1px solid ${resendMsg.type === "ok" ? "rgba(74,222,128,0.3)" : "rgba(248,113,113,0.3)"}`,
-          color: resendMsg.type === "ok" ? "#4ade80" : "#f87171",
+          color: resendMsg.type === "ok" ? "var(--lt-4ade80, #4ade80)" : "var(--lt-f87171, #f87171)",
           borderRadius: 7, padding: "8px 12px", fontSize: 12.5,
         }}>
           {resendMsg.text}
@@ -498,7 +498,7 @@ function BUModal({ companyId, bu, members, onSaved, onClose }) {
             <option key={m.user} value={m.user}>{m.full_name || m.username} ({m.role})</option>
           ))}
         </FieldSelect>
-        {error && <p style={{ color: "#f87171", fontSize: 12 }}>{error}</p>}
+        {error && <p style={{ color: "var(--lt-f87171, #f87171)", fontSize: 12 }}>{error}</p>}
         <div className="flex justify-end gap-2 pt-1">
           <button type="button" onClick={onClose} className="ank-btn-ghost text-xs">{t("enterprise.compliance.programs.cancel")}</button>
           <button type="submit" disabled={saving} className="ank-btn-accent text-xs">
@@ -637,7 +637,7 @@ function TeamModal({ companyId, team, members, units, onSaved, onClose }) {
           ))}
         </FieldSelect>
         <FieldTextarea label={t("enterprise.settings.company.info.descriptionLabel")} value={form.description} onChange={(e) => set("description")(e.target.value)} />
-        {error && <p style={{ color: "#f87171", fontSize: 12 }}>{error}</p>}
+        {error && <p style={{ color: "var(--lt-f87171, #f87171)", fontSize: 12 }}>{error}</p>}
         <div className="flex justify-end gap-2 pt-1">
           <button type="button" onClick={onClose} className="ank-btn-ghost text-xs">{t("enterprise.compliance.programs.cancel")}</button>
           <button type="submit" disabled={saving} className="ank-btn-accent text-xs">
@@ -708,7 +708,7 @@ function AddTeamMemberModal({ team, companyMembers, currentMemberIds, onAdded, o
             <option value="manager">Manager</option>
           </FieldSelect>
         )}
-        {error && <p style={{ color: "#f87171", fontSize: 12 }}>{error}</p>}
+        {error && <p style={{ color: "var(--lt-f87171, #f87171)", fontSize: 12 }}>{error}</p>}
         <div className="flex justify-end gap-2 pt-1">
           <button onClick={onClose} className="ank-btn-ghost text-xs">{t("enterprise.compliance.programs.cancel")}</button>
           <button onClick={handleAdd} disabled={!selectedUser || saving} className="ank-btn-accent text-xs" style={{ opacity: !selectedUser || saving ? 0.6 : 1 }}>
@@ -774,13 +774,13 @@ function TeamMembersPanel({ team, companyMembers, onClose }) {
                   {(m.full_name || m.username || "?").charAt(0).toUpperCase()}
                 </div>
                 <p style={{ fontSize: 12, fontWeight: 500, color: "var(--text-primary)" }}>{m.full_name || m.username}</p>
-                <span style={{ fontSize: 9, fontWeight: 700, padding: "1px 5px", borderRadius: 3, textTransform: "capitalize", background: m.role === "manager" ? "rgba(59,130,246,0.12)" : "var(--bg-elevated)", color: m.role === "manager" ? "#60a5fa" : "var(--text-tertiary)" }}>
+                <span style={{ fontSize: 9, fontWeight: 700, padding: "1px 5px", borderRadius: 3, textTransform: "capitalize", background: m.role === "manager" ? "rgba(59,130,246,0.12)" : "var(--bg-elevated)", color: m.role === "manager" ? "var(--lt-60a5fa, #60a5fa)" : "var(--text-tertiary)" }}>
                   {m.role}
                 </span>
               </div>
               <button onClick={() => handleRemove(m.user)}
                 style={{ color: "var(--text-tertiary)", padding: 3, borderRadius: 4, flexShrink: 0, cursor: "pointer", transition: "all 150ms" }}
-                onMouseEnter={(e) => { e.currentTarget.style.color = "#f87171"; e.currentTarget.style.background = "rgba(239,68,68,0.1)"; }}
+                onMouseEnter={(e) => { e.currentTarget.style.color = "var(--lt-f87171, #f87171)"; e.currentTarget.style.background = "rgba(239,68,68,0.1)"; }}
                 onMouseLeave={(e) => { e.currentTarget.style.color = "var(--text-tertiary)"; e.currentTarget.style.background = "transparent"; }}>
                 <XMarkIcon style={{ width: 12, height: 12 }} />
               </button>
@@ -866,7 +866,7 @@ function TeamsTab({ companyId }) {
               <div style={{ padding: "12px 16px" }} className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3 min-w-0">
                   <div style={{ background: "rgba(59,130,246,0.1)", borderRadius: 6, padding: 7, flexShrink: 0 }}>
-                    <UsersIcon style={{ width: 14, height: 14, color: "#60a5fa" }} />
+                    <UsersIcon style={{ width: 14, height: 14, color: "var(--lt-60a5fa, #60a5fa)" }} />
                   </div>
                   <div className="min-w-0">
                     <p style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)" }}>{team.name}</p>

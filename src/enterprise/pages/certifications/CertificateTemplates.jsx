@@ -10,8 +10,8 @@ import { EmptyState } from "../../components/EmptyState";
 import { TableSkeleton } from "../../components/LoadingSkeleton";
 
 const INPUT = {
-  width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)",
-  borderRadius: 8, padding: "9px 12px", fontSize: 13, color: "#F1F5F9", outline: "none", boxSizing: "border-box",
+  width: "100%", background: "var(--lt-rgba-255-255-255-0-05, rgba(255,255,255,0.05))", border: "1px solid var(--lt-rgba-255-255-255-0-12, rgba(255,255,255,0.12))",
+  borderRadius: 8, padding: "9px 12px", fontSize: 13, color: "var(--lt-f1f5f9, #F1F5F9)", outline: "none", boxSizing: "border-box",
 };
 
 function IssueCertModal({ template, onClose, onIssued }) {
@@ -51,8 +51,8 @@ function IssueCertModal({ template, onClose, onIssued }) {
   };
 
   return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }} onClick={onClose}>
-      <div style={{ background: "#0F172A", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 16, width: "100%", maxWidth: 420, boxShadow: "0 20px 60px rgba(0,0,0,0.7)" }} onClick={(e) => e.stopPropagation()}>
+    <div style={{ position: "fixed", inset: 0, background: "var(--lt-rgba-0-0-0-0-6, rgba(0,0,0,0.6))", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }} onClick={onClose}>
+      <div style={{ background: "var(--lt-0f172a, #0F172A)", border: "1px solid var(--lt-rgba-255-255-255-0-1, rgba(255,255,255,0.1))", borderRadius: 16, width: "100%", maxWidth: 420, boxShadow: "0 20px 60px var(--lt-rgba-0-0-0-0-7, rgba(0,0,0,0.7))" }} onClick={(e) => e.stopPropagation()}>
         <div style={{ height: 2, background: "linear-gradient(90deg, #6366F1, #818CF8, #A78BFA)" }} />
         <div style={{ padding: "18px 20px" }} className="space-y-4">
           <div className="flex items-center justify-between">
@@ -77,7 +77,7 @@ function IssueCertModal({ template, onClose, onIssued }) {
                       <span style={{ fontSize: 12, fontWeight: sel ? 700 : 500, color: sel ? "#C7D2FE" : "var(--text-secondary)" }}>
                         {m.full_name || m.username}
                       </span>
-                      {sel && <CheckBadgeIcon style={{ width: 14, height: 14, color: "#818CF8" }} />}
+                      {sel && <CheckBadgeIcon style={{ width: 14, height: 14, color: "var(--lt-818cf8, #818CF8)" }} />}
                     </button>
                   );
                 })}
@@ -95,8 +95,8 @@ function IssueCertModal({ template, onClose, onIssued }) {
             </div>
           )}
 
-          {error && <p style={{ fontSize: 12, color: "#f87171" }}>{error}</p>}
-          {success && <p style={{ fontSize: 12, color: "#4ade80", fontWeight: 700 }}>{success}</p>}
+          {error && <p style={{ fontSize: 12, color: "var(--lt-f87171, #f87171)" }}>{error}</p>}
+          {success && <p style={{ fontSize: 12, color: "var(--lt-4ade80, #4ade80)", fontWeight: 700 }}>{success}</p>}
 
           <div className="flex justify-end gap-2 pt-1">
             <button type="button" onClick={onClose} className="ank-btn-ghost text-xs">{t("enterprise.compliance.programs.cancel")}</button>
@@ -174,18 +174,18 @@ export function CertificateTemplates() {
                     <td style={{ padding: "12px 16px", color: "var(--text-secondary)" }}>{tpl.validity_days === 0 ? t("enterprise.certifications.myCertifications.noExpiry") : `${tpl.validity_days}d`}</td>
                     <td style={{ padding: "12px 16px", color: "var(--text-secondary)" }}>{tpl.requires_score ? `${tpl.minimum_score}%` : "—"}</td>
                     <td style={{ padding: "12px 16px" }}>
-                      <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 9px", borderRadius: 20, background: tpl.is_active ? "rgba(74,222,128,0.12)" : "rgba(255,255,255,0.06)", color: tpl.is_active ? "#4ade80" : "#8B8B9C" }}>
+                      <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 9px", borderRadius: 20, background: tpl.is_active ? "rgba(74,222,128,0.12)" : "rgba(255,255,255,0.06)", color: tpl.is_active ? "var(--lt-4ade80, #4ade80)" : "#8B8B9C" }}>
                         {tpl.is_active ? t("enterprise.certifications.templates.active") : t("enterprise.certifications.templates.inactive")}
                       </span>
                     </td>
                     <td style={{ padding: "12px 16px", color: "var(--text-secondary)" }}>{tpl.issued_count ?? 0}</td>
                     <td style={{ padding: "12px 16px" }}>
                       <div className="flex gap-1 flex-wrap">
-                        <button style={{ ...btn, color: "#818CF8" }} onClick={() => navigate(`/enterprise/certifications/templates/${tpl.id}/edit`)}>{t("enterprise.certifications.templates.edit")}</button>
-                        <button style={{ ...btn, color: tpl.is_active ? "var(--text-tertiary)" : "#4ade80" }} onClick={() => toggle(tpl)}>
+                        <button style={{ ...btn, color: "var(--lt-818cf8, #818CF8)" }} onClick={() => navigate(`/enterprise/certifications/templates/${tpl.id}/edit`)}>{t("enterprise.certifications.templates.edit")}</button>
+                        <button style={{ ...btn, color: tpl.is_active ? "var(--text-tertiary)" : "var(--lt-4ade80, #4ade80)" }} onClick={() => toggle(tpl)}>
                           {tpl.is_active ? t("enterprise.certifications.templates.deactivate") : t("enterprise.certifications.templates.activate")}
                         </button>
-                        <button style={{ ...btn, color: "#818CF8" }} onClick={() => setIssuingTemplate(tpl)}>{t("enterprise.certifications.templates.issue")}</button>
+                        <button style={{ ...btn, color: "var(--lt-818cf8, #818CF8)" }} onClick={() => setIssuingTemplate(tpl)}>{t("enterprise.certifications.templates.issue")}</button>
                       </div>
                     </td>
                   </tr>

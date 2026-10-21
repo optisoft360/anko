@@ -28,7 +28,7 @@ const STEP2_FIELDS = new Set(Object.keys(NUMBER_FIELDS).concat(["question_format
 const CONTENT_LANGUAGES = ["es", "en", "pt", "fr", "de", "it", "ca", "nl"];
 
 function FieldError({ message }) {
-  return message ? <p role="alert" style={{ color: "#f87171", fontSize: 11, marginTop: 4 }}>{message}</p> : null;
+  return message ? <p role="alert" style={{ color: "var(--lt-f87171, #f87171)", fontSize: 11, marginTop: 4 }}>{message}</p> : null;
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -68,9 +68,9 @@ function useProcessTypes() {
 function useDifficulties() {
   const { t } = useLanguage();
   return [
-    { value: "easy", label: t("enterprise.knowledge.sources.difficulty.easy"), color: "#4ade80", bg: "rgba(74,222,128,0.1)" },
-    { value: "medium", label: t("enterprise.knowledge.sources.difficulty.medium"), color: "#f59e0b", bg: "rgba(245,158,11,0.1)" },
-    { value: "hard", label: t("enterprise.knowledge.sources.difficulty.hard"), color: "#f87171", bg: "rgba(239,68,68,0.1)" },
+    { value: "easy", label: t("enterprise.knowledge.sources.difficulty.easy"), color: "var(--lt-4ade80, #4ade80)", bg: "rgba(74,222,128,0.1)" },
+    { value: "medium", label: t("enterprise.knowledge.sources.difficulty.medium"), color: "var(--lt-f59e0b, #f59e0b)", bg: "rgba(245,158,11,0.1)" },
+    { value: "hard", label: t("enterprise.knowledge.sources.difficulty.hard"), color: "var(--lt-f87171, #f87171)", bg: "rgba(239,68,68,0.1)" },
   ];
 }
 
@@ -148,7 +148,7 @@ function Step1({ form, onChange, onNext, onCancel }) {
           onFocus={(e) => (e.target.style.borderColor = "var(--accent)")}
           onBlur={(e) => (e.target.style.borderColor = "var(--border)")}
         />
-        {error && <p style={{ color: "#f87171", fontSize: 11, marginTop: 4 }}>{error}</p>}
+        {error && <p style={{ color: "var(--lt-f87171, #f87171)", fontSize: 11, marginTop: 4 }}>{error}</p>}
       </div>
 
       {/* Descripción */}
@@ -250,7 +250,7 @@ function Step2({ form, onChange, onBack, onNext, saving, error, fieldErrors = {}
                 flex: 1, padding: "8px 12px", borderRadius: 6, cursor: "pointer",
                 background: form.difficulty === d.value ? d.bg : "var(--bg-elevated)",
                 border: `1px solid ${form.difficulty === d.value ? d.color : "var(--border)"}`,
-                color: form.difficulty === d.value ? d.color : "var(--text-secondary)",
+                color: form.difficulty === d.value ? d.color: "var(--text-secondary)",
                 fontSize: 13, fontWeight: 600, transition: "all 150ms",
               }}
             >
@@ -357,7 +357,7 @@ function Step2({ form, onChange, onBack, onNext, saving, error, fieldErrors = {}
 
       {error && (
         <div style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 6, padding: "10px 14px" }}>
-          <p style={{ color: "#f87171", fontSize: 12 }}>{error}</p>
+          <p style={{ color: "var(--lt-f87171, #f87171)", fontSize: 12 }}>{error}</p>
         </div>
       )}
 
@@ -449,8 +449,8 @@ function Step3({ ksId, companyId, onFinish }) {
         <div className="space-y-1.5">
           {uploadedDocs.map((doc) => (
             <div key={doc.id} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 10px", background: "rgba(74,222,128,0.08)", border: "1px solid rgba(74,222,128,0.2)", borderRadius: 6 }}>
-              <CheckCircleOutline style={{ width: 14, height: 14, color: "#4ade80", flexShrink: 0 }} />
-              <span style={{ color: "#4ade80", fontSize: 12, fontWeight: 600 }}>{doc.filename}</span>
+              <CheckCircleOutline style={{ width: 14, height: 14, color: "var(--lt-4ade80, #4ade80)", flexShrink: 0 }} />
+              <span style={{ color: "var(--lt-4ade80, #4ade80)", fontSize: 12, fontWeight: 600 }}>{doc.filename}</span>
               <span style={{ color: "var(--text-tertiary)", fontSize: 11, marginLeft: "auto" }}>{doc.type?.toUpperCase()}</span>
             </div>
           ))}
@@ -626,7 +626,7 @@ export function KnowledgeSourceNew() {
         </p>
         {createdKsId && (
           <p style={{ color: "var(--text-tertiary)", fontSize: 11 }}>
-            {t("enterprise.knowledge.sourceNew.processId")} <span style={{ color: "#4ade80", fontWeight: 600 }}>{createdKsId}</span>
+            {t("enterprise.knowledge.sourceNew.processId")} <span style={{ color: "var(--lt-4ade80, #4ade80)", fontWeight: 600 }}>{createdKsId}</span>
           </p>
         )}
       </div>

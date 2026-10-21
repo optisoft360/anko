@@ -305,7 +305,7 @@ export function KnowledgeGraph() {
                 <div>
                   <div className="flex justify-between mb-1">
                     <span style={{ fontSize: 11, color: "var(--text-tertiary)" }}>{t("enterprise.knowledge.graph.importance")}</span>
-                    <span style={{ fontSize: 11, fontWeight: 700, color: "#818CF8" }}>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: "var(--lt-818cf8, #818CF8)" }}>
                       {Math.round(importanceOf(selected) * 100)}%
                     </span>
                   </div>
@@ -351,7 +351,7 @@ export function KnowledgeGraph() {
           )}
 
           {!loading && error && (
-            <div role="alert" style={{ padding: 16, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: 12, color: "#f87171", fontSize: 13, marginBottom: 12 }}>{error}</div>
+            <div role="alert" style={{ padding: 16, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: 12, color: "var(--lt-f87171, #f87171)", fontSize: 13, marginBottom: 12 }}>{error}</div>
           )}
 
           {!loading && !error && !visibleNodes.length && (

@@ -31,7 +31,7 @@ export function RetentionScoreGauge({ score = 0, label = "Retention Score", size
             offsetY: 8,
             fontSize: size === "lg" ? "28px" : "22px",
             fontWeight: 800,
-            color: "#F1F5F9",
+            color: "var(--lt-f1f5f9, #F1F5F9)",
             formatter: (v) => `${Math.round(v)}`,
           },
         },

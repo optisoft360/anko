@@ -93,29 +93,29 @@ function ConfirmDeleteDialog({ mod, onConfirm, onCancel, deleting }) {
   return (
     <div style={{
       position: "fixed", inset: 0, zIndex: 9999,
-      background: "rgba(0,0,0,0.7)", backdropFilter: "blur(5px)",
+      background: "var(--lt-rgba-0-0-0-0-7, rgba(0,0,0,0.7))", backdropFilter: "blur(5px)",
       display: "flex", alignItems: "center", justifyContent: "center", padding: 20,
     }}>
       <div style={{
-        background: "#0F172A", border: "1px solid rgba(239,68,68,0.25)",
+        background: "var(--lt-0f172a, #0F172A)", border: "1px solid rgba(239,68,68,0.25)",
         borderRadius: 16, padding: "28px 24px", maxWidth: 440, width: "100%",
-        boxShadow: "0 25px 60px rgba(0,0,0,0.7)",
+        boxShadow: "0 25px 60px var(--lt-rgba-0-0-0-0-7, rgba(0,0,0,0.7))",
         animation: "fadeIn 0.15s ease",
       }}>
         {/* Icon */}
         <div style={{ width: 52, height: 52, borderRadius: "50%", background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.25)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 18 }}>
-          <ExclamationTriangleIcon style={{ width: 24, height: 24, color: "#EF4444" }} />
+          <ExclamationTriangleIcon style={{ width: 24, height: 24, color: "var(--lt-ef4444, #EF4444)" }} />
         </div>
         {/* Title */}
-        <p style={{ fontSize: 17, fontWeight: 800, color: "#F1F5F9", marginBottom: 8 }}>
+        <p style={{ fontSize: 17, fontWeight: 800, color: "var(--lt-f1f5f9, #F1F5F9)", marginBottom: 8 }}>
           {t("enterprise.knowledge.sources.deleteDialog.title")}
         </p>
         {/* Process name */}
-        <p style={{ fontSize: 13, fontWeight: 700, color: "#F1F5F9", marginBottom: 10, padding: "9px 13px", background: "rgba(255,255,255,0.05)", borderRadius: 8, border: "1px solid rgba(255,255,255,0.08)" }}>
+        <p style={{ fontSize: 13, fontWeight: 700, color: "var(--lt-f1f5f9, #F1F5F9)", marginBottom: 10, padding: "9px 13px", background: "var(--lt-rgba-255-255-255-0-05, rgba(255,255,255,0.05))", borderRadius: 8, border: "1px solid var(--lt-rgba-255-255-255-0-08, rgba(255,255,255,0.08))" }}>
           {mod.title}
         </p>
         {/* Warning */}
-        <p style={{ fontSize: 12, color: "#94A3B8", lineHeight: 1.65, marginBottom: 6 }}>
+        <p style={{ fontSize: 12, color: "var(--lt-94a3b8, #94A3B8)", lineHeight: 1.65, marginBottom: 6 }}>
           {t("enterprise.knowledge.sources.deleteDialog.willDelete")}
         </p>
         <ul style={{ fontSize: 12, color: "#64748B", lineHeight: 1.8, marginBottom: 22, paddingLeft: 16 }}>
@@ -124,19 +124,19 @@ function ConfirmDeleteDialog({ mod, onConfirm, onCancel, deleting }) {
           <li>{t("enterprise.knowledge.sources.deleteDialog.item3")}</li>
           <li>{t("enterprise.knowledge.sources.deleteDialog.item4")}</li>
         </ul>
-        <p style={{ fontSize: 11, color: "#EF4444", fontWeight: 600, marginBottom: 20 }}>
+        <p style={{ fontSize: 11, color: "var(--lt-ef4444, #EF4444)", fontWeight: 600, marginBottom: 20 }}>
           {t("enterprise.knowledge.sources.deleteDialog.irreversible")}
         </p>
         {/* Actions */}
         <div style={{ display: "flex", gap: 10 }}>
           <button onClick={onCancel} disabled={deleting}
-            style={{ flex: 1, padding: "11px", borderRadius: 10, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#94A3B8", fontWeight: 700, fontSize: 13, cursor: deleting ? "default" : "pointer", opacity: deleting ? 0.5 : 1, transition: "opacity 0.15s" }}>
+            style={{ flex: 1, padding: "11px", borderRadius: 10, background: "var(--lt-rgba-255-255-255-0-05, rgba(255,255,255,0.05))", border: "1px solid var(--lt-rgba-255-255-255-0-1, rgba(255,255,255,0.1))", color: "var(--lt-94a3b8, #94A3B8)", fontWeight: 700, fontSize: 13, cursor: deleting ? "default" : "pointer", opacity: deleting ? 0.5 : 1, transition: "opacity 0.15s" }}>
             {t("enterprise.compliance.programs.cancel")}
           </button>
           <button onClick={onConfirm} disabled={deleting}
             style={{ flex: 1, padding: "11px", borderRadius: 10, background: deleting ? "rgba(239,68,68,0.3)" : "linear-gradient(135deg, #DC2626 0%, #EF4444 100%)", border: "none", color: "#fff", fontWeight: 700, fontSize: 13, cursor: deleting ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 7, transition: "opacity 0.15s" }}>
             {deleting
-              ? <><div style={{ width: 14, height: 14, borderRadius: "50%", border: "2px solid rgba(255,255,255,0.3)", borderTopColor: "#fff" }} className="animate-spin" />{t("enterprise.knowledge.sources.deleteDialog.deleting")}</>
+              ? <><div style={{ width: 14, height: 14, borderRadius: "50%", border: "2px solid var(--lt-rgba-255-255-255-0-3, rgba(255,255,255,0.3))", borderTopColor: "#fff" }} className="animate-spin" />{t("enterprise.knowledge.sources.deleteDialog.deleting")}</>
               : <><TrashIcon style={{ width: 14, height: 14 }} />{t("enterprise.knowledge.sources.deleteDialog.deleteAll")}</>
             }
           </button>
@@ -174,7 +174,7 @@ function ModuleRow({ mod, onDeleteRequest }) {
               <TypePill type={mod.process_type} />
               <DifficultyPill difficulty={mod.difficulty} />
               {mod.is_required && (
-                <span style={{ background: "rgba(239,68,68,0.1)", color: "#f87171", fontSize: 10, fontWeight: 700, padding: "2px 7px", borderRadius: 4 }}>
+                <span style={{ background: "rgba(239,68,68,0.1)", color: "var(--lt-f87171, #f87171)", fontSize: 10, fontWeight: 700, padding: "2px 7px", borderRadius: 4 }}>
                   {t("enterprise.compliance.programs.required")}
                 </span>
               )}
@@ -215,7 +215,7 @@ function ModuleRow({ mod, onDeleteRequest }) {
           <button
             onClick={(e) => { e.stopPropagation(); onDeleteRequest(mod); }}
             style={{ color: "var(--text-tertiary)", padding: 5, borderRadius: 5, transition: "color 150ms, background 150ms", background: "none", border: "none", cursor: "pointer" }}
-            onMouseEnter={(e) => { e.currentTarget.style.color = "#f87171"; e.currentTarget.style.background = "rgba(239,68,68,0.1)"; }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = "var(--lt-f87171, #f87171)"; e.currentTarget.style.background = "rgba(239,68,68,0.1)"; }}
             onMouseLeave={(e) => { e.currentTarget.style.color = "var(--text-tertiary)"; e.currentTarget.style.background = "transparent"; }}
           >
             <TrashIcon style={{ width: 14, height: 14 }} />

@@ -76,7 +76,7 @@ export function TeamRetention() {
                       <td style={{ padding: "12px 16px", fontWeight: 600, color: "var(--text-primary)" }}>
                         {m.name}
                         {Number(m.risk_score ?? 0) > 60 && (
-                          <span style={{ marginLeft: 8, fontSize: 10, fontWeight: 700, color: "#f87171", background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.25)", padding: "1px 8px", borderRadius: 20 }}>{t("enterprise.retention.teamRetention.atRisk")}</span>
+                          <span style={{ marginLeft: 8, fontSize: 10, fontWeight: 700, color: "var(--lt-f87171, #f87171)", background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.25)", padding: "1px 8px", borderRadius: 20 }}>{t("enterprise.retention.teamRetention.atRisk")}</span>
                         )}
                       </td>
                       <td style={{ padding: "12px 16px" }}>

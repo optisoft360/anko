@@ -117,9 +117,9 @@ function NewAssignmentModal({ companyId, onCreated, onClose }) {
   const filteredTeams   = teams.filter((tm)  => !search || tm.name.toLowerCase().includes(search.toLowerCase()));
 
   return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.65)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}
+    <div style={{ position: "fixed", inset: 0, background: "var(--lt-rgba-0-0-0-0-65, rgba(0,0,0,0.65))", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}
       onClick={onClose}>
-      <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border)", borderRadius: 10, width: "100%", maxWidth: 500, padding: 22, boxShadow: "0 20px 60px rgba(0,0,0,0.5)", maxHeight: "90vh", overflowY: "auto" }}
+      <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border)", borderRadius: 10, width: "100%", maxWidth: 500, padding: 22, boxShadow: "0 20px 60px var(--lt-rgba-0-0-0-0-5, rgba(0,0,0,0.5))", maxHeight: "90vh", overflowY: "auto" }}
         onClick={(e) => e.stopPropagation()}>
 
         {/* Header */}
@@ -279,7 +279,7 @@ function NewAssignmentModal({ companyId, onCreated, onClose }) {
                       style={{ width: "100%", textAlign: "left", background: sel ? "var(--bg-accent)" : "var(--bg-elevated)", border: `1px solid ${sel ? "var(--accent)" : "var(--border)"}`, borderRadius: 6, padding: "9px 11px", cursor: "pointer", transition: "all 150ms" }}>
                       <div className="flex items-center gap-2">
                         <div style={{ background: sel ? "var(--accent)" : "rgba(59,130,246,0.12)", borderRadius: 5, padding: 5, flexShrink: 0 }}>
-                          <UserGroupIcon style={{ width: 12, height: 12, color: sel ? "#fff" : "#60a5fa" }} />
+                          <UserGroupIcon style={{ width: 12, height: 12, color: sel ? "#fff" : "var(--lt-60a5fa, #60a5fa)" }} />
                         </div>
                         <div className="flex-1 min-w-0">
                           <p style={{ fontSize: 12.5, fontWeight: 500, color: "var(--text-primary)" }}>{tm.name}</p>
@@ -302,7 +302,7 @@ function NewAssignmentModal({ companyId, onCreated, onClose }) {
                 style={{ background: "var(--bg-elevated)", border: "1px solid var(--border)", borderRadius: 6, padding: "7px 11px", color: "var(--text-primary)", fontSize: 12, outline: "none", colorScheme: "dark" }} />
             </div>
 
-            {error && <p style={{ color: "#f87171", fontSize: 12, marginBottom: 10 }}>{error}</p>}
+            {error && <p style={{ color: "var(--lt-f87171, #f87171)", fontSize: 12, marginBottom: 10 }}>{error}</p>}
 
             <div className="flex justify-end gap-2">
               <button onClick={onClose} className="ank-btn-ghost text-xs">{t("enterprise.learning.assignmentsManager.modal.cancel")}</button>
@@ -361,7 +361,7 @@ function AssignmentRow({ a, onClick }) {
             </div>
           ) : a.team_name || a.team ? (
             <div className="flex items-center gap-1.5">
-              <UserGroupIcon style={{ width: 11, height: 11, color: "#60a5fa" }} />
+              <UserGroupIcon style={{ width: 11, height: 11, color: "var(--lt-60a5fa, #60a5fa)" }} />
               <p style={{ fontSize: 12, color: "var(--text-secondary)" }} className="truncate">{a.team_name || t("enterprise.learning.assignmentsManager.row.team", { id: a.team })}</p>
             </div>
           ) : EMPTY_CELL}
@@ -387,7 +387,7 @@ function AssignmentRow({ a, onClick }) {
         {/* Due date */}
         <div style={{ flex: COLUMN_FLEX[4], minWidth: 0 }}>
           {dueStr ? (
-            <p style={{ fontSize: 11, color: isOverdue ? "#f87171" : "var(--text-tertiary)" }} className="flex items-center gap-1">
+            <p style={{ fontSize: 11, color: isOverdue ? "var(--lt-f87171, #f87171)" : "var(--text-tertiary)" }} className="flex items-center gap-1">
               <ClockIcon style={{ width: 10, height: 10 }} /> {dueStr}
             </p>
           ) : EMPTY_CELL}

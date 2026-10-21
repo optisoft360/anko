@@ -28,14 +28,14 @@ const EMPTY = {
 };
 
 const INPUT = {
-  width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)",
-  borderRadius: 8, padding: "9px 12px", fontSize: 13, color: "#F1F5F9", outline: "none", boxSizing: "border-box",
+  width: "100%", background: "var(--lt-rgba-255-255-255-0-05, rgba(255,255,255,0.05))", border: "1px solid var(--lt-rgba-255-255-255-0-12, rgba(255,255,255,0.12))",
+  borderRadius: 8, padding: "9px 12px", fontSize: 13, color: "var(--lt-f1f5f9, #F1F5F9)", outline: "none", boxSizing: "border-box",
   fontFamily: "inherit",
 };
 const LABEL = { fontSize: 11, fontWeight: 700, color: "var(--text-tertiary)", display: "block", marginBottom: 5 };
 
 function FieldError({ message }) {
-  return message ? <p role="alert" style={{ fontSize: 11, color: "#f87171", marginTop: 4 }}>{message}</p> : null;
+  return message ? <p role="alert" style={{ fontSize: 11, color: "var(--lt-f87171, #f87171)", marginTop: 4 }}>{message}</p> : null;
 }
 
 /** 17: same rules as CertificateTemplateSerializer. Returns { field: message }. */
@@ -153,7 +153,7 @@ function RequirementsSection({ templateId }) {
             <div className="space-y-2">
               {requirements.map((r) => (
                 <div key={r.id} style={{ display: "flex", alignItems: "center", gap: 10, background: "var(--bg-elevated)", border: "1px solid var(--border)", borderRadius: 8, padding: "8px 12px" }}>
-                  <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 20, background: r.learning_path ? "rgba(99,102,241,0.12)" : "rgba(192,132,252,0.12)", color: r.learning_path ? "#818CF8" : "#C084FC", flexShrink: 0 }}>
+                  <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 20, background: r.learning_path ? "rgba(99,102,241,0.12)" : "rgba(192,132,252,0.12)", color: r.learning_path ? "var(--lt-818cf8, #818CF8)" : "#C084FC", flexShrink: 0 }}>
                     {r.learning_path ? t("enterprise.certifications.templateForm.requirements.learningPath") : t("enterprise.certifications.templateForm.requirements.compliance")}
                   </span>
                   <span style={{ fontSize: 12, fontWeight: 600, color: "var(--text-primary)", flex: 1 }}>
@@ -166,7 +166,7 @@ function RequirementsSection({ templateId }) {
                     <span style={{ fontSize: 10, color: "var(--text-tertiary)" }}>{t("enterprise.certifications.templateForm.requirements.optional")}</span>
                   )}
                   <button onClick={() => removeRequirement(r.id)} title={t("enterprise.certifications.templateForm.requirements.removeTitle")}
-                    style={{ background: "none", border: "none", cursor: "pointer", color: "#f87171", padding: 4, display: "flex" }}>
+                    style={{ background: "none", border: "none", cursor: "pointer", color: "var(--lt-f87171, #f87171)", padding: 4, display: "flex" }}>
                     <TrashIcon style={{ width: 13, height: 13 }} />
                   </button>
                 </div>
@@ -206,7 +206,7 @@ function RequirementsSection({ templateId }) {
                 {saving ? t("enterprise.certifications.templateForm.requirements.adding") : t("enterprise.certifications.templateForm.requirements.add")}
               </button>
             </div>
-            {error && <p style={{ fontSize: 12, color: "#f87171" }}>{error}</p>}
+            {error && <p style={{ fontSize: 12, color: "var(--lt-f87171, #f87171)" }}>{error}</p>}
           </div>
         </>
       )}
@@ -215,8 +215,8 @@ function RequirementsSection({ templateId }) {
 }
 
 const INPUT_SM = {
-  width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)",
-  borderRadius: 8, padding: "8px 10px", fontSize: 12, color: "#F1F5F9", outline: "none", boxSizing: "border-box",
+  width: "100%", background: "var(--lt-rgba-255-255-255-0-05, rgba(255,255,255,0.05))", border: "1px solid var(--lt-rgba-255-255-255-0-12, rgba(255,255,255,0.12))",
+  borderRadius: 8, padding: "8px 10px", fontSize: 12, color: "var(--lt-f1f5f9, #F1F5F9)", outline: "none", boxSizing: "border-box",
 };
 
 export function CertificateTemplateForm() {
@@ -277,7 +277,7 @@ export function CertificateTemplateForm() {
       </h1>
 
       {error && (
-        <div style={{ marginBottom: 16, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.25)", color: "#f87171", fontSize: 13, padding: "10px 14px", borderRadius: 10 }}>
+        <div style={{ marginBottom: 16, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.25)", color: "var(--lt-f87171, #f87171)", fontSize: 13, padding: "10px 14px", borderRadius: 10 }}>
           {error}
         </div>
       )}

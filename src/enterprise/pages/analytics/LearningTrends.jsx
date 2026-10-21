@@ -22,7 +22,7 @@ export function LearningTrends() {
     xaxis: { categories: data.map((d) => d.week || d.date), labels: { style: { fontSize: "11px", colors: "#64748B" } } },
     yaxis: { labels: { formatter: (v) => Math.round(v), style: { colors: "#64748B" } } },
     dataLabels: { enabled: false },
-    grid: { borderColor: "rgba(255,255,255,0.07)" },
+    grid: { borderColor: "var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))" },
     tooltip: { theme: "dark", y: { formatter: (v) => t("enterprise.analytics.learningTrends.tooltipCompletions", { n: v }) } },
   };
 

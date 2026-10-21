@@ -21,8 +21,8 @@ const STATUS_TONE = {
 };
 
 const INPUT = {
-  width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)",
-  borderRadius: 8, padding: "9px 12px", fontSize: 13, color: "#F1F5F9", outline: "none", boxSizing: "border-box",
+  width: "100%", background: "var(--lt-rgba-255-255-255-0-05, rgba(255,255,255,0.05))", border: "1px solid var(--lt-rgba-255-255-255-0-12, rgba(255,255,255,0.12))",
+  borderRadius: 8, padding: "9px 12px", fontSize: 13, color: "var(--lt-f1f5f9, #F1F5F9)", outline: "none", boxSizing: "border-box",
 };
 
 function NewProgramForm({ onCreated, onCancel }) {
@@ -48,7 +48,7 @@ function NewProgramForm({ onCreated, onCancel }) {
     <form onSubmit={handleSubmit} style={{ background: "rgba(99,102,241,0.06)", border: "1px solid rgba(99,102,241,0.2)", borderRadius: 12, padding: 20 }} className="space-y-4">
       <div className="flex items-center justify-between">
         <p style={{ fontWeight: 700, color: "#C7D2FE", fontSize: 14 }}>{t("enterprise.learning.trainingPrograms.newProgram")}</p>
-        <button type="button" onClick={onCancel} style={{ color: "#818CF8", background: "none", border: "none", cursor: "pointer" }}>
+        <button type="button" onClick={onCancel} style={{ color: "var(--lt-818cf8, #818CF8)", background: "none", border: "none", cursor: "pointer" }}>
           <XMarkIcon className="h-5 w-5" />
         </button>
       </div>
@@ -60,7 +60,7 @@ function NewProgramForm({ onCreated, onCancel }) {
         <label style={{ fontSize: 11, fontWeight: 700, color: "var(--text-tertiary)", display: "block", marginBottom: 5 }}>{t("enterprise.learning.trainingPrograms.description")}</label>
         <textarea rows={2} style={{ ...INPUT, resize: "vertical" }} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
       </div>
-      {error && <p style={{ fontSize: 12, color: "#f87171" }}>{error}</p>}
+      {error && <p style={{ fontSize: 12, color: "var(--lt-f87171, #f87171)" }}>{error}</p>}
       <div className="flex justify-end gap-2">
         <button type="button" onClick={onCancel} className="ank-btn-ghost text-xs">{t("enterprise.learning.trainingPrograms.cancel")}</button>
         <button type="submit" disabled={saving} className="ank-btn-accent text-xs" style={{ opacity: saving ? 0.7 : 1 }}>
@@ -101,8 +101,8 @@ function PublishVersionModal({ program, onClose, onPublished }) {
   };
 
   return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }} onClick={onClose}>
-      <div style={{ background: "#0F172A", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 16, width: "100%", maxWidth: 440, padding: 24, boxShadow: "0 20px 60px rgba(0,0,0,0.7)" }} className="space-y-4" onClick={(e) => e.stopPropagation()}>
+    <div style={{ position: "fixed", inset: 0, background: "var(--lt-rgba-0-0-0-0-6, rgba(0,0,0,0.6))", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }} onClick={onClose}>
+      <div style={{ background: "var(--lt-0f172a, #0F172A)", border: "1px solid var(--lt-rgba-255-255-255-0-1, rgba(255,255,255,0.1))", borderRadius: 16, width: "100%", maxWidth: 440, padding: 24, boxShadow: "0 20px 60px var(--lt-rgba-0-0-0-0-7, rgba(0,0,0,0.7))" }} className="space-y-4" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between">
           <p style={{ fontWeight: 700, color: "var(--text-primary)", fontSize: 14 }}>{t("enterprise.learning.trainingPrograms.publishModal.title")}</p>
           <button onClick={onClose} style={{ color: "var(--text-tertiary)", background: "none", border: "none", cursor: "pointer" }}><XMarkIcon className="h-5 w-5" /></button>
@@ -116,7 +116,7 @@ function PublishVersionModal({ program, onClose, onPublished }) {
             {paths.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
           </select>
           <textarea rows={2} placeholder={t("enterprise.learning.trainingPrograms.publishModal.releaseNotes")} style={{ ...INPUT, resize: "vertical" }} value={notes} onChange={(e) => setNotes(e.target.value)} />
-          {error && <p style={{ fontSize: 12, color: "#f87171" }}>{error}</p>}
+          {error && <p style={{ fontSize: 12, color: "var(--lt-f87171, #f87171)" }}>{error}</p>}
           <div className="flex justify-end gap-2">
             <button type="button" onClick={onClose} className="ank-btn-ghost text-xs">{t("enterprise.learning.trainingPrograms.cancel")}</button>
             <button type="submit" disabled={saving} className="ank-btn-accent text-xs" style={{ background: "linear-gradient(135deg, #22C55E, #4ade80)", opacity: saving ? 0.7 : 1 }}>
@@ -174,14 +174,14 @@ function ProgramCard({ program, onPublishVersion }) {
               <div className="flex gap-3 mt-1.5">
                 <span style={{ fontSize: 11, color: "var(--text-tertiary)" }}>{t("enterprise.learning.trainingPrograms.versionCount", { n: versionCount })}</span>
                 {currentNumber != null && (
-                  <span style={{ fontSize: 11, fontWeight: 700, color: "#4ade80" }}>{t("enterprise.learning.trainingPrograms.currentVersion", { n: currentNumber })}</span>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: "var(--lt-4ade80, #4ade80)" }}>{t("enterprise.learning.trainingPrograms.currentVersion", { n: currentNumber })}</span>
                 )}
               </div>
             </div>
           </div>
           <div className="flex gap-2 flex-shrink-0">
             <button onClick={() => onPublishVersion(program)}
-              style={{ fontSize: 11, fontWeight: 700, color: "#4ade80", background: "rgba(74,222,128,0.1)", border: "1px solid rgba(74,222,128,0.25)", borderRadius: 6, padding: "6px 10px", cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}>
+              style={{ fontSize: 11, fontWeight: 700, color: "var(--lt-4ade80, #4ade80)", background: "rgba(74,222,128,0.1)", border: "1px solid rgba(74,222,128,0.25)", borderRadius: 6, padding: "6px 10px", cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}>
               <CheckBadgeIcon style={{ width: 13, height: 13 }} /> {t("enterprise.learning.trainingPrograms.newVersion")}
             </button>
             {versionCount > 0 && (
@@ -205,7 +205,7 @@ function ProgramCard({ program, onPublishVersion }) {
                   {v.version_number}
                 </span>
                 <span style={{ color: "var(--text-secondary)" }}>{v.learning_path_name || "—"}</span>
-                {v.is_current && <span style={{ fontSize: 10, fontWeight: 700, color: "#4ade80" }}>{t("enterprise.learning.trainingPrograms.current")}</span>}
+                {v.is_current && <span style={{ fontSize: 10, fontWeight: 700, color: "var(--lt-4ade80, #4ade80)" }}>{t("enterprise.learning.trainingPrograms.current")}</span>}
                 {v.notes && <span style={{ color: "var(--text-tertiary)", fontSize: 11 }}>· {v.notes}</span>}
                 {v.created_by_username && <span style={{ color: "var(--text-tertiary)", fontSize: 11 }}>· {v.created_by_username}</span>}
                 <span style={{ color: "var(--text-tertiary)", fontSize: 11, marginLeft: "auto" }}>{v.created_at ? formatDate(v.created_at, language) : "—"}</span>

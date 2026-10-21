@@ -57,7 +57,7 @@ function AssignmentCard({ assignment: a, onOpen, onViewCertificate, starting }) 
       <div className="flex items-start justify-between gap-3 mb-3">
         <div className="flex items-start gap-2.5 min-w-0">
           <div style={{ background: isDone ? "rgba(74,222,128,0.12)" : "var(--accent-muted)", borderRadius: 7, padding: 8, flexShrink: 0, marginTop: 1 }}>
-            <RectangleStackIcon style={{ width: 14, height: 14, color: isDone ? "#4ade80" : "var(--accent)" }} />
+            <RectangleStackIcon style={{ width: 14, height: 14, color: isDone ? "var(--lt-4ade80, #4ade80)" : "var(--accent)" }} />
           </div>
           <div className="min-w-0">
             <p style={{ color: "var(--text-primary)", fontWeight: 700, fontSize: 14, lineHeight: 1.3 }}>
@@ -78,7 +78,7 @@ function AssignmentCard({ assignment: a, onOpen, onViewCertificate, starting }) 
         <div className="space-y-1.5 mb-3">
           <div className="flex justify-between">
             <span style={{ color: "var(--text-tertiary)", fontSize: 11 }}>{t("enterprise.learning.myAssignments.processesCount", { completed: completedMods, total: totalMods })}</span>
-            <span style={{ color: isDone ? "#4ade80" : "var(--accent)", fontSize: 11, fontWeight: 700 }}>{Math.round(pct)}%</span>
+            <span style={{ color: isDone ? "var(--lt-4ade80, #4ade80)" : "var(--accent)", fontSize: 11, fontWeight: 700 }}>{Math.round(pct)}%</span>
           </div>
           <ProgressBar value={pct} overdue={isOverdue} done={isDone} />
         </div>
@@ -87,16 +87,16 @@ function AssignmentCard({ assignment: a, onOpen, onViewCertificate, starting }) 
       {/* Footer */}
       <div className="flex items-center justify-between mt-2">
         {dueStr ? (
-          <p style={{ fontSize: 11, color: isOverdue ? "#f87171" : "var(--text-tertiary)", display: "flex", alignItems: "center", gap: 4 }}>
+          <p style={{ fontSize: 11, color: isOverdue ? "var(--lt-f87171, #f87171)" : "var(--text-tertiary)", display: "flex", alignItems: "center", gap: 4 }}>
             <ClockIcon style={{ width: 11, height: 11 }} />
             {isOverdue ? t("enterprise.learning.myAssignments.overdueSince") : t("enterprise.learning.myAssignments.dueLabel")}{dueStr}
           </p>
         ) : <span />}
-        <div style={{ display: "flex", alignItems: "center", gap: 5, color: isDone ? "#4ade80" : "var(--accent)", fontSize: 12, fontWeight: 600 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 5, color: isDone ? "var(--lt-4ade80, #4ade80)" : "var(--accent)", fontSize: 12, fontWeight: 600 }}>
           {isDone && a.issued_certification_id ? (
             <button
               onClick={(e) => { e.stopPropagation(); onViewCertificate(a.issued_certification_id); }}
-              style={{ display: "flex", alignItems: "center", gap: 5, color: "#4ade80", fontSize: 12, fontWeight: 600, background: "none", border: "none", cursor: "pointer", padding: 0 }}
+              style={{ display: "flex", alignItems: "center", gap: 5, color: "var(--lt-4ade80, #4ade80)", fontSize: 12, fontWeight: 600, background: "none", border: "none", cursor: "pointer", padding: 0 }}
             >
               {t("enterprise.learning.myAssignments.viewCertificate")} <ArrowRightIcon style={{ width: 12, height: 12 }} />
             </button>
@@ -144,10 +144,10 @@ export function MyAssignments() {
   const completed  = assignments.filter((a) => a.status === "completed");
 
   const groups = [
-    { label: t("enterprise.learning.myAssignments.groups.overdue"),    color: "#f87171", items: overdue },
+    { label: t("enterprise.learning.myAssignments.groups.overdue"),    color: "var(--lt-f87171, #f87171)", items: overdue },
     { label: t("enterprise.learning.myAssignments.groups.inProgress"), color: "#8B9CF4", items: inProgress },
     { label: t("enterprise.learning.myAssignments.groups.pending"),    color: "#8B8B9C", items: pending },
-    { label: t("enterprise.learning.myAssignments.groups.completed"), color: "#4ade80", items: completed },
+    { label: t("enterprise.learning.myAssignments.groups.completed"), color: "var(--lt-4ade80, #4ade80)", items: completed },
   ].filter((g) => g.items.length > 0);
 
   return (
@@ -161,7 +161,7 @@ export function MyAssignments() {
           </p>
         </div>
         {completed.length > 0 && (
-          <div style={{ display: "flex", alignItems: "center", gap: 6, color: "#4ade80", fontSize: 12, fontWeight: 700 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--lt-4ade80, #4ade80)", fontSize: 12, fontWeight: 700 }}>
             <CheckCircleIcon style={{ width: 14, height: 14 }} /> {t("enterprise.learning.myAssignments.completedCount", { count: completed.length, plural: completed.length !== 1 ? "s" : "" })}
           </div>
         )}

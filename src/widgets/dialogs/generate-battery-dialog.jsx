@@ -197,8 +197,8 @@ export function GenerateBatteryDialog({
     };
 
     /* ── shared field styles for mobile ── */
-    const mLbl = { fontSize: 11, fontWeight: 700, letterSpacing: ".9px", textTransform: "uppercase", color: "#94a3b8", marginBottom: 9, display: "flex", alignItems: "center", gap: 7 };
-    const mInput = (hasErr) => ({ width: "100%", padding: "12px 14px", background: "#f8fafc", border: `1.5px solid ${hasErr ? "#ef4444" : "#e2e8f0"}`, borderRadius: 13, fontFamily: "inherit", fontSize: 14, color: "#0f172a", outline: "none" });
+    const mLbl = { fontSize: 11, fontWeight: 700, letterSpacing: ".9px", textTransform: "uppercase", color: "var(--lt-94a3b8, #94a3b8)", marginBottom: 9, display: "flex", alignItems: "center", gap: 7 };
+    const mInput = (hasErr) => ({ width: "100%", padding: "12px 14px", background: "#f8fafc", border: `1.5px solid ${hasErr ? "#ef4444" : "var(--lt-e2e8f0, #e2e8f0)"}`, borderRadius: 13, fontFamily: "inherit", fontSize: 14, color: "var(--lt-0f172a, #0f172a)", outline: "none" });
 
     return (
         <Dialog
@@ -213,27 +213,27 @@ export function GenerateBatteryDialog({
                 <div className="md:hidden flex flex-col" style={{ maxHeight: "calc(100dvh - 40px)" }}>
 
                     {/* Dark header strip */}
-                    <div style={{ background: "#0f172a", padding: "14px 20px 20px", position: "relative", overflow: "hidden", flexShrink: 0 }}>
+                    <div style={{ background: "var(--lt-0f172a, #0f172a)", padding: "14px 20px 20px", position: "relative", overflow: "hidden", flexShrink: 0 }}>
                         <div style={{ position: "absolute", width: 300, height: 300, background: "radial-gradient(circle, rgba(57,73,171,.55) 0%, transparent 60%)", top: -120, right: -70, borderRadius: "50%", pointerEvents: "none" }} />
                         <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px)", backgroundSize: "28px 28px", pointerEvents: "none" }} />
                         {/* drag handle */}
-                        <div style={{ width: 38, height: 4, background: "rgba(255,255,255,.18)", borderRadius: 2, margin: "0 auto 18px" }} />
+                        <div style={{ width: 38, height: 4, background: "var(--lt-rgba-255-255-255-18, rgba(255,255,255,.18))", borderRadius: 2, margin: "0 auto 18px" }} />
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", position: "relative", zIndex: 1 }}>
                             <div style={{ display: "flex", alignItems: "center", gap: 13 }}>
                                 <div style={{ width: 42, height: 42, background: "rgba(57,73,171,.28)", border: "1px solid rgba(99,102,241,.4)", borderRadius: 13, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                                    <svg viewBox="0 0 24 24" style={{ width: 19, height: 19, stroke: "#818cf8", strokeWidth: 1.8, fill: "none" }}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                                    <svg viewBox="0 0 24 24" style={{ width: 19, height: 19, stroke: "var(--lt-818cf8, #818cf8)", strokeWidth: 1.8, fill: "none" }}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
                                 </div>
                                 <div>
                                     <div style={{ fontFamily: "'Syne', sans-serif", fontSize: 17, fontWeight: 800, color: "#fff", letterSpacing: "-.3px" }}>
                                         {language === "es" ? "Nueva Batería" : "New Battery"}
                                     </div>
-                                    <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", marginTop: 2 }}>
+                                    <div style={{ fontSize: 11, color: "var(--lt-rgba-255-255-255-4, rgba(255,255,255,.4))", marginTop: 2 }}>
                                         {language === "es" ? "Configura tu set de preguntas" : "Configure your question set"}
                                     </div>
                                 </div>
                             </div>
-                            <button type="button" onClick={onClose} style={{ width: 34, height: 34, borderRadius: "50%", background: "rgba(255,255,255,.08)", border: "1px solid rgba(255,255,255,.13)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
-                                <svg viewBox="0 0 24 24" style={{ width: 14, height: 14, stroke: "rgba(255,255,255,.6)", strokeWidth: 2, fill: "none" }}><path d="M18 6 6 18M6 6l12 12"/></svg>
+                            <button type="button" onClick={onClose} style={{ width: 34, height: 34, borderRadius: "50%", background: "var(--lt-rgba-255-255-255-08, rgba(255,255,255,.08))", border: "1px solid var(--lt-rgba-255-255-255-13, rgba(255,255,255,.13))", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
+                                <svg viewBox="0 0 24 24" style={{ width: 14, height: 14, stroke: "var(--lt-rgba-255-255-255-6, rgba(255,255,255,.6))", strokeWidth: 2, fill: "none" }}><path d="M18 6 6 18M6 6l12 12"/></svg>
                             </button>
                         </div>
                     </div>
@@ -245,7 +245,7 @@ export function GenerateBatteryDialog({
                         <div style={{ marginBottom: 20 }}>
                             <div style={mLbl}>
                                 {language === "es" ? "Tema" : "Topic"}
-                                <span style={{ fontSize: 9, background: "#f8fafc", color: "#94a3b8", border: "1px solid #e2e8f0", padding: "1px 7px", borderRadius: 20, fontWeight: 500, textTransform: "none", letterSpacing: ".3px" }}>
+                                <span style={{ fontSize: 9, background: "#f8fafc", color: "var(--lt-94a3b8, #94a3b8)", border: "1px solid var(--lt-e2e8f0, #e2e8f0)", padding: "1px 7px", borderRadius: 20, fontWeight: 500, textTransform: "none", letterSpacing: ".3px" }}>
                                     {language === "es" ? "opcional" : "optional"}
                                 </span>
                             </div>
@@ -258,7 +258,7 @@ export function GenerateBatteryDialog({
                                 placeholder={language === "es" ? "Ej: Barcelona, Historia de España, etc." : "E.g. Barcelona, Spanish History, etc."}
                             />
                             {errors.query_text && (
-                                <p style={{ fontSize: 11, color: "#ef4444", marginTop: 5 }}>{errors.query_text}</p>
+                                <p style={{ fontSize: 11, color: "var(--lt-ef4444, #ef4444)", marginTop: 5 }}>{errors.query_text}</p>
                             )}
                         </div>
 
@@ -274,7 +274,7 @@ export function GenerateBatteryDialog({
                                 </div>
                             ) : scannedDocuments.length === 0 ? (
                                 <div style={{ padding: 16, background: "#fff1f2", border: "1.5px dashed #fca5a5", borderRadius: 13, textAlign: "center" }}>
-                                    <ExclamationCircleIcon style={{ width: 28, height: 28, color: "#f87171", margin: "0 auto 6px" }} />
+                                    <ExclamationCircleIcon style={{ width: 28, height: 28, color: "var(--lt-f87171, #f87171)", margin: "0 auto 6px" }} />
                                     <p style={{ fontSize: 13, color: "#b91c1c", fontWeight: 600 }}>
                                         {language === "es" ? "No hay secciones disponibles. Sube un documento primero." : "No sections available. Upload a document first."}
                                     </p>
@@ -290,10 +290,10 @@ export function GenerateBatteryDialog({
                                             <div
                                                 key={doc.id}
                                                 onClick={() => handleDocumentToggle(doc)}
-                                                style={{ background: isOn ? "rgba(57,73,171,.07)" : "#f8fafc", border: `1.5px solid ${isOn ? "rgba(57,73,171,.30)" : (errors.sections ? "#ef4444" : "#e2e8f0")}`, borderRadius: 13, padding: "13px 14px", display: "flex", alignItems: "center", gap: 12, cursor: "pointer" }}
+                                                style={{ background: isOn ? "rgba(57,73,171,.07)" : "#f8fafc", border: `1.5px solid ${isOn ? "rgba(57,73,171,.30)" : (errors.sections ? "#ef4444" : "var(--lt-e2e8f0, #e2e8f0)")}`, borderRadius: 13, padding: "13px 14px", display: "flex", alignItems: "center", gap: 12, cursor: "pointer" }}
                                             >
                                                 {/* checkbox */}
-                                                <div style={{ width: 22, height: 22, borderRadius: 7, border: `1.5px solid ${isOn ? "rgb(57,73,171)" : "#e2e8f0"}`, background: isOn ? "rgb(57,73,171)" : "#fff", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                                <div style={{ width: 22, height: 22, borderRadius: 7, border: `1.5px solid ${isOn ? "rgb(57,73,171)" : "var(--lt-e2e8f0, #e2e8f0)"}`, background: isOn ? "rgb(57,73,171)" : "#fff", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                                                     {isOn && <svg viewBox="0 0 24 24" style={{ width: 11, height: 11, stroke: "#fff", strokeWidth: 2.5, fill: "none" }}><polyline points="20 6 9 17 4 12"/></svg>}
                                                 </div>
                                                 {/* pdf icon */}
@@ -301,10 +301,10 @@ export function GenerateBatteryDialog({
                                                     <svg viewBox="0 0 24 24" style={{ width: 17, height: 17, stroke: "#b91c1c", strokeWidth: 1.8, fill: "none" }}><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
                                                 </div>
                                                 <div style={{ flex: 1, minWidth: 0 }}>
-                                                    <div style={{ fontSize: 13, fontWeight: 600, color: "#0f172a", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", marginBottom: 3 }}>
+                                                    <div style={{ fontSize: 13, fontWeight: 600, color: "var(--lt-0f172a, #0f172a)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", marginBottom: 3 }}>
                                                         {doc.filename || doc.name}
                                                     </div>
-                                                    <div style={{ fontSize: 11, color: "#94a3b8" }}>
+                                                    <div style={{ fontSize: 11, color: "var(--lt-94a3b8, #94a3b8)" }}>
                                                         {doc.type ? `.${doc.type}` : ""}{doc.size ? ` · ${Math.round(doc.size / 1024)} KB` : ""}
                                                     </div>
                                                 </div>
@@ -319,17 +319,17 @@ export function GenerateBatteryDialog({
                                 </div>
                             )}
                             {errors.sections && (
-                                <p style={{ fontSize: 11, color: "#ef4444", marginTop: 6 }}>{errors.sections}</p>
+                                <p style={{ fontSize: 11, color: "var(--lt-ef4444, #ef4444)", marginTop: 6 }}>{errors.sections}</p>
                             )}
                         </div>
 
-                        <div style={{ height: 1, background: "#e2e8f0", margin: "4px 0 22px" }} />
+                        <div style={{ height: 1, background: "var(--lt-e2e8f0, #e2e8f0)", margin: "4px 0 22px" }} />
 
                         {/* Rule */}
                         <div style={{ marginBottom: 20 }}>
                             <div style={mLbl}>
                                 {language === "es" ? "Regla" : "Rule"}
-                                <span style={{ fontSize: 9, background: "#f8fafc", color: "#94a3b8", border: "1px solid #e2e8f0", padding: "1px 7px", borderRadius: 20, fontWeight: 500, textTransform: "none", letterSpacing: ".3px" }}>
+                                <span style={{ fontSize: 9, background: "#f8fafc", color: "var(--lt-94a3b8, #94a3b8)", border: "1px solid var(--lt-e2e8f0, #e2e8f0)", padding: "1px 7px", borderRadius: 20, fontWeight: 500, textTransform: "none", letterSpacing: ".3px" }}>
                                     {language === "es" ? "opcional" : "optional"}
                                 </span>
                             </div>
@@ -345,7 +345,7 @@ export function GenerateBatteryDialog({
                                     ))}
                                 </select>
                                 <div style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>
-                                    <svg viewBox="0 0 24 24" style={{ width: 16, height: 16, stroke: "#94a3b8", strokeWidth: 2, fill: "none" }}><polyline points="6 9 12 15 18 9"/></svg>
+                                    <svg viewBox="0 0 24 24" style={{ width: 16, height: 16, stroke: "var(--lt-94a3b8, #94a3b8)", strokeWidth: 2, fill: "none" }}><polyline points="6 9 12 15 18 9"/></svg>
                                 </div>
                             </div>
                         </div>
@@ -354,15 +354,15 @@ export function GenerateBatteryDialog({
                         {!formData.rule && (
                             <div style={{ marginBottom: 20 }}>
                                 <div style={mLbl}>{language === "es" ? "Cantidad de Preguntas" : "Number of Questions"}</div>
-                                <div style={{ display: "flex", alignItems: "center", background: "#f8fafc", border: "1.5px solid #e2e8f0", borderRadius: 13, overflow: "hidden" }}>
+                                <div style={{ display: "flex", alignItems: "center", background: "#f8fafc", border: "1.5px solid var(--lt-e2e8f0, #e2e8f0)", borderRadius: 13, overflow: "hidden" }}>
                                     <button
                                         type="button"
                                         onClick={() => setFormData(prev => ({ ...prev, quantity: Math.max(1, prev.quantity - 5) }))}
                                         style={{ width: 52, height: 52, background: "transparent", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}
                                     >
-                                        <svg viewBox="0 0 24 24" style={{ width: 18, height: 18, stroke: "#475569", strokeWidth: 2.5, fill: "none" }}><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                        <svg viewBox="0 0 24 24" style={{ width: 18, height: 18, stroke: "var(--lt-475569, #475569)", strokeWidth: 2.5, fill: "none" }}><line x1="5" y1="12" x2="19" y2="12"/></svg>
                                     </button>
-                                    <div style={{ flex: 1, textAlign: "center", fontFamily: "'Syne', sans-serif", fontSize: 20, fontWeight: 800, color: "#0f172a" }}>
+                                    <div style={{ flex: 1, textAlign: "center", fontFamily: "'Syne', sans-serif", fontSize: 20, fontWeight: 800, color: "var(--lt-0f172a, #0f172a)" }}>
                                         {formData.quantity}
                                     </div>
                                     <button
@@ -370,10 +370,10 @@ export function GenerateBatteryDialog({
                                         onClick={() => setFormData(prev => ({ ...prev, quantity: Math.min(15, prev.quantity + 5) }))}
                                         style={{ width: 52, height: 52, background: "transparent", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}
                                     >
-                                        <svg viewBox="0 0 24 24" style={{ width: 18, height: 18, stroke: "#475569", strokeWidth: 2.5, fill: "none" }}><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                        <svg viewBox="0 0 24 24" style={{ width: 18, height: 18, stroke: "var(--lt-475569, #475569)", strokeWidth: 2.5, fill: "none" }}><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                                     </button>
                                 </div>
-                                <p style={{ fontSize: 11, color: "#94a3b8", marginTop: 6 }}>
+                                <p style={{ fontSize: 11, color: "var(--lt-94a3b8, #94a3b8)", marginTop: 6 }}>
                                     {language === "es" ? "Máximo 15 preguntas por batería" : "Maximum 15 questions per battery"}
                                 </p>
                             </div>
@@ -394,7 +394,7 @@ export function GenerateBatteryDialog({
                                             key={val}
                                             type="button"
                                             onClick={() => handleSelectChange("difficulty", val)}
-                                            style={{ flex: 1, padding: "11px 0", borderRadius: 12, border: `1.5px solid ${active ? on.borderColor : "#e2e8f0"}`, fontSize: 13, fontWeight: 600, cursor: "pointer", textAlign: "center", background: active ? on.background : "#f8fafc", color: active ? on.color : "#475569" }}
+                                            style={{ flex: 1, padding: "11px 0", borderRadius: 12, border: `1.5px solid ${active ? on.borderColor : "var(--lt-e2e8f0, #e2e8f0)"}`, fontSize: 13, fontWeight: 600, cursor: "pointer", textAlign: "center", background: active ? on.background: "#f8fafc", color: active ? on.color: "var(--lt-475569, #475569)" }}
                                         >
                                             {label}
                                         </button>
@@ -418,7 +418,7 @@ export function GenerateBatteryDialog({
                                             key={val}
                                             type="button"
                                             onClick={() => handleSelectChange("question_format", val)}
-                                            style={{ padding: "9px 14px", borderRadius: 11, border: `1.5px solid ${active ? "rgba(57,73,171,.30)" : "#e2e8f0"}`, fontSize: 13, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 7, background: active ? "rgba(57,73,171,.10)" : "#f8fafc", color: active ? "rgb(57,73,171)" : "#475569" }}
+                                            style={{ padding: "9px 14px", borderRadius: 11, border: `1.5px solid ${active ? "rgba(57,73,171,.30)" : "var(--lt-e2e8f0, #e2e8f0)"}`, fontSize: 13, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 7, background: active ? "rgba(57,73,171,.10)" : "#f8fafc", color: active ? "rgb(57,73,171)" : "#475569" }}
                                         >
                                             <svg viewBox="0 0 24 24" style={{ width: 13, height: 13, stroke: "currentColor", strokeWidth: 2, fill: "none" }}>{ico}</svg>
                                             {label}
@@ -431,11 +431,11 @@ export function GenerateBatteryDialog({
                     </div>
 
                     {/* Bottom action bar */}
-                    <div style={{ display: "flex", gap: 10, padding: "18px 20px", paddingBottom: "max(18px, env(safe-area-inset-bottom, 18px))", borderTop: "1px solid #e2e8f0", background: "#fff", flexShrink: 0 }}>
+                    <div style={{ display: "flex", gap: 10, padding: "18px 20px", paddingBottom: "max(18px, env(safe-area-inset-bottom, 18px))", borderTop: "1px solid var(--lt-e2e8f0, #e2e8f0)", background: "#fff", flexShrink: 0 }}>
                         <button
                             type="button"
                             onClick={onClose}
-                            style={{ flex: 1, padding: 14, background: "#f8fafc", border: "1.5px solid #e2e8f0", borderRadius: 13, fontSize: 14, fontWeight: 600, color: "#475569", cursor: "pointer" }}
+                            style={{ flex: 1, padding: 14, background: "#f8fafc", border: "1.5px solid var(--lt-e2e8f0, #e2e8f0)", borderRadius: 13, fontSize: 14, fontWeight: 600, color: "var(--lt-475569, #475569)", cursor: "pointer" }}
                         >
                             {language === "es" ? "Cancelar" : "Cancel"}
                         </button>

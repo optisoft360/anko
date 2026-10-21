@@ -152,10 +152,10 @@ export default function InviteUser() {
     return (
       <div style={{ maxWidth: 460, margin: "52px auto", padding: "0 16px" }}>
         <div style={{
-          background: "#0F172A",
+          background: "var(--lt-0f172a, #0F172A)",
           border: "1px solid rgba(52,211,153,0.22)",
           borderRadius: 22, padding: "52px 40px",
-          boxShadow: "0 0 60px rgba(52,211,153,0.05), 0 20px 40px rgba(0,0,0,0.3)",
+          boxShadow: "0 0 60px rgba(52,211,153,0.05), 0 20px 40px var(--lt-rgba-0-0-0-0-3, rgba(0,0,0,0.3))",
           textAlign: "center",
         }}>
           {/* checkmark icon */}
@@ -167,7 +167,7 @@ export default function InviteUser() {
             <CheckCircleIcon style={{ width: 34, height: 34, color: "#34D399" }} />
           </div>
 
-          <h2 style={{ fontSize: 22, fontWeight: 800, color: "#F1F5F9", margin: "0 0 10px", letterSpacing: "-0.01em" }}>
+          <h2 style={{ fontSize: 22, fontWeight: 800, color: "var(--lt-f1f5f9, #F1F5F9)", margin: "0 0 10px", letterSpacing: "-0.01em" }}>
             {t("enterprise.settings.inviteUser.sentTitle")}
           </h2>
           <p style={{ fontSize: 14, color: "#64748B", margin: "0 0 32px", lineHeight: 1.5 }}>
@@ -181,9 +181,9 @@ export default function InviteUser() {
             borderRadius: 14, padding: "16px 22px", marginBottom: 32,
             display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
           }}>
-            <EnvelopeIcon style={{ width: 18, height: 18, color: "#818CF8", flexShrink: 0 }} />
+            <EnvelopeIcon style={{ width: 18, height: 18, color: "var(--lt-818cf8, #818CF8)", flexShrink: 0 }} />
             <span style={{
-              fontSize: 15, fontWeight: 800, color: "#818CF8",
+              fontSize: 15, fontWeight: 800, color: "var(--lt-818cf8, #818CF8)",
               wordBreak: "break-all", letterSpacing: "-0.01em",
             }}>
               {sentEmail}
@@ -196,7 +196,7 @@ export default function InviteUser() {
               style={{
                 flex: 1, padding: 13, borderRadius: 11,
                 background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.22)",
-                color: "#818CF8", fontSize: 13, fontWeight: 700, cursor: "pointer",
+                color: "var(--lt-818cf8, #818CF8)", fontSize: 13, fontWeight: 700, cursor: "pointer",
                 transition: "all 150ms",
               }}
               onMouseEnter={e => e.currentTarget.style.background = "rgba(99,102,241,0.18)"}
@@ -231,22 +231,22 @@ export default function InviteUser() {
           onClick={() => navigate("/enterprise/invitations")}
           style={{
             width: 38, height: 38, borderRadius: 10, flexShrink: 0,
-            background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)",
+            background: "var(--lt-rgba-255-255-255-0-03, rgba(255,255,255,0.03))", border: "1px solid rgba(255,255,255,0.08)",
             display: "flex", alignItems: "center", justifyContent: "center",
-            cursor: "pointer", color: "#94A3B8", transition: "all 150ms",
+            cursor: "pointer", color: "var(--lt-94a3b8, #94A3B8)", transition: "all 150ms",
           }}
-          onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.07)"; e.currentTarget.style.color = "#F1F5F9"; }}
-          onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.03)"; e.currentTarget.style.color = "#94A3B8"; }}
+          onMouseEnter={e => { e.currentTarget.style.background = "var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))"; e.currentTarget.style.color = "var(--lt-f1f5f9, #F1F5F9)"; }}
+          onMouseLeave={e => { e.currentTarget.style.background = "var(--lt-rgba-255-255-255-0-03, rgba(255,255,255,0.03))"; e.currentTarget.style.color = "var(--lt-94a3b8, #94A3B8)"; }}
         >
           <ArrowLeftIcon style={{ width: 16, height: 16 }} />
         </button>
         <div>
-          <h1 style={{ fontSize: 22, fontWeight: 800, color: "#F1F5F9", margin: 0, letterSpacing: "-0.01em" }}>
+          <h1 style={{ fontSize: 22, fontWeight: 800, color: "var(--lt-f1f5f9, #F1F5F9)", margin: 0, letterSpacing: "-0.01em" }}>
             {t("enterprise.settings.inviteUser.title")}
           </h1>
           {company?.company_name && (
             <p style={{ fontSize: 13, color: "#64748B", margin: "3px 0 0" }}>
-              {t("enterprise.settings.inviteUser.sendingTo")} · <span style={{ color: "#94A3B8", fontWeight: 600 }}>{company.company_name}</span>
+              {t("enterprise.settings.inviteUser.sendingTo")} · <span style={{ color: "var(--lt-94a3b8, #94A3B8)", fontWeight: 600 }}>{company.company_name}</span>
             </p>
           )}
         </div>
@@ -257,7 +257,7 @@ export default function InviteUser() {
 
         {/* ── LEFT: Search panel ───────────────────────────── */}
         <div style={{
-          background: "#0F172A", border: "1px solid rgba(255,255,255,0.07)",
+          background: "var(--lt-0f172a, #0F172A)", border: "1px solid rgba(255,255,255,0.07)",
           borderRadius: 18, overflow: "hidden",
         }}>
           {isAdmin && (
@@ -279,12 +279,12 @@ export default function InviteUser() {
                 style={{
                   width: "100%", boxSizing: "border-box",
                   padding: "10px 12px 10px 36px", borderRadius: 10,
-                  background: "#1E293B", border: "1px solid rgba(255,255,255,0.07)",
-                  color: "#F1F5F9", fontSize: 13, outline: "none",
+                  background: "var(--lt-1e293b, #1E293B)", border: "1px solid rgba(255,255,255,0.07)",
+                  color: "var(--lt-f1f5f9, #F1F5F9)", fontSize: 13, outline: "none",
                   transition: "border-color 150ms",
                 }}
                 onFocus={e => e.target.style.borderColor = "rgba(99,102,241,0.5)"}
-                onBlur={e => e.target.style.borderColor = "rgba(255,255,255,0.07)"}
+                onBlur={e => e.target.style.borderColor = "var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))"}
               />
             </div>
           </div>
@@ -312,14 +312,14 @@ export default function InviteUser() {
                   >
                     <UserAvatar user={u} size={38} />
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ fontSize: 13, fontWeight: 700, color: "#F1F5F9", margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      <p style={{ fontSize: 13, fontWeight: 700, color: "var(--lt-f1f5f9, #F1F5F9)", margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                         {displayName(u)}
                       </p>
                       <p style={{ fontSize: 11, color: "#64748B", margin: "2px 0 0", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                         {u.email}
                       </p>
                     </div>
-                    <EnvelopeIcon style={{ width: 12, height: 12, color: "#334155", flexShrink: 0 }} />
+                    <EnvelopeIcon style={{ width: 12, height: 12, color: "var(--lt-334155, #334155)", flexShrink: 0 }} />
                   </button>
                 ))}
               </div>
@@ -331,10 +331,10 @@ export default function InviteUser() {
               <div style={{ padding: "28px 22px", textAlign: "center" }}>
                 <div style={{
                   width: 44, height: 44, borderRadius: 12,
-                  background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)",
+                  background: "var(--lt-rgba-255-255-255-0-03, rgba(255,255,255,0.03))", border: "1px solid rgba(255,255,255,0.06)",
                   display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 10px",
                 }}>
-                  <UserIcon style={{ width: 20, height: 20, color: "#334155" }} />
+                  <UserIcon style={{ width: 20, height: 20, color: "var(--lt-334155, #334155)" }} />
                 </div>
                 <p style={{ color: "#64748B", fontSize: 13, margin: 0 }}>
                   {t("enterprise.settings.inviteUser.typeToSearch")}
@@ -346,14 +346,14 @@ export default function InviteUser() {
           )}
 
           {/* Manual email entry */}
-          <div style={{ padding: "16px 22px 22px", borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+          <div style={{ padding: "16px 22px 22px", borderTop: "1px solid var(--lt-rgba-255-255-255-0-05, rgba(255,255,255,0.05))" }}>
             <p style={{ fontSize: 10, fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.1em", margin: "0 0 10px" }}>
               {t("enterprise.settings.inviteUser.orTypeEmail")}
             </p>
             <div style={{ position: "relative" }}>
               <EnvelopeIcon style={{
                 position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)",
-                width: 14, height: 14, color: selectedUser ? "#818CF8" : "#64748B", pointerEvents: "none",
+                width: 14, height: 14, color: selectedUser ? "var(--lt-818cf8, #818CF8)" : "#64748B", pointerEvents: "none",
               }} />
               <input
                 type="email"
@@ -363,13 +363,13 @@ export default function InviteUser() {
                 style={{
                   width: "100%", boxSizing: "border-box",
                   padding: "10px 36px 10px 34px", borderRadius: 10,
-                  background: selectedUser ? "rgba(99,102,241,0.08)" : "#1E293B",
-                  border: `1px solid ${selectedUser ? "rgba(99,102,241,0.3)" : "rgba(255,255,255,0.07)"}`,
-                  color: "#F1F5F9", fontSize: 13, outline: "none",
+                  background: selectedUser ? "rgba(99,102,241,0.08)" : "var(--lt-1e293b, #1E293B)",
+                  border: `1px solid ${selectedUser ? "rgba(99,102,241,0.3)" : "var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))"}`,
+                  color: "var(--lt-f1f5f9, #F1F5F9)", fontSize: 13, outline: "none",
                   transition: "all 150ms",
                 }}
                 onFocus={e => { if (!selectedUser) e.target.style.borderColor = "rgba(99,102,241,0.5)"; }}
-                onBlur={e => { if (!selectedUser) e.target.style.borderColor = "rgba(255,255,255,0.07)"; }}
+                onBlur={e => { if (!selectedUser) e.target.style.borderColor = "var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))"; }}
               />
               {(selectedUser || email) && (
                 <button
@@ -392,7 +392,7 @@ export default function InviteUser() {
 
           {/* Email preview — "where the invitation is sent" */}
           <div style={{
-            background: "#0F172A", border: `1px solid ${activeEmail ? "rgba(99,102,241,0.22)" : "rgba(255,255,255,0.07)"}`,
+            background: "var(--lt-0f172a, #0F172A)", border: `1px solid ${activeEmail ? "rgba(99,102,241,0.22)" : "var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))"}`,
             borderRadius: 18, padding: "22px",
             transition: "border-color 200ms",
             boxShadow: activeEmail ? "0 0 30px rgba(99,102,241,0.06)" : "none",
@@ -405,12 +405,12 @@ export default function InviteUser() {
               <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
                 <UserAvatar user={selectedUser} size={48} />
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ fontSize: 15, fontWeight: 800, color: "#F1F5F9", margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                  <p style={{ fontSize: 15, fontWeight: 800, color: "var(--lt-f1f5f9, #F1F5F9)", margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                     {displayName(selectedUser)}
                   </p>
                   <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 5 }}>
-                    <EnvelopeIcon style={{ width: 13, height: 13, color: "#818CF8", flexShrink: 0 }} />
-                    <span style={{ fontSize: 13, fontWeight: 700, color: "#818CF8", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                    <EnvelopeIcon style={{ width: 13, height: 13, color: "var(--lt-818cf8, #818CF8)", flexShrink: 0 }} />
+                    <span style={{ fontSize: 13, fontWeight: 700, color: "var(--lt-818cf8, #818CF8)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                       {selectedUser.email}
                     </span>
                   </div>
@@ -423,11 +423,11 @@ export default function InviteUser() {
                   background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.25)",
                   display: "flex", alignItems: "center", justifyContent: "center",
                 }}>
-                  <EnvelopeIcon style={{ width: 22, height: 22, color: "#818CF8" }} />
+                  <EnvelopeIcon style={{ width: 22, height: 22, color: "var(--lt-818cf8, #818CF8)" }} />
                 </div>
                 <div>
                   <p style={{ fontSize: 11, color: "#64748B", margin: "0 0 4px", fontWeight: 600 }}>{t("enterprise.settings.inviteUser.externalUser")}</p>
-                  <span style={{ fontSize: 14, fontWeight: 800, color: "#818CF8", wordBreak: "break-all" }}>
+                  <span style={{ fontSize: 14, fontWeight: 800, color: "var(--lt-818cf8, #818CF8)", wordBreak: "break-all" }}>
                     {activeEmail}
                   </span>
                 </div>
@@ -436,12 +436,12 @@ export default function InviteUser() {
               <div style={{ display: "flex", alignItems: "center", gap: 14, opacity: 0.45 }}>
                 <div style={{
                   width: 48, height: 48, borderRadius: 14,
-                  background: "#1E293B", border: "1px dashed rgba(255,255,255,0.08)",
+                  background: "var(--lt-1e293b, #1E293B)", border: "1px dashed rgba(255,255,255,0.08)",
                   display: "flex", alignItems: "center", justifyContent: "center",
                 }}>
-                  <EnvelopeIcon style={{ width: 22, height: 22, color: "#334155" }} />
+                  <EnvelopeIcon style={{ width: 22, height: 22, color: "var(--lt-334155, #334155)" }} />
                 </div>
-                <p style={{ fontSize: 13, color: "#334155", margin: 0 }}>
+                <p style={{ fontSize: 13, color: "var(--lt-334155, #334155)", margin: 0 }}>
                   {t("enterprise.settings.inviteUser.selectOrEnter")}
                 </p>
               </div>
@@ -449,7 +449,7 @@ export default function InviteUser() {
           </div>
 
           {/* Role selector */}
-          <div style={{ background: "#0F172A", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 18, padding: "22px" }}>
+          <div style={{ background: "var(--lt-0f172a, #0F172A)", border: "1px solid var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))", borderRadius: 18, padding: "22px" }}>
             <p style={{ fontSize: 10, fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.1em", margin: "0 0 14px" }}>
               {t("enterprise.settings.inviteUser.assignRole")}
             </p>
@@ -460,16 +460,16 @@ export default function InviteUser() {
                   onClick={() => setRole(r.value)}
                   style={{
                     padding: "11px 8px", borderRadius: 11,
-                    background: role === r.value ? r.bg : "rgba(255,255,255,0.02)",
-                    border: `1px solid ${role === r.value ? r.border : "rgba(255,255,255,0.06)"}`,
+                    background: role === r.value ? r.bg : "var(--lt-rgba-255-255-255-0-02, rgba(255,255,255,0.02))",
+                    border: `1px solid ${role === r.value ? r.border : "var(--lt-rgba-255-255-255-0-06, rgba(255,255,255,0.06))"}`,
                     cursor: "pointer", transition: "all 150ms",
                     textAlign: "center",
                     boxShadow: role === r.value ? `0 2px 12px ${r.color}18` : "none",
                   }}
-                  onMouseEnter={e => { if (role !== r.value) e.currentTarget.style.background = "rgba(255,255,255,0.05)"; }}
-                  onMouseLeave={e => { if (role !== r.value) e.currentTarget.style.background = "rgba(255,255,255,0.02)"; }}
+                  onMouseEnter={e => { if (role !== r.value) e.currentTarget.style.background = "var(--lt-rgba-255-255-255-0-05, rgba(255,255,255,0.05))"; }}
+                  onMouseLeave={e => { if (role !== r.value) e.currentTarget.style.background = "var(--lt-rgba-255-255-255-0-02, rgba(255,255,255,0.02))"; }}
                 >
-                  <span style={{ fontSize: 12, fontWeight: 700, color: role === r.value ? r.color : "#64748B" }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: role === r.value ? r.color: "#64748B" }}>
                     {r.label}
                   </span>
                 </button>
@@ -478,7 +478,7 @@ export default function InviteUser() {
           </div>
 
           {/* Stage selector */}
-          <div style={{ background: "#0F172A", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 18, padding: "22px" }}>
+          <div style={{ background: "var(--lt-0f172a, #0F172A)", border: "1px solid var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))", borderRadius: 18, padding: "22px" }}>
             <p style={{ fontSize: 10, fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.1em", margin: "0 0 14px" }}>
               {t("enterprise.settings.inviteUser.employeeStage")}
             </p>
@@ -488,15 +488,15 @@ export default function InviteUser() {
                 onChange={e => setStage(e.target.value)}
                 style={{
                   width: "100%", padding: "11px 14px", borderRadius: 11,
-                  background: "#1E293B", border: "1px solid rgba(255,255,255,0.07)",
-                  color: "#F1F5F9", fontSize: 13, outline: "none", cursor: "pointer",
+                  background: "var(--lt-1e293b, #1E293B)", border: "1px solid rgba(255,255,255,0.07)",
+                  color: "var(--lt-f1f5f9, #F1F5F9)", fontSize: 13, outline: "none", cursor: "pointer",
                   appearance: "none",
                 }}
                 onFocus={e => e.target.style.borderColor = "rgba(99,102,241,0.45)"}
-                onBlur={e => e.target.style.borderColor = "rgba(255,255,255,0.07)"}
+                onBlur={e => e.target.style.borderColor = "var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))"}
               >
                 {STAGES.map(s => (
-                  <option key={s.value} value={s.value} style={{ background: "#1E293B" }}>
+                  <option key={s.value} value={s.value} style={{ background: "var(--lt-1e293b, #1E293B)" }}>
                     {s.label}
                   </option>
                 ))}
@@ -516,7 +516,7 @@ export default function InviteUser() {
           {sendError && (
             <div style={{
               background: "rgba(248,113,113,0.08)", border: "1px solid rgba(248,113,113,0.22)",
-              borderRadius: 11, padding: "12px 16px", fontSize: 13, color: "#F87171",
+              borderRadius: 11, padding: "12px 16px", fontSize: 13, color: "var(--lt-f87171, #F87171)",
             }}>
               {sendError}
             </div>
@@ -532,7 +532,7 @@ export default function InviteUser() {
                 ? "linear-gradient(135deg, #6366F1 0%, #818CF8 100%)"
                 : "#1E293B",
               border: "none",
-              color: activeEmail ? "#fff" : "#334155",
+              color: activeEmail ? "#fff" : "var(--lt-334155, #334155)",
               fontSize: 14, fontWeight: 800,
               cursor: activeEmail && !sending ? "pointer" : "not-allowed",
               opacity: sending ? 0.7 : 1, transition: "all 200ms",
@@ -553,7 +553,7 @@ export default function InviteUser() {
               {t("enterprise.settings.inviteUser.willJoinAs")}{" "}
               <span style={{ color: selectedRole.color, fontWeight: 700 }}>{selectedRole.label}</span>
               {"  ·  "}
-              <span style={{ color: "#94A3B8" }}>
+              <span style={{ color: "var(--lt-94a3b8, #94A3B8)" }}>
                 {STAGES.find(s => s.value === stage)?.label}
               </span>
             </p>
