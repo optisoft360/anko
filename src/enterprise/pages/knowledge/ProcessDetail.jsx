@@ -212,7 +212,7 @@ function AutoGenBanner({ runState, collapsed, onToggle, onDismiss, onStop, summa
 
         {/* Progress bar */}
         {!isTerminal && (
-          <div style={{ flex: 1, height: 4, background: "rgba(255,255,255,0.08)", borderRadius: 2, overflow: "hidden" }}>
+          <div style={{ flex: 1, height: 4, background: "var(--lt-rgba-255-255-255-0-08, rgba(255,255,255,0.08))", borderRadius: 2, overflow: "hidden" }}>
             <div style={{ height: "100%", width: `${progress}%`, background: accentColor, borderRadius: 2, transition: "width 600ms ease" }} />
           </div>
         )}
@@ -225,7 +225,7 @@ function AutoGenBanner({ runState, collapsed, onToggle, onDismiss, onStop, summa
         {/* Stop */}
         {!isTerminal && onStop && (
           <button onClick={onStop}
-            style={{ color: "#f87171", cursor: "pointer", padding: "2px 8px", borderRadius: 4, fontSize: 11, fontWeight: 600, background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", flexShrink: 0 }}
+            style={{ color: "var(--lt-f87171, #f87171)", cursor: "pointer", padding: "2px 8px", borderRadius: 4, fontSize: 11, fontWeight: 600, background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", flexShrink: 0 }}
             onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(239,68,68,0.2)")}
             onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(239,68,68,0.1)")}
             title={t("enterprise.knowledge.processDetail.banner.stopTitle")}>
@@ -235,7 +235,7 @@ function AutoGenBanner({ runState, collapsed, onToggle, onDismiss, onStop, summa
 
         {/* Toggle */}
         <button onClick={onToggle}
-          style={{ color: "var(--text-tertiary)", cursor: "pointer", padding: "2px 6px", borderRadius: 4, fontSize: 11, fontWeight: 600, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", flexShrink: 0 }}
+          style={{ color: "var(--text-tertiary)", cursor: "pointer", padding: "2px 6px", borderRadius: 4, fontSize: 11, fontWeight: 600, background: "var(--lt-rgba-255-255-255-0-06, rgba(255,255,255,0.06))", border: "1px solid var(--lt-rgba-255-255-255-0-1, rgba(255,255,255,0.1))", flexShrink: 0 }}
           onMouseEnter={(e) => (e.currentTarget.style.color = "var(--text-primary)")}
           onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-tertiary)")}>
           {collapsed ? t("enterprise.knowledge.processDetail.banner.view") : t("enterprise.knowledge.processDetail.banner.hide")}
@@ -283,19 +283,19 @@ function AutoGenBanner({ runState, collapsed, onToggle, onDismiss, onStop, summa
 
           {/* Failed */}
           {isFailed && (
-            <p style={{ color: "#f87171", fontSize: 12, marginTop: 10, opacity: 0.85 }}>{error || message || t("enterprise.knowledge.processDetail.unexpectedError")}</p>
+            <p style={{ color: "var(--lt-f87171, #f87171)", fontSize: 12, marginTop: 10, opacity: 0.85 }}>{error || message || t("enterprise.knowledge.processDetail.unexpectedError")}</p>
           )}
 
           {/* Canceled */}
           {isCanceled && (
-            <p style={{ color: "#f59e0b", fontSize: 12, marginTop: 10, opacity: 0.85 }}>{t("enterprise.knowledge.processDetail.banner.canceledMessage")}</p>
+            <p style={{ color: "var(--lt-f59e0b, #f59e0b)", fontSize: 12, marginTop: 10, opacity: 0.85 }}>{t("enterprise.knowledge.processDetail.banner.canceledMessage")}</p>
           )}
 
           {/* Success results */}
           {isSuccess && (decks.length > 0 || batteries.length > 0) && (
             <div className="space-y-3 mt-3">
               {status === "completed_with_errors" && (
-                <p style={{ color: "#f59e0b", fontSize: 11 }}>{t("enterprise.knowledge.processDetail.banner.partialFailure")}</p>
+                <p style={{ color: "var(--lt-f59e0b, #f59e0b)", fontSize: 11 }}>{t("enterprise.knowledge.processDetail.banner.partialFailure")}</p>
               )}
               <div className="grid grid-cols-1 gap-1.5">
                 {[...decks.map((a) => ({ ...a, _t: "deck" })), ...batteries.map((a) => ({ ...a, _t: "battery" }))].map((a) => {
@@ -304,12 +304,12 @@ function AutoGenBanner({ runState, collapsed, onToggle, onDismiss, onStop, summa
                   return (
                     <button key={`${a._t}-${a.resource_id}`}
                       onClick={() => navigate(href)}
-                      style={{ display: "flex", alignItems: "center", gap: 8, padding: "7px 10px", background: "rgba(255,255,255,0.04)", borderRadius: 5, cursor: "pointer", textAlign: "left", width: "100%" }}
-                      onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.08)")}
-                      onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.04)")}>
+                      style={{ display: "flex", alignItems: "center", gap: 8, padding: "7px 10px", background: "var(--lt-rgba-255-255-255-0-04, rgba(255,255,255,0.04))", borderRadius: 5, cursor: "pointer", textAlign: "left", width: "100%" }}
+                      onMouseEnter={(e) => (e.currentTarget.style.background = "var(--lt-rgba-255-255-255-0-08, rgba(255,255,255,0.08))")}
+                      onMouseLeave={(e) => (e.currentTarget.style.background = "var(--lt-rgba-255-255-255-0-04, rgba(255,255,255,0.04))")}>
                       {a._t === "deck"
                         ? <ViewColumnsIcon style={{ width: 12, height: 12, color: "var(--accent)", flexShrink: 0 }} />
-                        : <BoltIcon style={{ width: 12, height: 12, color: "#f59e0b", flexShrink: 0 }} />}
+                        : <BoltIcon style={{ width: 12, height: 12, color: "var(--lt-f59e0b, #f59e0b)", flexShrink: 0 }} />}
                       <span style={{ fontSize: 12, color: "var(--text-primary)", fontWeight: 500, flex: 1 }} className="truncate">{title}</span>
                       <span style={{ fontSize: 10, color: "var(--text-tertiary)", flexShrink: 0, textTransform: "capitalize" }}>{a._t}</span>
                     </button>
@@ -384,7 +384,7 @@ export function AddDocModal({ ksId, companyId, onClose, onAdded, initialFiles = 
   const allDone = results.length > 0 && !uploading;
 
   return (
-    <div style={{ position: "fixed", inset: 0, zIndex: 50, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+    <div style={{ position: "fixed", inset: 0, zIndex: 50, background: "var(--lt-rgba-0-0-0-0-7, rgba(0,0,0,0.7))", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
       <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border)", borderRadius: 10, padding: "24px", width: "100%", maxWidth: 420 }}>
         <div className="flex items-center justify-between mb-5">
           <h2 style={{ color: "var(--text-primary)", fontWeight: 700, fontSize: 14 }}>{t("enterprise.knowledge.processDetail.addDocModal.title")}</h2>
@@ -416,18 +416,18 @@ export function AddDocModal({ ksId, companyId, onClose, onAdded, initialFiles = 
                 {entries.map(({ file: f, error: reason }, i) => (
                   <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8, padding: "5px 0" }}>
                     {reason
-                      ? <ExclamationTriangleIcon style={{ width: 12, height: 12, color: "#f87171", flexShrink: 0, marginTop: 2 }} />
+                      ? <ExclamationTriangleIcon style={{ width: 12, height: 12, color: "var(--lt-f87171, #f87171)", flexShrink: 0, marginTop: 2 }} />
                       : <DocumentArrowUpIcon style={{ width: 12, height: 12, color: "var(--text-tertiary)", flexShrink: 0, marginTop: 2 }} />}
                     <div style={{ minWidth: 0 }}>
-                      <span style={{ fontSize: 12, color: reason ? "#f87171" : "var(--text-secondary)", display: "block" }} className="truncate">{f.name}</span>
-                      {reason && <span style={{ fontSize: 11, color: "#f87171" }}>{reason}</span>}
+                      <span style={{ fontSize: 12, color: reason ? "var(--lt-f87171, #f87171)" : "var(--text-secondary)", display: "block" }} className="truncate">{f.name}</span>
+                      {reason && <span style={{ fontSize: 11, color: "var(--lt-f87171, #f87171)" }}>{reason}</span>}
                     </div>
                   </div>
                 ))}
               </div>
             )}
 
-            {error && <p style={{ color: "#f87171", fontSize: 12 }}>{error}</p>}
+            {error && <p style={{ color: "var(--lt-f87171, #f87171)", fontSize: 12 }}>{error}</p>}
 
             <div className="flex justify-end gap-2 pt-1">
               <button onClick={onClose} className="ank-btn-ghost text-xs">{t("enterprise.compliance.programs.cancel")}</button>
@@ -442,9 +442,9 @@ export function AddDocModal({ ksId, companyId, onClose, onAdded, initialFiles = 
             {results.map((r, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "7px 10px", background: r.ok ? "rgba(74,222,128,0.08)" : "rgba(239,68,68,0.08)", border: `1px solid ${r.ok ? "rgba(74,222,128,0.2)" : "rgba(239,68,68,0.2)"}`, borderRadius: 6 }}>
                 {r.ok
-                  ? <CheckCircleSolid style={{ width: 14, height: 14, color: "#4ade80", flexShrink: 0 }} />
-                  : <ExclamationTriangleIcon style={{ width: 14, height: 14, color: "#f87171", flexShrink: 0 }} />}
-                <span style={{ fontSize: 12, color: r.ok ? "#4ade80" : "#f87171", fontWeight: 600 }} className="truncate">{r.name}{r.reason ? ` — ${r.reason}` : ""}</span>
+                  ? <CheckCircleSolid style={{ width: 14, height: 14, color: "var(--lt-4ade80, #4ade80)", flexShrink: 0 }} />
+                  : <ExclamationTriangleIcon style={{ width: 14, height: 14, color: "var(--lt-f87171, #f87171)", flexShrink: 0 }} />}
+                <span style={{ fontSize: 12, color: r.ok ? "var(--lt-4ade80, #4ade80)" : "var(--lt-f87171, #f87171)", fontWeight: 600 }} className="truncate">{r.name}{r.reason ? ` — ${r.reason}` : ""}</span>
               </div>
             ))}
             <div className="flex justify-end pt-3">
@@ -519,7 +519,7 @@ function DocumentsTab({ docs, onAdd, onAutoGen, genStatus }) {
                 {doc.version_note ? ` · ${doc.version_note}` : ""}
               </p>
             </div>
-            <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 7px", borderRadius: 4, background: doc.status === "ready" ? "rgba(74,222,128,0.12)" : "rgba(255,255,255,0.07)", color: doc.status === "ready" ? "#4ade80" : "#8B8B9C", flexShrink: 0 }}>
+            <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 7px", borderRadius: 4, background: doc.status === "ready" ? "rgba(74,222,128,0.12)" : "var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))", color: doc.status === "ready" ? "#4ade80" : "#8B8B9C", flexShrink: 0 }}>
               {doc.status}
             </span>
           </div>
@@ -576,27 +576,27 @@ function ConfirmDeleteDialog({ target, onConfirm, onCancel, deleting }) {
   return (
     <div style={{
       position: "fixed", inset: 0, zIndex: 9999,
-      background: "rgba(0,0,0,0.65)", backdropFilter: "blur(4px)",
+      background: "var(--lt-rgba-0-0-0-0-65, rgba(0,0,0,0.65))", backdropFilter: "blur(4px)",
       display: "flex", alignItems: "center", justifyContent: "center", padding: 20,
     }}>
       <div style={{
-        background: "#0F172A", border: "1px solid rgba(239,68,68,0.25)",
+        background: "var(--lt-0f172a, #0F172A)", border: "1px solid rgba(239,68,68,0.25)",
         borderRadius: 16, padding: "28px 24px", maxWidth: 420, width: "100%",
-        boxShadow: "0 25px 60px rgba(0,0,0,0.6)",
+        boxShadow: "0 25px 60px var(--lt-rgba-0-0-0-0-6, rgba(0,0,0,0.6))",
       }}>
         {/* Icon */}
         <div style={{ width: 52, height: 52, borderRadius: "50%", background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.25)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 18 }}>
-          <TrashIcon style={{ width: 22, height: 22, color: "#EF4444" }} />
+          <TrashIcon style={{ width: 22, height: 22, color: "var(--lt-ef4444, #EF4444)" }} />
         </div>
         {/* Title */}
-        <p style={{ fontSize: 17, fontWeight: 800, color: "#F1F5F9", marginBottom: 8 }}>
+        <p style={{ fontSize: 17, fontWeight: 800, color: "var(--lt-f1f5f9, #F1F5F9)", marginBottom: 8 }}>
           {isTopic ? t("enterprise.knowledge.processDetail.deleteDialog.titleTopic") : isDeck ? t("enterprise.knowledge.processDetail.deleteDialog.titleDeck") : t("enterprise.knowledge.processDetail.deleteDialog.titleBattery")}
         </p>
         {/* Body */}
-        <p style={{ fontSize: 13, color: "#94A3B8", lineHeight: 1.6, marginBottom: 6 }}>
+        <p style={{ fontSize: 13, color: "var(--lt-94a3b8, #94A3B8)", lineHeight: 1.6, marginBottom: 6 }}>
           {t("enterprise.knowledge.processDetail.deleteDialog.willDelete")}
         </p>
-        <p style={{ fontSize: 13, fontWeight: 700, color: "#F1F5F9", marginBottom: 6, padding: "8px 12px", background: "rgba(255,255,255,0.05)", borderRadius: 8, border: "1px solid rgba(255,255,255,0.08)" }}>
+        <p style={{ fontSize: 13, fontWeight: 700, color: "var(--lt-f1f5f9, #F1F5F9)", marginBottom: 6, padding: "8px 12px", background: "var(--lt-rgba-255-255-255-0-05, rgba(255,255,255,0.05))", borderRadius: 8, border: "1px solid var(--lt-rgba-255-255-255-0-08, rgba(255,255,255,0.08))" }}>
           {label}
         </p>
         <p style={{ fontSize: 12, color: "#64748B", lineHeight: 1.55, marginBottom: 24 }}>
@@ -609,13 +609,13 @@ function ConfirmDeleteDialog({ target, onConfirm, onCancel, deleting }) {
         {/* Actions */}
         <div style={{ display: "flex", gap: 10 }}>
           <button onClick={onCancel} disabled={deleting}
-            style={{ flex: 1, padding: "11px", borderRadius: 10, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#94A3B8", fontWeight: 700, fontSize: 13, cursor: deleting ? "default" : "pointer", opacity: deleting ? 0.5 : 1, transition: "opacity 0.15s" }}>
+            style={{ flex: 1, padding: "11px", borderRadius: 10, background: "var(--lt-rgba-255-255-255-0-05, rgba(255,255,255,0.05))", border: "1px solid var(--lt-rgba-255-255-255-0-1, rgba(255,255,255,0.1))", color: "var(--lt-94a3b8, #94A3B8)", fontWeight: 700, fontSize: 13, cursor: deleting ? "default" : "pointer", opacity: deleting ? 0.5 : 1, transition: "opacity 0.15s" }}>
             {t("enterprise.compliance.programs.cancel")}
           </button>
           <button onClick={onConfirm} disabled={deleting}
             style={{ flex: 1, padding: "11px", borderRadius: 10, background: deleting ? "rgba(239,68,68,0.3)" : "linear-gradient(135deg, #DC2626 0%, #EF4444 100%)", border: "none", color: "#fff", fontWeight: 700, fontSize: 13, cursor: deleting ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 7, transition: "opacity 0.15s" }}>
             {deleting
-              ? <><div style={{ width: 14, height: 14, borderRadius: "50%", border: "2px solid rgba(255,255,255,0.3)", borderTopColor: "#fff" }} className="animate-spin" />{t("enterprise.knowledge.sources.deleteDialog.deleting")}</>
+              ? <><div style={{ width: 14, height: 14, borderRadius: "50%", border: "2px solid var(--lt-rgba-255-255-255-0-3, rgba(255,255,255,0.3))", borderTopColor: "#fff" }} className="animate-spin" />{t("enterprise.knowledge.sources.deleteDialog.deleting")}</>
               : <><TrashIcon style={{ width: 14, height: 14 }} />{t("enterprise.knowledge.processDetail.deleteDialog.delete")}</>
             }
           </button>
@@ -674,7 +674,7 @@ function EnterpriseBatteryCard({ battery, onSimulate, onDelete }) {
           <BoltIcon style={{ width: 11, height: 11 }} />
           {(battery.difficulty || "Medium").charAt(0).toUpperCase() + (battery.difficulty || "medium").slice(1).toLowerCase()}
         </span>
-        <span style={{ fontSize: 11, fontWeight: 600, padding: "3px 9px", borderRadius: 6, background: "rgba(255,255,255,0.06)", color: "var(--text-secondary)" }}>
+        <span style={{ fontSize: 11, fontWeight: 600, padding: "3px 9px", borderRadius: 6, background: "var(--lt-rgba-255-255-255-0-06, rgba(255,255,255,0.06))", color: "var(--text-secondary)" }}>
           {battery.question_count ?? 0} QUESTIONS
         </span>
       </div>
@@ -707,7 +707,7 @@ function EnterpriseBatteryCard({ battery, onSimulate, onDelete }) {
           style={{
             padding: "10px 12px", borderRadius: 8,
             background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)",
-            color: "#EF4444", cursor: "pointer",
+            color: "var(--lt-ef4444, #EF4444)", cursor: "pointer",
             display: "flex", alignItems: "center", justifyContent: "center",
             transition: "all 0.15s",
           }}
@@ -780,12 +780,12 @@ function EnterpriseDeckCard({ deck, onStudy, onLearn }) {
   return (
     <div
       style={{
-        background: "#0F172A", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10,
+        background: "var(--lt-0f172a, #0F172A)", border: "1px solid var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))", borderRadius: 10,
         padding: "16px", display: "flex", flexDirection: "column", gap: 10,
         transition: "border-color 0.15s, box-shadow 0.15s",
       }}
       onMouseEnter={(e) => { e.currentTarget.style.borderColor = "rgba(99,102,241,0.35)"; e.currentTarget.style.boxShadow = "0 0 0 1px rgba(99,102,241,0.12)"; }}
-      onMouseLeave={(e) => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)"; e.currentTarget.style.boxShadow = "none"; }}
+      onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))"; e.currentTarget.style.boxShadow = "none"; }}
     >
       {/* Row 1: visibility + count + date + download */}
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -793,8 +793,8 @@ function EnterpriseDeckCard({ deck, onStudy, onLearn }) {
           VISIBILITY: {visStyle.label}
         </span>
         <div style={{ display: "flex", alignItems: "center", gap: 5, padding: "2px 8px", borderRadius: 4, background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.15)", flexShrink: 0 }}>
-          <ViewColumnsIcon style={{ width: 11, height: 11, color: "#818CF8" }} />
-          <span style={{ fontSize: 10, fontWeight: 700, color: "#818CF8" }}>{cardCount}</span>
+          <ViewColumnsIcon style={{ width: 11, height: 11, color: "var(--lt-818cf8, #818CF8)" }} />
+          <span style={{ fontSize: 10, fontWeight: 700, color: "var(--lt-818cf8, #818CF8)" }}>{cardCount}</span>
         </div>
         <span style={{ marginLeft: "auto", fontSize: 11, color: "var(--text-tertiary)", flexShrink: 0 }}>{createdAt}</span>
         <button
@@ -815,9 +815,9 @@ function EnterpriseDeckCard({ deck, onStudy, onLearn }) {
           style={{
             display: "flex", alignItems: "center", gap: 5,
             fontSize: 10, fontWeight: 700, padding: "3px 10px", borderRadius: 20,
-            background: summaryUnavailable ? "rgba(245,158,11,0.08)" : showSummary ? "rgba(255,255,255,0.05)" : "rgba(99,102,241,0.1)",
-            color: summaryUnavailable ? "#f59e0b" : showSummary ? "#94A3B8" : "#818CF8",
-            border: `1px solid ${summaryUnavailable ? "rgba(245,158,11,0.2)" : showSummary ? "rgba(255,255,255,0.08)" : "rgba(99,102,241,0.2)"}`,
+            background: summaryUnavailable ? "rgba(245,158,11,0.08)" : showSummary ? "var(--lt-rgba-255-255-255-0-05, rgba(255,255,255,0.05))" : "rgba(99,102,241,0.1)",
+            color: summaryUnavailable ? "var(--lt-f59e0b, #f59e0b)" : showSummary ? "var(--lt-94a3b8, #94A3B8)" : "var(--lt-818cf8, #818CF8)",
+            border: `1px solid ${summaryUnavailable ? "rgba(245,158,11,0.2)" : showSummary ? "var(--lt-rgba-255-255-255-0-08, rgba(255,255,255,0.08))" : "rgba(99,102,241,0.2)"}`,
             cursor: loadingSummary ? "default" : "pointer", letterSpacing: "0.03em",
             transition: "all 150ms", opacity: loadingSummary ? 0.7 : 1,
           }}
@@ -830,19 +830,19 @@ function EnterpriseDeckCard({ deck, onStudy, onLearn }) {
       {/* Summary or description */}
       {showSummary && summary ? (
         <div style={{ padding: "10px 12px", borderRadius: 8, background: "rgba(99,102,241,0.06)", border: "1px solid rgba(99,102,241,0.12)" }}>
-          <p style={{ fontSize: 12, color: "#94A3B8", lineHeight: 1.6, fontStyle: "italic", margin: 0 }}>"{summary}"</p>
+          <p style={{ fontSize: 12, color: "var(--lt-94a3b8, #94A3B8)", lineHeight: 1.6, fontStyle: "italic", margin: 0 }}>"{summary}"</p>
         </div>
       ) : deck.description ? (
-        <p style={{ fontSize: 12, color: "#94A3B8", lineHeight: 1.5, margin: 0,
+        <p style={{ fontSize: 12, color: "var(--lt-94a3b8, #94A3B8)", lineHeight: 1.5, margin: 0,
           display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
           {deck.description}
         </p>
       ) : (
-        <p style={{ fontSize: 12, color: "#334155", fontStyle: "italic", margin: 0 }}>Sin descripción.</p>
+        <p style={{ fontSize: 12, color: "var(--lt-334155, #334155)", fontStyle: "italic", margin: 0 }}>Sin descripción.</p>
       )}
 
       {/* Title */}
-      <p style={{ fontSize: 14, fontWeight: 700, color: "#F1F5F9", lineHeight: 1.35, margin: 0 }}>
+      <p style={{ fontSize: 14, fontWeight: 700, color: "var(--lt-f1f5f9, #F1F5F9)", lineHeight: 1.35, margin: 0 }}>
         {deck.title}
       </p>
 
@@ -853,7 +853,7 @@ function EnterpriseDeckCard({ deck, onStudy, onLearn }) {
           style={{
             flex: 1, padding: "10px", borderRadius: 8,
             background: "transparent", border: "1px solid rgba(99,102,241,0.3)",
-            color: "#818CF8", fontSize: 12, fontWeight: 700, cursor: "pointer",
+            color: "var(--lt-818cf8, #818CF8)", fontSize: 12, fontWeight: 700, cursor: "pointer",
             display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
             transition: "background 0.15s",
           }}
@@ -963,8 +963,8 @@ function TagGroupSection({ tagGroup, content, isLast, onStudy, onLearn, onSimula
     <div style={{ display: "flex", minWidth: 0 }}>
       {/* Timeline */}
       <div style={{ width: 22, display: "flex", flexDirection: "column", alignItems: "center", marginRight: 14, flexShrink: 0 }}>
-        <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#6366F1", border: "2px solid #0F172A", flexShrink: 0, marginTop: 7 }} />
-        {!isLast && <div style={{ width: 2, flex: 1, background: "rgba(255,255,255,0.08)", minHeight: 24, marginTop: 4 }} />}
+        <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#6366F1", border: "2px solid var(--lt-0f172a, #0F172A)", flexShrink: 0, marginTop: 7 }} />
+        {!isLast && <div style={{ width: 2, flex: 1, background: "var(--lt-rgba-255-255-255-0-08, rgba(255,255,255,0.08))", minHeight: 24, marginTop: 4 }} />}
       </div>
 
       {/* Content */}
@@ -974,20 +974,20 @@ function TagGroupSection({ tagGroup, content, isLast, onStudy, onLearn, onSimula
           <button onClick={() => setExpanded((v) => !v)} style={{ color: "#64748B", cursor: "pointer", padding: 0, background: "none", border: "none", display: "flex", alignItems: "center", flexShrink: 0 }}>
             {expanded ? <ChevronDownIcon style={{ width: 13, height: 13 }} /> : <ChevronRightIcon style={{ width: 13, height: 13 }} />}
           </button>
-          <span style={{ fontWeight: 700, color: "#F1F5F9", fontSize: 13, flexShrink: 0, maxWidth: 240, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+          <span style={{ fontWeight: 700, color: "var(--lt-f1f5f9, #F1F5F9)", fontSize: 13, flexShrink: 0, maxWidth: 240, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
             {tagGroup.name}
           </span>
-          <span style={{ padding: "1px 7px", borderRadius: 20, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.09)", color: "#64748B", fontSize: 10, fontWeight: 600, flexShrink: 0 }}>
+          <span style={{ padding: "1px 7px", borderRadius: 20, background: "var(--lt-rgba-255-255-255-0-06, rgba(255,255,255,0.06))", border: "1px solid var(--lt-rgba-255-255-255-0-09, rgba(255,255,255,0.09))", color: "#64748B", fontSize: 10, fontWeight: 600, flexShrink: 0 }}>
             {t("enterprise.knowledge.processDetail.tagGroup.counts", { decks: decks.length, batteries: batteries.length })}
           </span>
           {tagGroup.status && (
-            <span style={{ padding: "1px 7px", borderRadius: 4, background: "rgba(99,102,241,0.1)", color: "#818CF8", fontSize: 10, fontWeight: 700, flexShrink: 0, textTransform: "capitalize" }}>
+            <span style={{ padding: "1px 7px", borderRadius: 4, background: "rgba(99,102,241,0.1)", color: "var(--lt-818cf8, #818CF8)", fontSize: 10, fontWeight: 700, flexShrink: 0, textTransform: "capitalize" }}>
               {tagGroup.status}
             </span>
           )}
           <span style={{ flex: 1 }} />
           {canReorder && (
-            <span style={{ fontSize: 10, color: "#475569", flexShrink: 0, display: "flex", alignItems: "center", gap: 3 }}>
+            <span style={{ fontSize: 10, color: "var(--lt-475569, #475569)", flexShrink: 0, display: "flex", alignItems: "center", gap: 3 }}>
               <Bars3Icon style={{ width: 11, height: 11 }} /> {t("enterprise.knowledge.processDetail.reorder")}
             </span>
           )}
@@ -998,7 +998,7 @@ function TagGroupSection({ tagGroup, content, isLast, onStudy, onLearn, onSimula
             {isLoading ? (
               <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 0" }}>
                 <div style={{ width: 14, height: 14, border: "2px solid rgba(99,102,241,0.25)", borderTopColor: "#6366F1", borderRadius: "50%" }} className="animate-spin" />
-                <span style={{ fontSize: 12, color: "#475569" }}>{t("enterprise.knowledge.processDetail.loading")}</span>
+                <span style={{ fontSize: 12, color: "var(--lt-475569, #475569)" }}>{t("enterprise.knowledge.processDetail.loading")}</span>
               </div>
             ) : (
               <>
@@ -1026,14 +1026,14 @@ function TagGroupSection({ tagGroup, content, isLast, onStudy, onLearn, onSimula
 
                 {decks.length === 0 && batteries.length === 0 && (
                   <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 8px" }}>
-                    <p style={{ color: "#334155", fontSize: 12, fontStyle: "italic", margin: 0 }}>{t("enterprise.knowledge.processDetail.noContentTopic")}</p>
+                    <p style={{ color: "var(--lt-334155, #334155)", fontSize: 12, fontStyle: "italic", margin: 0 }}>{t("enterprise.knowledge.processDetail.noContentTopic")}</p>
                     <button
                       onClick={() => onAddDeck?.(tagGroup.id)}
-                      style={{ padding: "3px 8px", borderRadius: 6, background: "rgba(99,102,241,0.08)", border: "1px solid rgba(99,102,241,0.2)", color: "#818CF8", fontSize: 11, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}
+                      style={{ padding: "3px 8px", borderRadius: 6, background: "rgba(99,102,241,0.08)", border: "1px solid rgba(99,102,241,0.2)", color: "var(--lt-818cf8, #818CF8)", fontSize: 11, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}
                     >+ Deck</button>
                     <button
                       onClick={() => onAddBattery?.(tagGroup.id)}
-                      style={{ padding: "3px 8px", borderRadius: 6, background: "rgba(94,106,210,0.08)", border: "1px solid rgba(94,106,210,0.2)", color: "#818CF8", fontSize: 11, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}
+                      style={{ padding: "3px 8px", borderRadius: 6, background: "rgba(94,106,210,0.08)", border: "1px solid rgba(94,106,210,0.2)", color: "var(--lt-818cf8, #818CF8)", fontSize: 11, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}
                     >+ {t("enterprise.knowledge.processDetail.battery")}</button>
                   </div>
                 )}
@@ -1056,13 +1056,13 @@ function DocumentsPanel({ docs, onAdd }) {
     : docs;
 
   return (
-    <div style={{ background: "#0F172A", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, overflow: "hidden" }}>
+    <div style={{ background: "var(--lt-0f172a, #0F172A)", border: "1px solid var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))", borderRadius: 12, overflow: "hidden" }}>
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 20px", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
-        <h3 style={{ color: "#F1F5F9", fontWeight: 700, fontSize: 14, margin: 0 }}>{t("enterprise.knowledge.processDetail.documentsPanel.title")}</h3>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 20px", borderBottom: "1px solid var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))" }}>
+        <h3 style={{ color: "var(--lt-f1f5f9, #F1F5F9)", fontWeight: 700, fontSize: 14, margin: 0 }}>{t("enterprise.knowledge.processDetail.documentsPanel.title")}</h3>
         <button
           onClick={onAdd}
-          style={{ display: "flex", alignItems: "center", gap: 5, padding: "5px 10px", borderRadius: 6, background: "rgba(99,102,241,0.12)", border: "1px solid rgba(99,102,241,0.25)", color: "#818CF8", fontSize: 11, fontWeight: 700, cursor: "pointer" }}
+          style={{ display: "flex", alignItems: "center", gap: 5, padding: "5px 10px", borderRadius: 6, background: "rgba(99,102,241,0.12)", border: "1px solid rgba(99,102,241,0.25)", color: "var(--lt-818cf8, #818CF8)", fontSize: 11, fontWeight: 700, cursor: "pointer" }}
           onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(99,102,241,0.22)"; }}
           onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(99,102,241,0.12)"; }}
         >
@@ -1071,24 +1071,24 @@ function DocumentsPanel({ docs, onAdd }) {
       </div>
 
       {/* Search + filter */}
-      <div style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,0.05)", display: "flex", gap: 8 }}>
+      <div style={{ padding: "12px 16px", borderBottom: "1px solid var(--lt-rgba-255-255-255-0-05, rgba(255,255,255,0.05))", display: "flex", gap: 8 }}>
         <div style={{ flex: 1, position: "relative" }}>
-          <MagnifyingGlassIcon style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", width: 13, height: 13, color: "#475569", pointerEvents: "none" }} />
+          <MagnifyingGlassIcon style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", width: 13, height: 13, color: "var(--lt-475569, #475569)", pointerEvents: "none" }} />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={t("enterprise.knowledge.processDetail.documentsPanel.searchPlaceholder")}
-            style={{ width: "100%", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 6, padding: "7px 10px 7px 30px", color: "#F1F5F9", fontSize: 12, outline: "none", boxSizing: "border-box" }}
+            style={{ width: "100%", background: "var(--lt-rgba-255-255-255-0-04, rgba(255,255,255,0.04))", border: "1px solid var(--lt-rgba-255-255-255-0-08, rgba(255,255,255,0.08))", borderRadius: 6, padding: "7px 10px 7px 30px", color: "var(--lt-f1f5f9, #F1F5F9)", fontSize: 12, outline: "none", boxSizing: "border-box" }}
           />
         </div>
-        <button style={{ padding: "6px 10px", borderRadius: 6, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "#64748B", cursor: "pointer", display: "flex", alignItems: "center" }}>
+        <button style={{ padding: "6px 10px", borderRadius: 6, background: "var(--lt-rgba-255-255-255-0-04, rgba(255,255,255,0.04))", border: "1px solid var(--lt-rgba-255-255-255-0-08, rgba(255,255,255,0.08))", color: "#64748B", cursor: "pointer", display: "flex", alignItems: "center" }}>
           <FunnelIcon style={{ width: 14, height: 14 }} />
         </button>
       </div>
 
       {/* Count */}
       <div style={{ padding: "8px 20px 4px" }}>
-        <span style={{ color: "#475569", fontSize: 11 }}>
+        <span style={{ color: "var(--lt-475569, #475569)", fontSize: 11 }}>
           {t("enterprise.knowledge.processDetail.documentsPanel.count", { count: filtered.length, plural: filtered.length !== 1 ? "s" : "" })}
         </span>
       </div>
@@ -1097,30 +1097,30 @@ function DocumentsPanel({ docs, onAdd }) {
       <div style={{ padding: "0 12px 4px" }}>
         {docs.length === 0 && (
           <div style={{ padding: "16px 8px", textAlign: "center" }}>
-            <p style={{ color: "#475569", fontSize: 12, margin: 0 }}>{t("enterprise.knowledge.processDetail.documentsPanel.empty")}</p>
+            <p style={{ color: "var(--lt-475569, #475569)", fontSize: 12, margin: 0 }}>{t("enterprise.knowledge.processDetail.documentsPanel.empty")}</p>
           </div>
         )}
         {filtered.map((doc) => {
           const ext = doc.type?.toUpperCase() || (doc.filename?.split(".").pop()?.toUpperCase()) || "FILE";
           const isPdf = ext === "PDF";
           return (
-            <div key={doc.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 8px", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+            <div key={doc.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 8px", borderBottom: "1px solid var(--lt-rgba-255-255-255-0-04, rgba(255,255,255,0.04))" }}>
               <div style={{ width: 32, height: 38, background: isPdf ? "#DC2626" : "#3B82F6", borderRadius: 4, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                 <span style={{ color: "#fff", fontSize: 7, fontWeight: 800, letterSpacing: "0.02em" }}>{ext.slice(0, 4)}</span>
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ color: "#F1F5F9", fontWeight: 600, fontSize: 12, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{doc.filename}</p>
-                <p style={{ color: "#475569", fontSize: 10, margin: "2px 0 0" }}>
+                <p style={{ color: "var(--lt-f1f5f9, #F1F5F9)", fontWeight: 600, fontSize: 12, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{doc.filename}</p>
+                <p style={{ color: "var(--lt-475569, #475569)", fontSize: 10, margin: "2px 0 0" }}>
                   {ext}
                   {` · ${formatBytes(doc.size || 0)}`}
                   {doc.added_by ? ` · ${t("enterprise.knowledge.processDetail.by", { name: doc.added_by })}` : ""}
                 </p>
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
-                <span style={{ fontSize: 9, fontWeight: 700, padding: "2px 6px", borderRadius: 4, background: doc.status === "ready" ? "rgba(74,222,128,0.15)" : "rgba(255,255,255,0.07)", color: doc.status === "ready" ? "#4ade80" : "#8B8B9C" }}>
+                <span style={{ fontSize: 9, fontWeight: 700, padding: "2px 6px", borderRadius: 4, background: doc.status === "ready" ? "rgba(74,222,128,0.15)" : "var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))", color: doc.status === "ready" ? "#4ade80" : "#8B8B9C" }}>
                   {doc.status}
                 </span>
-                <button style={{ color: "#475569", cursor: "pointer", background: "none", border: "none", padding: 2, display: "flex" }}>
+                <button style={{ color: "var(--lt-475569, #475569)", cursor: "pointer", background: "none", border: "none", padding: 2, display: "flex" }}>
                   <EllipsisVerticalIcon style={{ width: 14, height: 14 }} />
                 </button>
               </div>
@@ -1132,18 +1132,18 @@ function DocumentsPanel({ docs, onAdd }) {
       {/* Drag-drop zone */}
       <div
         onClick={() => onAdd()}
-        style={{ margin: "8px 12px 12px", border: "1.5px dashed rgba(255,255,255,0.1)", borderRadius: 8, padding: "20px 16px", textAlign: "center", cursor: "pointer", transition: "border-color 150ms" }}
+        style={{ margin: "8px 12px 12px", border: "1.5px dashed var(--lt-rgba-255-255-255-0-1, rgba(255,255,255,0.1))", borderRadius: 8, padding: "20px 16px", textAlign: "center", cursor: "pointer", transition: "border-color 150ms" }}
         onMouseEnter={(e) => (e.currentTarget.style.borderColor = "rgba(99,102,241,0.4)")}
-        onMouseLeave={(e) => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)")}
+        onMouseLeave={(e) => (e.currentTarget.style.borderColor = "var(--lt-rgba-255-255-255-0-1, rgba(255,255,255,0.1))")}
         onDragOver={(e) => { e.preventDefault(); e.currentTarget.style.borderColor = "rgba(99,102,241,0.5)"; }}
-        onDragLeave={(e) => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)")}
+        onDragLeave={(e) => (e.currentTarget.style.borderColor = "var(--lt-rgba-255-255-255-0-1, rgba(255,255,255,0.1))")}
         onDrop={(e) => { e.preventDefault(); onAdd(Array.from(e.dataTransfer.files || [])); }}
       >
-        <div style={{ width: 32, height: 32, borderRadius: "50%", background: "rgba(255,255,255,0.05)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 8px" }}>
+        <div style={{ width: 32, height: 32, borderRadius: "50%", background: "var(--lt-rgba-255-255-255-0-05, rgba(255,255,255,0.05))", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 8px" }}>
           <ArrowUpTrayIcon style={{ width: 16, height: 16, color: "#64748B" }} />
         </div>
         <p style={{ color: "#64748B", fontSize: 12, margin: "0 0 3px" }}>{t("enterprise.knowledge.processDetail.documentsPanel.dragDrop")}</p>
-        <span style={{ color: "#6366F1", fontSize: 12, fontWeight: 600 }}>{t("enterprise.knowledge.processDetail.documentsPanel.orSelectFiles")}</span>
+        <span style={{ color: "var(--lt-6366f1, #6366F1)", fontSize: 12, fontWeight: 600 }}>{t("enterprise.knowledge.processDetail.documentsPanel.orSelectFiles")}</span>
       </div>
     </div>
   );
@@ -1172,7 +1172,7 @@ function ItemJobStrip({ job, accentColor }) {
         {label}
       </span>
       {!isFailed && (
-        <div style={{ width: 60, height: 3, background: "rgba(255,255,255,0.08)", borderRadius: 2, overflow: "hidden", flexShrink: 0 }}>
+        <div style={{ width: 60, height: 3, background: "var(--lt-rgba-255-255-255-0-08, rgba(255,255,255,0.08))", borderRadius: 2, overflow: "hidden", flexShrink: 0 }}>
           <div style={{ height: "100%", width: `${isSuccess ? 100 : Math.max(4, job.progress || 0)}%`, background: barColor, borderRadius: 2, transition: "width 500ms ease" }} />
         </div>
       )}
@@ -1192,20 +1192,20 @@ function DeckRowItem({ deck, index, onStudy, onLearn, dragHandleProps, onAddDeck
   const isFailed = job && FAILED_STATUSES.has(job.status);
   const isSuccess = job && SUCCESS_STATUSES.has(job.status);
   const isRunning = job && !isFailed && !isSuccess;
-  const borderColor = isFailed ? "rgba(239,68,68,0.35)" : isSuccess ? "rgba(74,222,128,0.35)" : isRunning ? "rgba(99,102,241,0.35)" : "rgba(255,255,255,0.06)";
+  const borderColor = isFailed ? "rgba(239,68,68,0.35)" : isSuccess ? "rgba(74,222,128,0.35)" : isRunning ? "rgba(99,102,241,0.35)" : "var(--lt-rgba-255-255-255-0-06, rgba(255,255,255,0.06))";
   return (
-    <div style={{ background: "rgba(255,255,255,0.025)", border: `1px solid ${borderColor}`, borderRadius: 8, marginBottom: 6, minWidth: 0, transition: "border-color 250ms" }}>
+    <div style={{ background: "var(--lt-rgba-255-255-255-0-025, rgba(255,255,255,0.025))", border: `1px solid ${borderColor}`, borderRadius: 8, marginBottom: 6, minWidth: 0, transition: "border-color 250ms" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", minWidth: 0 }}>
         {dragHandleProps && (
-          <div {...dragHandleProps} style={{ cursor: "grab", color: "#334155", display: "flex", alignItems: "center", flexShrink: 0, touchAction: "none" }} title={t("enterprise.knowledge.processDetail.dragToReorder")}>
+          <div {...dragHandleProps} style={{ cursor: "grab", color: "var(--lt-334155, #334155)", display: "flex", alignItems: "center", flexShrink: 0, touchAction: "none" }} title={t("enterprise.knowledge.processDetail.dragToReorder")}>
             <Bars3Icon style={{ width: 14, height: 14 }} />
           </div>
         )}
         <div style={{ width: 26, height: 26, borderRadius: 7, background: "rgba(99,102,241,0.12)", border: "1px solid rgba(99,102,241,0.2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-          <ViewColumnsIcon style={{ width: 13, height: 13, color: "#818CF8" }} />
+          <ViewColumnsIcon style={{ width: 13, height: 13, color: "var(--lt-818cf8, #818CF8)" }} />
         </div>
-        <span style={{ fontSize: 12, fontWeight: 700, color: "#F1F5F9", flexShrink: 0, maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={label}>{label}</span>
-        <span style={{ padding: "1px 7px", borderRadius: 20, background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.15)", color: "#818CF8", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>
+        <span style={{ fontSize: 12, fontWeight: 700, color: "var(--lt-f1f5f9, #F1F5F9)", flexShrink: 0, maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={label}>{label}</span>
+        <span style={{ padding: "1px 7px", borderRadius: 20, background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.15)", color: "var(--lt-818cf8, #818CF8)", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>
           {isRunning ? <ArrowPathIcon className="animate-spin" style={{ width: 9, height: 9, display: "inline-block" }} /> : t("enterprise.knowledge.processDetail.cardsCount", { n: cardCount })}
         </span>
         <span style={{ flex: 1, fontSize: 11, color: "#64748B", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", minWidth: 0 }}>
@@ -1214,7 +1214,7 @@ function DeckRowItem({ deck, index, onStudy, onLearn, dragHandleProps, onAddDeck
         <button
           onClick={() => onLearn?.(deck)}
           disabled={isRunning}
-          style={{ padding: "4px 10px", borderRadius: 6, background: "transparent", border: "1px solid rgba(99,102,241,0.25)", color: "#818CF8", fontSize: 11, fontWeight: 700, cursor: isRunning ? "default" : "pointer", flexShrink: 0, whiteSpace: "nowrap", opacity: isRunning ? 0.4 : 1 }}
+          style={{ padding: "4px 10px", borderRadius: 6, background: "transparent", border: "1px solid rgba(99,102,241,0.25)", color: "var(--lt-818cf8, #818CF8)", fontSize: 11, fontWeight: 700, cursor: isRunning ? "default" : "pointer", flexShrink: 0, whiteSpace: "nowrap", opacity: isRunning ? 0.4 : 1 }}
           onMouseEnter={(e) => { if (!isRunning) e.currentTarget.style.background = "rgba(99,102,241,0.1)"; }}
           onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
         >
@@ -1223,7 +1223,7 @@ function DeckRowItem({ deck, index, onStudy, onLearn, dragHandleProps, onAddDeck
         <button
           onClick={() => onStudy?.(deck)}
           disabled={isRunning}
-          style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.2)", color: "#818CF8", fontSize: 11, fontWeight: 700, cursor: isRunning ? "default" : "pointer", flexShrink: 0, whiteSpace: "nowrap", opacity: isRunning ? 0.4 : 1 }}
+          style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.2)", color: "var(--lt-818cf8, #818CF8)", fontSize: 11, fontWeight: 700, cursor: isRunning ? "default" : "pointer", flexShrink: 0, whiteSpace: "nowrap", opacity: isRunning ? 0.4 : 1 }}
           onMouseEnter={(e) => { if (!isRunning) e.currentTarget.style.background = "rgba(99,102,241,0.18)"; }}
           onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(99,102,241,0.1)"; }}
         >
@@ -1231,7 +1231,7 @@ function DeckRowItem({ deck, index, onStudy, onLearn, dragHandleProps, onAddDeck
         </button>
         <button
           onClick={() => onAddDeck?.()}
-          style={{ padding: "4px 8px", borderRadius: 6, background: "rgba(74,222,128,0.07)", border: "1px solid rgba(74,222,128,0.18)", color: "#4ade80", fontSize: 11, fontWeight: 700, cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap" }}
+          style={{ padding: "4px 8px", borderRadius: 6, background: "rgba(74,222,128,0.07)", border: "1px solid rgba(74,222,128,0.18)", color: "var(--lt-4ade80, #4ade80)", fontSize: 11, fontWeight: 700, cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap" }}
           onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(74,222,128,0.15)"; }}
           onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(74,222,128,0.07)"; }}
         >
@@ -1242,7 +1242,7 @@ function DeckRowItem({ deck, index, onStudy, onLearn, dragHandleProps, onAddDeck
           onClick={() => onDelete?.(deck)}
           title={t("enterprise.knowledge.processDetail.deleteDeckTitle")}
           disabled={isRunning}
-          style={{ padding: "4px 7px", borderRadius: 6, background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.15)", color: "#EF4444", cursor: isRunning ? "default" : "pointer", flexShrink: 0, display: "flex", alignItems: "center", opacity: isRunning ? 0.4 : 1 }}
+          style={{ padding: "4px 7px", borderRadius: 6, background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.15)", color: "var(--lt-ef4444, #EF4444)", cursor: isRunning ? "default" : "pointer", flexShrink: 0, display: "flex", alignItems: "center", opacity: isRunning ? 0.4 : 1 }}
           onMouseEnter={(e) => { if (!isRunning) e.currentTarget.style.background = "rgba(239,68,68,0.14)"; }}
           onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(239,68,68,0.06)"; }}
         >
@@ -1255,7 +1255,7 @@ function DeckRowItem({ deck, index, onStudy, onLearn, dragHandleProps, onAddDeck
           {isFailed && onDismissJob && (
             <button
               onClick={() => onDismissJob(job.id)}
-              style={{ marginRight: 12, flexShrink: 0, fontSize: 10, fontWeight: 700, color: "#f87171", background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 5, padding: "2px 8px", cursor: "pointer" }}
+              style={{ marginRight: 12, flexShrink: 0, fontSize: 10, fontWeight: 700, color: "var(--lt-f87171, #f87171)", background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 5, padding: "2px 8px", cursor: "pointer" }}
               onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(239,68,68,0.18)"; }}
               onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(239,68,68,0.08)"; }}
             >
@@ -1280,21 +1280,21 @@ function BatteryRowItem({ battery, index, onSimulate, onDelete, dragHandleProps,
   const isFailed = job && FAILED_STATUSES.has(job.status);
   const isSuccess = job && SUCCESS_STATUSES.has(job.status);
   const isRunning = job && !isFailed && !isSuccess;
-  const borderColor = isFailed ? "rgba(239,68,68,0.35)" : isSuccess ? "rgba(74,222,128,0.35)" : isRunning ? "rgba(94,106,210,0.35)" : "rgba(255,255,255,0.06)";
+  const borderColor = isFailed ? "rgba(239,68,68,0.35)" : isSuccess ? "rgba(74,222,128,0.35)" : isRunning ? "rgba(94,106,210,0.35)" : "var(--lt-rgba-255-255-255-0-06, rgba(255,255,255,0.06))";
 
   return (
-    <div style={{ background: "rgba(255,255,255,0.025)", border: `1px solid ${borderColor}`, borderRadius: 8, marginBottom: 6, minWidth: 0, transition: "border-color 250ms" }}>
+    <div style={{ background: "var(--lt-rgba-255-255-255-0-025, rgba(255,255,255,0.025))", border: `1px solid ${borderColor}`, borderRadius: 8, marginBottom: 6, minWidth: 0, transition: "border-color 250ms" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", minWidth: 0 }}>
         {dragHandleProps && (
-          <div {...dragHandleProps} style={{ cursor: "grab", color: "#334155", display: "flex", alignItems: "center", flexShrink: 0, touchAction: "none" }} title={t("enterprise.knowledge.processDetail.dragToReorder")}>
+          <div {...dragHandleProps} style={{ cursor: "grab", color: "var(--lt-334155, #334155)", display: "flex", alignItems: "center", flexShrink: 0, touchAction: "none" }} title={t("enterprise.knowledge.processDetail.dragToReorder")}>
             <Bars3Icon style={{ width: 14, height: 14 }} />
           </div>
         )}
         <div style={{ width: 26, height: 26, borderRadius: 7, background: "rgba(94,106,210,0.12)", border: "1px solid rgba(94,106,210,0.2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-          <BoltIcon style={{ width: 13, height: 13, color: "#818CF8" }} />
+          <BoltIcon style={{ width: 13, height: 13, color: "var(--lt-818cf8, #818CF8)" }} />
         </div>
-        <span style={{ fontSize: 12, fontWeight: 700, color: "#F1F5F9", flexShrink: 0, maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={label}>{label}</span>
-        <span style={{ padding: "1px 7px", borderRadius: 20, background: "rgba(94,106,210,0.1)", border: "1px solid rgba(94,106,210,0.15)", color: "#818CF8", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>
+        <span style={{ fontSize: 12, fontWeight: 700, color: "var(--lt-f1f5f9, #F1F5F9)", flexShrink: 0, maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={label}>{label}</span>
+        <span style={{ padding: "1px 7px", borderRadius: 20, background: "rgba(94,106,210,0.1)", border: "1px solid rgba(94,106,210,0.15)", color: "var(--lt-818cf8, #818CF8)", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>
           {isRunning ? <ArrowPathIcon className="animate-spin" style={{ width: 9, height: 9, display: "inline-block" }} /> : t("enterprise.knowledge.processDetail.questionsCount", { n: questionCount })}
         </span>
         <span style={{ flex: 1, fontSize: 11, color: "#64748B", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", minWidth: 0 }}>
@@ -1303,10 +1303,10 @@ function BatteryRowItem({ battery, index, onSimulate, onDelete, dragHandleProps,
 
         {/* Completion bar */}
         <div style={{ display: "flex", alignItems: "center", gap: 5, flexShrink: 0 }}>
-          <div style={{ width: 52, height: 4, background: "rgba(255,255,255,0.08)", borderRadius: 2, overflow: "hidden" }}>
+          <div style={{ width: 52, height: 4, background: "var(--lt-rgba-255-255-255-0-08, rgba(255,255,255,0.08))", borderRadius: 2, overflow: "hidden" }}>
             <div style={{ height: "100%", width: `${hasAttempt ? pctRounded : 0}%`, background: pctColor, borderRadius: 2, transition: "width 400ms ease" }} />
           </div>
-          <span style={{ fontSize: 10, fontWeight: 700, color: hasAttempt ? pctColor : "#334155", minWidth: 28, textAlign: "right" }}>
+          <span style={{ fontSize: 10, fontWeight: 700, color: hasAttempt ? pctColor : "var(--lt-334155, #334155)", minWidth: 28, textAlign: "right" }}>
             {hasAttempt ? `${pctRounded}%` : "—"}
           </span>
         </div>
@@ -1314,7 +1314,7 @@ function BatteryRowItem({ battery, index, onSimulate, onDelete, dragHandleProps,
         <button
           onClick={() => onSimulate?.(battery)}
           disabled={isRunning}
-          style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(94,106,210,0.1)", border: "1px solid rgba(94,106,210,0.2)", color: "#818CF8", fontSize: 11, fontWeight: 700, cursor: isRunning ? "default" : "pointer", flexShrink: 0, whiteSpace: "nowrap", opacity: isRunning ? 0.4 : 1 }}
+          style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(94,106,210,0.1)", border: "1px solid rgba(94,106,210,0.2)", color: "var(--lt-818cf8, #818CF8)", fontSize: 11, fontWeight: 700, cursor: isRunning ? "default" : "pointer", flexShrink: 0, whiteSpace: "nowrap", opacity: isRunning ? 0.4 : 1 }}
           onMouseEnter={(e) => { if (!isRunning) e.currentTarget.style.background = "rgba(94,106,210,0.18)"; }}
           onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(94,106,210,0.1)"; }}
         >
@@ -1322,7 +1322,7 @@ function BatteryRowItem({ battery, index, onSimulate, onDelete, dragHandleProps,
         </button>
         <button
           onClick={() => onAddBattery?.()}
-          style={{ padding: "4px 8px", borderRadius: 6, background: "rgba(74,222,128,0.07)", border: "1px solid rgba(74,222,128,0.18)", color: "#4ade80", fontSize: 11, fontWeight: 700, cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap" }}
+          style={{ padding: "4px 8px", borderRadius: 6, background: "rgba(74,222,128,0.07)", border: "1px solid rgba(74,222,128,0.18)", color: "var(--lt-4ade80, #4ade80)", fontSize: 11, fontWeight: 700, cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap" }}
           onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(74,222,128,0.15)"; }}
           onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(74,222,128,0.07)"; }}
         >
@@ -1332,7 +1332,7 @@ function BatteryRowItem({ battery, index, onSimulate, onDelete, dragHandleProps,
           onClick={() => onDelete?.(battery)}
           title={t("enterprise.knowledge.processDetail.deleteBatteryTitle")}
           disabled={isRunning}
-          style={{ padding: "4px 7px", borderRadius: 6, background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.15)", color: "#EF4444", cursor: isRunning ? "default" : "pointer", flexShrink: 0, display: "flex", alignItems: "center", opacity: isRunning ? 0.4 : 1 }}
+          style={{ padding: "4px 7px", borderRadius: 6, background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.15)", color: "var(--lt-ef4444, #EF4444)", cursor: isRunning ? "default" : "pointer", flexShrink: 0, display: "flex", alignItems: "center", opacity: isRunning ? 0.4 : 1 }}
           onMouseEnter={(e) => { if (!isRunning) e.currentTarget.style.background = "rgba(239,68,68,0.14)"; }}
           onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(239,68,68,0.06)"; }}
         >
@@ -1345,7 +1345,7 @@ function BatteryRowItem({ battery, index, onSimulate, onDelete, dragHandleProps,
           {isFailed && onDismissJob && (
             <button
               onClick={() => onDismissJob(job.id)}
-              style={{ marginRight: 12, flexShrink: 0, fontSize: 10, fontWeight: 700, color: "#f87171", background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 5, padding: "2px 8px", cursor: "pointer" }}
+              style={{ marginRight: 12, flexShrink: 0, fontSize: 10, fontWeight: 700, color: "var(--lt-f87171, #f87171)", background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 5, padding: "2px 8px", cursor: "pointer" }}
               onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(239,68,68,0.18)"; }}
               onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(239,68,68,0.08)"; }}
             >
@@ -1402,9 +1402,9 @@ function TopicTreeItem({
     <div style={{ display: "flex", minWidth: 0 }}>
       {/* Timeline */}
       <div style={{ width: 22, display: "flex", flexDirection: "column", alignItems: "center", marginRight: 14, flexShrink: 0 }}>
-        <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#4ade80", border: "2px solid #0F172A", flexShrink: 0, marginTop: 7 }} />
+        <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#4ade80", border: "2px solid var(--lt-0f172a, #0F172A)", flexShrink: 0, marginTop: 7 }} />
         {!isLast && (
-          <div style={{ width: 2, flex: 1, background: "rgba(255,255,255,0.08)", minHeight: 24, marginTop: 4 }} />
+          <div style={{ width: 2, flex: 1, background: "var(--lt-rgba-255-255-255-0-08, rgba(255,255,255,0.08))", minHeight: 24, marginTop: 4 }} />
         )}
       </div>
 
@@ -1420,15 +1420,15 @@ function TopicTreeItem({
               ? <ChevronDownIcon style={{ width: 13, height: 13 }} />
               : <ChevronRightIcon style={{ width: 13, height: 13 }} />}
           </button>
-          <span style={{ fontWeight: 700, color: "#F1F5F9", fontSize: 13, flexShrink: 0 }}>{topic.title || t("enterprise.knowledge.processDetail.topicLabel", { n: index + 1 })}</span>
-          <span style={{ padding: "1px 7px", borderRadius: 20, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.09)", color: "#64748B", fontSize: 10, fontWeight: 600, flexShrink: 0 }}>
+          <span style={{ fontWeight: 700, color: "var(--lt-f1f5f9, #F1F5F9)", fontSize: 13, flexShrink: 0 }}>{topic.title || t("enterprise.knowledge.processDetail.topicLabel", { n: index + 1 })}</span>
+          <span style={{ padding: "1px 7px", borderRadius: 20, background: "var(--lt-rgba-255-255-255-0-06, rgba(255,255,255,0.06))", border: "1px solid var(--lt-rgba-255-255-255-0-09, rgba(255,255,255,0.09))", color: "#64748B", fontSize: 10, fontWeight: 600, flexShrink: 0 }}>
             {t("enterprise.knowledge.processDetail.tagsCount", { n: tagCount })}
           </span>
           <span style={{ fontSize: 11, color: "#64748B", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1, minWidth: 0 }}>
             {description}
           </span>
           {canReorder && (decks.length + batteries.length) > 1 && (
-            <span style={{ fontSize: 10, color: "#475569", flexShrink: 0, display: "flex", alignItems: "center", gap: 3 }}>
+            <span style={{ fontSize: 10, color: "var(--lt-475569, #475569)", flexShrink: 0, display: "flex", alignItems: "center", gap: 3 }}>
               <Bars3Icon style={{ width: 11, height: 11 }} /> {t("enterprise.knowledge.processDetail.dragToReorderLong")}
             </span>
           )}
@@ -1436,7 +1436,7 @@ function TopicTreeItem({
           <button
             onClick={deleteTopic}
             title={t("enterprise.knowledge.processDetail.deleteDialog.titleTopic")}
-            style={{ padding: "4px 7px", borderRadius: 6, background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.15)", color: "#EF4444", cursor: "pointer", flexShrink: 0, display: "flex", alignItems: "center" }}
+            style={{ padding: "4px 7px", borderRadius: 6, background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.15)", color: "var(--lt-ef4444, #EF4444)", cursor: "pointer", flexShrink: 0, display: "flex", alignItems: "center" }}
             onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(239,68,68,0.14)"; }}
             onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(239,68,68,0.06)"; }}
           >
@@ -1477,9 +1477,9 @@ function TopicTreeItem({
             ))}
             {decks.length === 0 && batteries.length === 0 && pendingDeckJobs.length === 0 && pendingBatteryJobs.length === 0 && (
               <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", padding: "4px 8px" }}>
-                <p style={{ color: "#334155", fontSize: 12, fontStyle: "italic", margin: 0 }}>{t("enterprise.knowledge.processDetail.noContentGenerated")}</p>
-                {onAddDeck && <button type="button" onClick={addDeck} style={{ padding: "4px 8px", borderRadius: 6, background: "rgba(74,222,128,0.07)", border: "1px solid rgba(74,222,128,0.18)", color: "#4ade80", fontSize: 11, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}>+ {t("enterprise.knowledge.processDetail.addDeck")}</button>}
-                {onAddBattery && <button type="button" onClick={addBattery} style={{ padding: "4px 8px", borderRadius: 6, background: "rgba(74,222,128,0.07)", border: "1px solid rgba(74,222,128,0.18)", color: "#4ade80", fontSize: 11, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}>+ {t("enterprise.knowledge.processDetail.addBattery")}</button>}
+                <p style={{ color: "var(--lt-334155, #334155)", fontSize: 12, fontStyle: "italic", margin: 0 }}>{t("enterprise.knowledge.processDetail.noContentGenerated")}</p>
+                {onAddDeck && <button type="button" onClick={addDeck} style={{ padding: "4px 8px", borderRadius: 6, background: "rgba(74,222,128,0.07)", border: "1px solid rgba(74,222,128,0.18)", color: "var(--lt-4ade80, #4ade80)", fontSize: 11, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}>+ {t("enterprise.knowledge.processDetail.addDeck")}</button>}
+                {onAddBattery && <button type="button" onClick={addBattery} style={{ padding: "4px 8px", borderRadius: 6, background: "rgba(74,222,128,0.07)", border: "1px solid rgba(74,222,128,0.18)", color: "var(--lt-4ade80, #4ade80)", fontSize: 11, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}>+ {t("enterprise.knowledge.processDetail.addBattery")}</button>}
               </div>
             )}
           </div>
@@ -1526,13 +1526,13 @@ function KnowledgeStructurePanel({
   const completionColor = processCompletion >= 80 ? "#4ade80" : processCompletion >= 50 ? "#f59e0b" : "#818CF8";
 
   return (
-    <div style={{ background: "#0F172A", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, overflow: "hidden" }}>
+    <div style={{ background: "var(--lt-0f172a, #0F172A)", border: "1px solid var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))", borderRadius: 12, overflow: "hidden" }}>
       {/* Header with stats */}
-      <div style={{ padding: "16px 20px", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
+      <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))" }}>
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
           <div style={{ minWidth: 0 }}>
-            <h3 style={{ color: "#F1F5F9", fontWeight: 700, fontSize: 14, margin: 0 }}>{t("enterprise.knowledge.processDetail.structurePanel.title")}</h3>
-            <p style={{ color: "#475569", fontSize: 11, margin: "3px 0 0" }}>
+            <h3 style={{ color: "var(--lt-f1f5f9, #F1F5F9)", fontWeight: 700, fontSize: 14, margin: 0 }}>{t("enterprise.knowledge.processDetail.structurePanel.title")}</h3>
+            <p style={{ color: "var(--lt-475569, #475569)", fontSize: 11, margin: "3px 0 0" }}>
               {t("enterprise.knowledge.processDetail.structurePanel.summary", { topics: summary?.topics ?? topics.length, decks: summary?.decks ?? decks.length, batteries: summary?.batteries ?? batteries.length })}
             </p>
           </div>
@@ -1544,12 +1544,12 @@ function KnowledgeStructurePanel({
               { count: totalQuestions, label: t("enterprise.knowledge.processDetail.structurePanel.stats.questions") },
               { count: totalCards, label: t("enterprise.knowledge.processDetail.structurePanel.stats.cards") },
             ].map(({ count, label }) => (
-              <div key={label} style={{ display: "flex", alignItems: "center", gap: 4, padding: "3px 8px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 6 }}>
-                <span style={{ fontSize: 12, fontWeight: 700, color: "#94A3B8" }}>{count}</span>
-                <span style={{ fontSize: 10, color: "#475569" }}>{label}</span>
+              <div key={label} style={{ display: "flex", alignItems: "center", gap: 4, padding: "3px 8px", background: "var(--lt-rgba-255-255-255-0-05, rgba(255,255,255,0.05))", border: "1px solid var(--lt-rgba-255-255-255-0-08, rgba(255,255,255,0.08))", borderRadius: 6 }}>
+                <span style={{ fontSize: 12, fontWeight: 700, color: "var(--lt-94a3b8, #94A3B8)" }}>{count}</span>
+                <span style={{ fontSize: 10, color: "var(--lt-475569, #475569)" }}>{label}</span>
               </div>
             ))}
-            <button onClick={() => onAddTopic?.()} style={{ display: "flex", alignItems: "center", gap: 4, padding: "4px 10px", background: "rgba(74,222,128,0.08)", border: "1px solid rgba(74,222,128,0.22)", borderRadius: 6, color: "#4ade80", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
+            <button onClick={() => onAddTopic?.()} style={{ display: "flex", alignItems: "center", gap: 4, padding: "4px 10px", background: "rgba(74,222,128,0.08)", border: "1px solid rgba(74,222,128,0.22)", borderRadius: 6, color: "var(--lt-4ade80, #4ade80)", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
               <PlusIcon style={{ width: 11, height: 11 }} /> {t("enterprise.knowledge.processDetail.structurePanel.addTopic")}
             </button>
           </div>
@@ -1559,13 +1559,13 @@ function KnowledgeStructurePanel({
         {batteries.length > 0 && (
           <div style={{ marginTop: 14, display: "flex", alignItems: "center", gap: 10 }}>
             <span style={{ fontSize: 11, fontWeight: 600, color: "#64748B", flexShrink: 0 }}>{t("enterprise.knowledge.processDetail.structurePanel.completion")}</span>
-            <div style={{ flex: 1, height: 6, background: "rgba(255,255,255,0.07)", borderRadius: 3, overflow: "hidden" }}>
+            <div style={{ flex: 1, height: 6, background: "var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))", borderRadius: 3, overflow: "hidden" }}>
               <div style={{ height: "100%", width: `${processCompletion}%`, background: processCompletion > 0 ? `linear-gradient(90deg, ${completionColor}99, ${completionColor})` : "transparent", borderRadius: 3, transition: "width 600ms ease" }} />
             </div>
             <span style={{ fontSize: 12, fontWeight: 800, color: completionColor, flexShrink: 0, minWidth: 36, textAlign: "right" }}>
               {processCompletion}%
             </span>
-            <span style={{ fontSize: 10, color: "#475569", flexShrink: 0, whiteSpace: "nowrap" }}>
+            <span style={{ fontSize: 10, color: "var(--lt-475569, #475569)", flexShrink: 0, whiteSpace: "nowrap" }}>
               {t("enterprise.knowledge.processDetail.structurePanel.completedBatteries", { completed: completedBatteries, total: batteries.length, passing })}
             </span>
           </div>
@@ -1579,11 +1579,11 @@ function KnowledgeStructurePanel({
         </div>
       ) : !hasContent && !useTagGroupSystem ? (
         <div style={{ padding: "40px 24px", textAlign: "center" }}>
-          <div style={{ width: 44, height: 44, borderRadius: 10, background: "rgba(255,255,255,0.04)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 14px" }}>
-            <SparklesIcon style={{ width: 22, height: 22, color: "#334155" }} />
+          <div style={{ width: 44, height: 44, borderRadius: 10, background: "var(--lt-rgba-255-255-255-0-04, rgba(255,255,255,0.04))", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 14px" }}>
+            <SparklesIcon style={{ width: 22, height: 22, color: "var(--lt-334155, #334155)" }} />
           </div>
-          <p style={{ color: "#F1F5F9", fontWeight: 600, fontSize: 13, margin: "0 0 6px" }}>{t("enterprise.knowledge.processDetail.structurePanel.noStructure")}</p>
-          <p style={{ color: "#475569", fontSize: 12, margin: "0 auto 16px", lineHeight: 1.7, maxWidth: 360 }}>
+          <p style={{ color: "var(--lt-f1f5f9, #F1F5F9)", fontWeight: 600, fontSize: 13, margin: "0 0 6px" }}>{t("enterprise.knowledge.processDetail.structurePanel.noStructure")}</p>
+          <p style={{ color: "var(--lt-475569, #475569)", fontSize: 12, margin: "0 auto 16px", lineHeight: 1.7, maxWidth: 360 }}>
             {t("enterprise.knowledge.processDetail.structurePanel.noStructureHint")}
           </p>
           <button
@@ -1623,7 +1623,7 @@ function KnowledgeStructurePanel({
               {/* Sin clasificar */}
               {(unclassifiedDecks.length > 0 || unclassifiedBatteries.length > 0) && (
                 <div style={{ marginTop: 4 }}>
-                  <p style={{ fontSize: 10, fontWeight: 700, color: "#475569", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 8, paddingLeft: 36 }}>
+                  <p style={{ fontSize: 10, fontWeight: 700, color: "var(--lt-475569, #475569)", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 8, paddingLeft: 36 }}>
                     {t("enterprise.knowledge.processDetail.structurePanel.unclassified")}
                   </p>
                   {unclassifiedDecks.map((d, i) => (
@@ -1704,18 +1704,18 @@ function KnowledgeStructurePanel({
 // ─── Enterprise dark dialogs ──────────────────────────────────────────────────
 
 const D = {
-  bg:        "#0F172A",
-  surface:   "#1E293B",
-  subtle:    "rgba(255,255,255,0.04)",
-  border:    "rgba(255,255,255,0.08)",
-  borderHov: "rgba(255,255,255,0.14)",
+  bg: "var(--lt-0f172a, #0F172A)",
+  surface: "var(--lt-1e293b, #1E293B)",
+  subtle: "var(--lt-rgba-255-255-255-0-04, rgba(255,255,255,0.04))",
+  border: "var(--lt-rgba-255-255-255-0-08, rgba(255,255,255,0.08))",
+  borderHov: "var(--lt-rgba-255-255-255-0-14, rgba(255,255,255,0.14))",
   accent:    "#6366F1",
   accentSoft:"rgba(99,102,241,0.15)",
   accentBdr: "rgba(99,102,241,0.3)",
-  text:      "#F1F5F9",
-  muted:     "#94A3B8",
-  dim:       "#64748B",
-  error:     "#f87171",
+  text: "var(--lt-f1f5f9, #F1F5F9)",
+  muted: "var(--lt-94a3b8, #94A3B8)",
+  dim: "#64748B",
+  error: "var(--lt-f87171, #f87171)",
   errorSoft: "rgba(239,68,68,0.12)",
 };
 
@@ -1796,7 +1796,7 @@ function SectionTree({ scannedDocuments, selectedIds, onToggleDoc, onToggleSecti
               </div>
               {/* pdf icon */}
               <div style={{ width: 30, height: 30, borderRadius: 8, background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                <svg viewBox="0 0 24 24" style={{ width: 14, height: 14, stroke: "#f87171", strokeWidth: 1.8, fill: "none" }}><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                <svg viewBox="0 0 24 24" style={{ width: 14, height: 14, stroke: "var(--lt-f87171, #f87171)", strokeWidth: 1.8, fill: "none" }}><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
               </div>
               <span style={{ flex: 1, color: D.text, fontSize: 12, fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{doc.filename || doc.name}</span>
               <span style={{ fontSize: 10, color: D.dim, flexShrink: 0 }}>{t("enterprise.knowledge.processDetail.sectionsAbbr", { n: (doc.sections || []).length })}</span>
@@ -1804,7 +1804,7 @@ function SectionTree({ scannedDocuments, selectedIds, onToggleDoc, onToggleSecti
             </div>
             {/* Sections */}
             {isOpen && (
-              <div style={{ background: "rgba(0,0,0,0.15)", padding: "4px 14px 10px 42px" }}>
+              <div style={{ background: "var(--lt-rgba-0-0-0-0-15, rgba(0,0,0,0.15))", padding: "4px 14px 10px 42px" }}>
                 {(doc.sections || []).map(s => {
                   const sel = selectedIds.includes(Number(s.id));
                   return (
@@ -1862,8 +1862,8 @@ export function AddTopicDialog({ open, onClose, onCreate }) {
 
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
-      <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.75)", backdropFilter: "blur(6px)" }} onClick={onClose} />
-      <form onSubmit={handleSubmit} role="dialog" aria-label={t(`${K}title`)} style={{ position: "relative", width: "100%", maxWidth: 480, background: D.bg, border: `1px solid ${D.border}`, borderRadius: 20, padding: 24, display: "flex", flexDirection: "column", gap: 14, boxShadow: "0 32px 80px rgba(0,0,0,0.7)" }}>
+      <div style={{ position: "absolute", inset: 0, background: "var(--lt-rgba-0-0-0-0-75, rgba(0,0,0,0.75))", backdropFilter: "blur(6px)" }} onClick={onClose} />
+      <form onSubmit={handleSubmit} role="dialog" aria-label={t(`${K}title`)} style={{ position: "relative", width: "100%", maxWidth: 480, background: D.bg, border: `1px solid ${D.border}`, borderRadius: 20, padding: 24, display: "flex", flexDirection: "column", gap: 14, boxShadow: "0 32px 80px var(--lt-rgba-0-0-0-0-7, rgba(0,0,0,0.7))" }}>
         <h2 style={{ color: D.text, fontWeight: 800, fontSize: 17, margin: 0 }}>{t(`${K}title`)}</h2>
         <div>
           <DLbl>{t(`${K}titleField`)} <span style={{ color: D.error }}>*</span></DLbl>
@@ -1989,29 +1989,29 @@ export function EnterpriseDeckDialog({ open, onClose, onCreate, projectId }) {
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
       {/* Backdrop */}
-      <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.75)", backdropFilter: "blur(6px)" }} onClick={onClose} />
+      <div style={{ position: "absolute", inset: 0, background: "var(--lt-rgba-0-0-0-0-75, rgba(0,0,0,0.75))", backdropFilter: "blur(6px)" }} onClick={onClose} />
       {/* Panel */}
-      <div style={{ position: "relative", width: "100%", maxWidth: 620, maxHeight: "92vh", background: D.bg, border: `1px solid ${D.border}`, borderRadius: 20, display: "flex", flexDirection: "column", overflow: "hidden", boxShadow: "0 32px 80px rgba(0,0,0,0.7)" }}>
+      <div style={{ position: "relative", width: "100%", maxWidth: 620, maxHeight: "92vh", background: D.bg, border: `1px solid ${D.border}`, borderRadius: 20, display: "flex", flexDirection: "column", overflow: "hidden", boxShadow: "0 32px 80px var(--lt-rgba-0-0-0-0-7, rgba(0,0,0,0.7))" }}>
         {/* Header */}
         <div style={{ padding: "20px 24px 0", flexShrink: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 18 }}>
             <div style={{ width: 44, height: 44, borderRadius: 12, background: D.accentSoft, border: `1px solid ${D.accentBdr}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-              <ViewColumnsIcon style={{ width: 20, height: 20, color: "#818CF8" }} />
+              <ViewColumnsIcon style={{ width: 20, height: 20, color: "var(--lt-818cf8, #818CF8)" }} />
             </div>
             <div style={{ flex: 1 }}>
               <h2 style={{ color: D.text, fontWeight: 800, fontSize: 17, margin: 0, letterSpacing: "-0.3px" }}>{t("enterprise.knowledge.processDetail.deckDialog.title")}</h2>
               <p style={{ color: D.dim, fontSize: 12, margin: "2px 0 0" }}>{activeTab === "ai" ? t("enterprise.knowledge.processDetail.deckDialog.subtitleAi") : t("enterprise.knowledge.processDetail.deckDialog.subtitleManual")}</p>
             </div>
             <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 8, background: D.subtle, border: `1px solid ${D.border}`, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: D.muted, flexShrink: 0 }}
-              onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.08)"; e.currentTarget.style.color = D.text; }}
+              onMouseEnter={e => { e.currentTarget.style.background = "var(--lt-rgba-255-255-255-0-08, rgba(255,255,255,0.08))"; e.currentTarget.style.color = D.text; }}
               onMouseLeave={e => { e.currentTarget.style.background = D.subtle; e.currentTarget.style.color = D.muted; }}>
               <XMarkIcon style={{ width: 15, height: 15 }} />
             </button>
           </div>
           {/* Tabs */}
-          <div style={{ display: "flex", gap: 4, background: "rgba(255,255,255,0.04)", border: `1px solid ${D.border}`, borderRadius: "11px 11px 0 0", padding: "5px 5px 0" }}>
+          <div style={{ display: "flex", gap: 4, background: "var(--lt-rgba-255-255-255-0-04, rgba(255,255,255,0.04))", border: `1px solid ${D.border}`, borderRadius: "11px 11px 0 0", padding: "5px 5px 0" }}>
             {[{ key: "ai", label: t("enterprise.knowledge.processDetail.deckDialog.tabAi"), icon: <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/> }, { key: "manual", label: t("enterprise.knowledge.processDetail.deckDialog.tabManual"), icon: <><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></> }].map(({ key, label, icon }) => (
-              <button key={key} onClick={() => { setActiveTab(key); setErrors({}); }} style={{ flex: 1, padding: "9px 0", fontSize: 12, fontWeight: 600, cursor: "pointer", borderRadius: "8px 8px 0 0", background: activeTab === key ? D.bg : "transparent", color: activeTab === key ? D.accent : D.dim, border: "none", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, transition: "all 150ms" }}>
+              <button key={key} onClick={() => { setActiveTab(key); setErrors({}); }} style={{ flex: 1, padding: "9px 0", fontSize: 12, fontWeight: 600, cursor: "pointer", borderRadius: "8px 8px 0 0", background: activeTab === key ? D.bg: "transparent", color: activeTab === key ? D.accent : D.dim, border: "none", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, transition: "all 150ms" }}>
                 <svg viewBox="0 0 24 24" style={{ width: 12, height: 12, stroke: "currentColor", strokeWidth: 2, fill: "none" }}>{icon}</svg>
                 {label}
               </button>
@@ -2064,7 +2064,7 @@ export function EnterpriseDeckDialog({ open, onClose, onCreate, projectId }) {
                 <label style={{ position: "relative", width: 42, height: 24, cursor: "pointer", display: "block", flexShrink: 0 }}>
                   <input type="checkbox" checked={formData.visibility === "public"} onChange={e => set("visibility", e.target.checked ? "public" : "private")} style={{ opacity: 0, width: 0, height: 0, position: "absolute" }} />
                   <div style={{ position: "absolute", inset: 0, background: formData.visibility === "public" ? D.accent : D.surface, border: `1px solid ${formData.visibility === "public" ? D.accent : D.border}`, borderRadius: 12, transition: "all 250ms" }} />
-                  <div style={{ position: "absolute", top: 3, left: formData.visibility === "public" ? 21 : 3, width: 18, height: 18, background: "#fff", borderRadius: "50%", boxShadow: "0 1px 4px rgba(0,0,0,0.4)", transition: "left 250ms" }} />
+                  <div style={{ position: "absolute", top: 3, left: formData.visibility === "public" ? 21 : 3, width: 18, height: 18, background: "#fff", borderRadius: "50%", boxShadow: "0 1px 4px var(--lt-rgba-0-0-0-0-4, rgba(0,0,0,0.4))", transition: "left 250ms" }} />
                 </label>
               </div>
 
@@ -2118,7 +2118,7 @@ export function EnterpriseDeckDialog({ open, onClose, onCreate, projectId }) {
                 <label style={{ position: "relative", width: 42, height: 24, cursor: "pointer", display: "block", flexShrink: 0 }}>
                   <input type="checkbox" checked={formData.visibility === "public"} onChange={e => set("visibility", e.target.checked ? "public" : "private")} style={{ opacity: 0, width: 0, height: 0, position: "absolute" }} />
                   <div style={{ position: "absolute", inset: 0, background: formData.visibility === "public" ? D.accent : D.surface, border: `1px solid ${formData.visibility === "public" ? D.accent : D.border}`, borderRadius: 12, transition: "all 250ms" }} />
-                  <div style={{ position: "absolute", top: 3, left: formData.visibility === "public" ? 21 : 3, width: 18, height: 18, background: "#fff", borderRadius: "50%", boxShadow: "0 1px 4px rgba(0,0,0,0.4)", transition: "left 250ms" }} />
+                  <div style={{ position: "absolute", top: 3, left: formData.visibility === "public" ? 21 : 3, width: 18, height: 18, background: "#fff", borderRadius: "50%", boxShadow: "0 1px 4px var(--lt-rgba-0-0-0-0-4, rgba(0,0,0,0.4))", transition: "left 250ms" }} />
                 </label>
               </div>
 
@@ -2161,7 +2161,7 @@ export function EnterpriseDeckDialog({ open, onClose, onCreate, projectId }) {
         </form>
 
         {/* Footer */}
-        <div style={{ display: "flex", gap: 10, padding: "16px 24px", borderTop: `1px solid ${D.border}`, flexShrink: 0, background: "rgba(0,0,0,0.2)" }}>
+        <div style={{ display: "flex", gap: 10, padding: "16px 24px", borderTop: `1px solid ${D.border}`, flexShrink: 0, background: "var(--lt-rgba-0-0-0-0-2, rgba(0,0,0,0.2))" }}>
           <button type="button" onClick={onClose} style={{ ...btnBase, background: D.subtle, border: `1px solid ${D.border}`, color: D.muted, flex: 1 }}
             onMouseEnter={e => { e.currentTarget.style.background = D.surface; e.currentTarget.style.color = D.text; }}
             onMouseLeave={e => { e.currentTarget.style.background = D.subtle; e.currentTarget.style.color = D.muted; }}>
@@ -2170,7 +2170,7 @@ export function EnterpriseDeckDialog({ open, onClose, onCreate, projectId }) {
           <button type="button" onClick={handleSubmit} disabled={submitting || (loadingSections && activeTab === "ai")}
             style={{ ...btnBase, background: submitting ? "rgba(99,102,241,0.5)" : "linear-gradient(135deg, #6366F1 0%, #818CF8 100%)", color: "#fff", flex: 2, justifyContent: "center", boxShadow: "0 4px 16px rgba(99,102,241,0.3)", cursor: submitting ? "not-allowed" : "pointer" }}>
             {submitting ? (
-              <><div style={{ width: 14, height: 14, border: "2px solid rgba(255,255,255,0.3)", borderTopColor: "#fff", borderRadius: "50%" }} className="animate-spin" /> {t("enterprise.knowledge.processDetail.generating")}</>
+              <><div style={{ width: 14, height: 14, border: "2px solid var(--lt-rgba-255-255-255-0-3, rgba(255,255,255,0.3))", borderTopColor: "#fff", borderRadius: "50%" }} className="animate-spin" /> {t("enterprise.knowledge.processDetail.generating")}</>
             ) : activeTab === "ai" ? (
               <><SparklesIcon style={{ width: 14, height: 14 }} /> {t("enterprise.knowledge.processDetail.deckDialog.generateDeck")}</>
             ) : (
@@ -2253,19 +2253,19 @@ function EnterpriseBatteryDialog({ open, onClose, onGenerate, projectId }) {
 
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
-      <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.75)", backdropFilter: "blur(6px)" }} onClick={onClose} />
-      <div style={{ position: "relative", width: "100%", maxWidth: 580, maxHeight: "92vh", background: D.bg, border: `1px solid ${D.border}`, borderRadius: 20, display: "flex", flexDirection: "column", overflow: "hidden", boxShadow: "0 32px 80px rgba(0,0,0,0.7)" }}>
+      <div style={{ position: "absolute", inset: 0, background: "var(--lt-rgba-0-0-0-0-75, rgba(0,0,0,0.75))", backdropFilter: "blur(6px)" }} onClick={onClose} />
+      <div style={{ position: "relative", width: "100%", maxWidth: 580, maxHeight: "92vh", background: D.bg, border: `1px solid ${D.border}`, borderRadius: 20, display: "flex", flexDirection: "column", overflow: "hidden", boxShadow: "0 32px 80px var(--lt-rgba-0-0-0-0-7, rgba(0,0,0,0.7))" }}>
         {/* Header */}
         <div style={{ padding: "20px 24px", borderBottom: `1px solid ${D.border}`, flexShrink: 0, display: "flex", alignItems: "center", gap: 14 }}>
           <div style={{ width: 44, height: 44, borderRadius: 12, background: "rgba(94,106,210,0.15)", border: "1px solid rgba(94,106,210,0.3)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-            <BoltIcon style={{ width: 20, height: 20, color: "#818CF8" }} />
+            <BoltIcon style={{ width: 20, height: 20, color: "var(--lt-818cf8, #818CF8)" }} />
           </div>
           <div style={{ flex: 1 }}>
             <h2 style={{ color: D.text, fontWeight: 800, fontSize: 17, margin: 0, letterSpacing: "-0.3px" }}>{t("enterprise.knowledge.processDetail.batteryDialog.title")}</h2>
             <p style={{ color: D.dim, fontSize: 12, margin: "2px 0 0" }}>{t("enterprise.knowledge.processDetail.batteryDialog.subtitle")}</p>
           </div>
           <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 8, background: D.subtle, border: `1px solid ${D.border}`, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: D.muted, flexShrink: 0 }}
-            onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.08)"; e.currentTarget.style.color = D.text; }}
+            onMouseEnter={e => { e.currentTarget.style.background = "var(--lt-rgba-255-255-255-0-08, rgba(255,255,255,0.08))"; e.currentTarget.style.color = D.text; }}
             onMouseLeave={e => { e.currentTarget.style.background = D.subtle; e.currentTarget.style.color = D.muted; }}>
             <XMarkIcon style={{ width: 15, height: 15 }} />
           </button>
@@ -2354,7 +2354,7 @@ function EnterpriseBatteryDialog({ open, onClose, onGenerate, projectId }) {
         </form>
 
         {/* Footer */}
-        <div style={{ display: "flex", gap: 10, padding: "16px 24px", borderTop: `1px solid ${D.border}`, flexShrink: 0, background: "rgba(0,0,0,0.2)" }}>
+        <div style={{ display: "flex", gap: 10, padding: "16px 24px", borderTop: `1px solid ${D.border}`, flexShrink: 0, background: "var(--lt-rgba-0-0-0-0-2, rgba(0,0,0,0.2))" }}>
           <button type="button" onClick={onClose} style={{ ...btnBase, background: D.subtle, border: `1px solid ${D.border}`, color: D.muted, flex: 1 }}
             onMouseEnter={e => { e.currentTarget.style.background = D.surface; e.currentTarget.style.color = D.text; }}
             onMouseLeave={e => { e.currentTarget.style.background = D.subtle; e.currentTarget.style.color = D.muted; }}>
@@ -2363,7 +2363,7 @@ function EnterpriseBatteryDialog({ open, onClose, onGenerate, projectId }) {
           <button type="button" onClick={handleSubmit} disabled={submitting || loadingSections || scannedDocuments.length === 0}
             style={{ ...btnBase, background: submitting ? "rgba(99,102,241,0.5)" : "linear-gradient(135deg, #6366F1 0%, #818CF8 100%)", color: "#fff", flex: 2, justifyContent: "center", boxShadow: "0 4px 16px rgba(99,102,241,0.3)", cursor: submitting || loadingSections || scannedDocuments.length === 0 ? "not-allowed" : "pointer", opacity: scannedDocuments.length === 0 && !loadingSections ? 0.5 : 1 }}>
             {submitting ? (
-              <><div style={{ width: 14, height: 14, border: "2px solid rgba(255,255,255,0.3)", borderTopColor: "#fff", borderRadius: "50%" }} className="animate-spin" /> {t("enterprise.knowledge.processDetail.generating")}</>
+              <><div style={{ width: 14, height: 14, border: "2px solid var(--lt-rgba-255-255-255-0-3, rgba(255,255,255,0.3))", borderTopColor: "#fff", borderRadius: "50%" }} className="animate-spin" /> {t("enterprise.knowledge.processDetail.generating")}</>
             ) : (
               <><BoltIcon style={{ width: 14, height: 14 }} /> {t("enterprise.knowledge.processDetail.batteryDialog.generateBattery")}</>
             )}

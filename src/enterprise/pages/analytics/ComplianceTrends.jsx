@@ -22,7 +22,7 @@ export function ComplianceTrends() {
     xaxis: { categories: data.map((d) => d.month || d.date), labels: { style: { fontSize: "11px", colors: "#64748B" } } },
     yaxis: { min: 0, max: 100, labels: { formatter: (v) => `${v}%`, style: { colors: "#64748B" } } },
     dataLabels: { enabled: false },
-    grid: { borderColor: "rgba(255,255,255,0.07)" },
+    grid: { borderColor: "var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))" },
     tooltip: { theme: "dark", y: { formatter: (v) => `${v}% ${t("enterprise.analytics.complianceTrends.tooltipCompliance")}` }, custom: ({ dataPointIndex }) => {
       const row = data[dataPointIndex];
       return `<div style="padding:8px 10px;font-size:11px;background:#0F172A;color:#E2E8F0;border:1px solid rgba(255,255,255,0.1);border-radius:6px;"><div>${row?.month || row?.date}</div><div>${t("enterprise.analytics.complianceTrends.tooltipTotal")}: ${row?.total}</div><div>${t("enterprise.analytics.complianceTrends.tooltipCompliant")}: ${row?.compliant}</div><div>${t("enterprise.analytics.complianceTrends.tooltipRate")}: ${row?.compliance_rate}%</div></div>`;

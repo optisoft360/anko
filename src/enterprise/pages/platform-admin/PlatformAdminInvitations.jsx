@@ -11,9 +11,9 @@ import { useLanguage } from "../../../context/language-context";
 function useStatusMeta() {
   const { t } = useLanguage();
   return {
-    pending:   { label: t("enterprise.platformAdmin.invitations.status.pending"),   color: "#F59E0B", bg: "rgba(245,158,11,0.12)",  border: "rgba(245,158,11,0.28)" },
+    pending:   { label: t("enterprise.platformAdmin.invitations.status.pending"),   color: "var(--lt-f59e0b, #F59E0B)", bg: "rgba(245,158,11,0.12)",  border: "rgba(245,158,11,0.28)" },
     accepted:  { label: t("enterprise.platformAdmin.invitations.status.accepted"),  color: "#34D399", bg: "rgba(52,211,153,0.12)",  border: "rgba(52,211,153,0.28)" },
-    expired:   { label: t("enterprise.platformAdmin.invitations.status.expired"),   color: "#F87171", bg: "rgba(248,113,113,0.12)", border: "rgba(248,113,113,0.28)" },
+    expired:   { label: t("enterprise.platformAdmin.invitations.status.expired"),   color: "var(--lt-f87171, #F87171)", bg: "rgba(248,113,113,0.12)", border: "rgba(248,113,113,0.28)" },
     cancelled: { label: t("enterprise.platformAdmin.invitations.status.cancelled"), color: "#64748B", bg: "rgba(100,116,139,0.10)", border: "rgba(100,116,139,0.22)" },
   };
 }
@@ -21,24 +21,24 @@ function useStatusMeta() {
 function useRoleMeta() {
   const { t } = useLanguage();
   return {
-    owner:    { label: t("enterprise.settings.inviteUser.roles.owner"),    color: "#F59E0B" },
-    admin:    { label: t("enterprise.settings.inviteUser.roles.admin"),    color: "#818CF8" },
+    owner:    { label: t("enterprise.settings.inviteUser.roles.owner"),    color: "var(--lt-f59e0b, #F59E0B)" },
+    admin:    { label: t("enterprise.settings.inviteUser.roles.admin"),    color: "var(--lt-818cf8, #818CF8)" },
     manager:  { label: t("enterprise.settings.inviteUser.roles.manager"),  color: "#38BDF8" },
     trainer:  { label: t("enterprise.settings.inviteUser.roles.trainer"), color: "#A78BFA" },
     employee: { label: t("enterprise.settings.inviteUser.roles.employee"),color: "#34D399" },
-    auditor:  { label: t("enterprise.settings.inviteUser.roles.auditor"), color: "#94A3B8" },
+    auditor:  { label: t("enterprise.settings.inviteUser.roles.auditor"), color: "var(--lt-94a3b8, #94A3B8)" },
   };
 }
 
 function useRoles() {
   const { t } = useLanguage();
   return [
-    { value: "admin",    label: t("enterprise.settings.inviteUser.roles.admin"),    color: "#818CF8", bg: "rgba(129,140,248,0.12)", border: "rgba(129,140,248,0.28)" },
+    { value: "admin",    label: t("enterprise.settings.inviteUser.roles.admin"),    color: "var(--lt-818cf8, #818CF8)", bg: "rgba(129,140,248,0.12)", border: "rgba(129,140,248,0.28)" },
     { value: "manager",  label: t("enterprise.settings.inviteUser.roles.manager"),  color: "#38BDF8", bg: "rgba(56,189,248,0.12)",  border: "rgba(56,189,248,0.28)"  },
     { value: "trainer",  label: t("enterprise.settings.inviteUser.roles.trainer"),  color: "#A78BFA", bg: "rgba(167,139,250,0.12)", border: "rgba(167,139,250,0.28)" },
     { value: "employee", label: t("enterprise.settings.inviteUser.roles.employee"), color: "#34D399", bg: "rgba(52,211,153,0.12)",  border: "rgba(52,211,153,0.28)"  },
-    { value: "auditor",  label: t("enterprise.settings.inviteUser.roles.auditor"),  color: "#94A3B8", bg: "rgba(148,163,184,0.10)", border: "rgba(148,163,184,0.22)" },
-    { value: "owner",    label: t("enterprise.settings.inviteUser.roles.owner"),    color: "#F59E0B", bg: "rgba(245,158,11,0.12)",  border: "rgba(245,158,11,0.28)"  },
+    { value: "auditor",  label: t("enterprise.settings.inviteUser.roles.auditor"),  color: "var(--lt-94a3b8, #94A3B8)", bg: "rgba(148,163,184,0.10)", border: "rgba(148,163,184,0.22)" },
+    { value: "owner",    label: t("enterprise.settings.inviteUser.roles.owner"),    color: "var(--lt-f59e0b, #F59E0B)", bg: "rgba(245,158,11,0.12)",  border: "rgba(245,158,11,0.28)"  },
   ];
 }
 
@@ -59,7 +59,7 @@ const STATUS_TABS = ["all", "pending", "accepted", "expired", "cancelled"];
 
 function StatusBadge({ status }) {
   const STATUS_META = useStatusMeta();
-  const meta = STATUS_META[status] || { label: status, color: "#94A3B8", bg: "rgba(148,163,184,0.1)", border: "rgba(148,163,184,0.22)" };
+  const meta = STATUS_META[status] || { label: status, color: "var(--lt-94a3b8, #94A3B8)", bg: "rgba(148,163,184,0.1)", border: "rgba(148,163,184,0.22)" };
   return (
     <span style={{
       display: "inline-flex", alignItems: "center", gap: 5,
@@ -75,7 +75,7 @@ function StatusBadge({ status }) {
 
 function RoleBadge({ role }) {
   const ROLE_META = useRoleMeta();
-  const meta = ROLE_META[role] || { label: role, color: "#94A3B8" };
+  const meta = ROLE_META[role] || { label: role, color: "var(--lt-94a3b8, #94A3B8)" };
   return <span style={{ fontSize: 12, fontWeight: 600, color: meta.color }}>{meta.label}</span>;
 }
 
@@ -119,7 +119,7 @@ function InviteModal({ companies, onClose, onSent }) {
     <>
       {/* Backdrop */}
       <div
-        style={{ position: "fixed", inset: 0, zIndex: 1000, background: "rgba(0,0,0,0.78)", backdropFilter: "blur(4px)" }}
+        style={{ position: "fixed", inset: 0, zIndex: 1000, background: "var(--lt-rgba-0-0-0-0-78, rgba(0,0,0,0.78))", backdropFilter: "blur(4px)" }}
         onClick={onClose}
       />
 
@@ -129,9 +129,9 @@ function InviteModal({ companies, onClose, onSent }) {
         display: "flex", alignItems: "center", justifyContent: "center", padding: 20,
       }}>
         <div style={{
-          background: "#0F172A", border: "1px solid rgba(255,255,255,0.1)",
+          background: "var(--lt-0f172a, #0F172A)", border: "1px solid var(--lt-rgba-255-255-255-0-1, rgba(255,255,255,0.1))",
           borderRadius: 22, width: "100%", maxWidth: 520,
-          boxShadow: "0 30px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(99,102,241,0.12)",
+          boxShadow: "0 30px 80px var(--lt-rgba-0-0-0-0-6, rgba(0,0,0,0.6)), 0 0 0 1px rgba(99,102,241,0.12)",
           overflow: "hidden",
         }}>
           {/* Top accent */}
@@ -140,7 +140,7 @@ function InviteModal({ companies, onClose, onSent }) {
           {/* Header */}
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "22px 24px 18px" }}>
             <div>
-              <h2 style={{ fontSize: 18, fontWeight: 800, color: "#F1F5F9", margin: 0, letterSpacing: "-0.01em" }}>
+              <h2 style={{ fontSize: 18, fontWeight: 800, color: "var(--lt-f1f5f9, #F1F5F9)", margin: 0, letterSpacing: "-0.01em" }}>
                 {t("enterprise.platformAdmin.invitations.inviteModal.title")}
               </h2>
               <p style={{ fontSize: 12, color: "#64748B", margin: "3px 0 0" }}>{t("enterprise.platformAdmin.invitations.inviteModal.subtitle")}</p>
@@ -149,7 +149,7 @@ function InviteModal({ companies, onClose, onSent }) {
               onClick={onClose}
               style={{
                 width: 34, height: 34, borderRadius: 9,
-                background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
+                background: "var(--lt-rgba-255-255-255-0-04, rgba(255,255,255,0.04))", border: "1px solid var(--lt-rgba-255-255-255-0-08, rgba(255,255,255,0.08))",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 cursor: "pointer", color: "#64748B",
               }}
@@ -167,19 +167,19 @@ function InviteModal({ companies, onClose, onSent }) {
               }}>
                 <CheckCircleIcon style={{ width: 28, height: 28, color: "#34D399" }} />
               </div>
-              <p style={{ fontSize: 16, fontWeight: 800, color: "#F1F5F9", margin: "0 0 8px" }}>{t("enterprise.settings.inviteUser.sentTitle")}</p>
+              <p style={{ fontSize: 16, fontWeight: 800, color: "var(--lt-f1f5f9, #F1F5F9)", margin: "0 0 8px" }}>{t("enterprise.settings.inviteUser.sentTitle")}</p>
               <div style={{
                 background: "rgba(99,102,241,0.08)", border: "1px solid rgba(99,102,241,0.22)",
                 borderRadius: 11, padding: "12px 18px", marginBottom: 20,
                 display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
               }}>
-                <EnvelopeIcon style={{ width: 15, height: 15, color: "#818CF8" }} />
-                <span style={{ fontSize: 13, fontWeight: 700, color: "#818CF8" }}>{email}</span>
+                <EnvelopeIcon style={{ width: 15, height: 15, color: "var(--lt-818cf8, #818CF8)" }} />
+                <span style={{ fontSize: 13, fontWeight: 700, color: "var(--lt-818cf8, #818CF8)" }}>{email}</span>
               </div>
               <div style={{ display: "flex", gap: 10 }}>
                 <button
                   onClick={() => { setSuccess(false); setEmail(""); setCompanyId(""); }}
-                  style={{ flex: 1, padding: 11, borderRadius: 10, background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.22)", color: "#818CF8", fontSize: 13, fontWeight: 700, cursor: "pointer" }}
+                  style={{ flex: 1, padding: 11, borderRadius: 10, background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.22)", color: "var(--lt-818cf8, #818CF8)", fontSize: 13, fontWeight: 700, cursor: "pointer" }}
                 >
                   {t("enterprise.platformAdmin.invitations.inviteModal.sendAnother")}
                 </button>
@@ -204,13 +204,13 @@ function InviteModal({ companies, onClose, onSent }) {
                   <select
                     value={companyId}
                     onChange={e => setCompanyId(e.target.value)}
-                    style={{ width: "100%", padding: "11px 14px 11px 34px", borderRadius: 11, background: "#1E293B", border: "1px solid rgba(255,255,255,0.08)", color: companyId ? "#F1F5F9" : "#64748B", fontSize: 13, outline: "none", cursor: "pointer", appearance: "none" }}
+                    style={{ width: "100%", padding: "11px 14px 11px 34px", borderRadius: 11, background: "var(--lt-1e293b, #1E293B)", border: "1px solid var(--lt-rgba-255-255-255-0-08, rgba(255,255,255,0.08))", color: companyId ? "var(--lt-f1f5f9, #F1F5F9)" : "#64748B", fontSize: 13, outline: "none", cursor: "pointer", appearance: "none" }}
                     onFocus={e => e.target.style.borderColor = "rgba(99,102,241,0.45)"}
-                    onBlur={e => e.target.style.borderColor = "rgba(255,255,255,0.08)"}
+                    onBlur={e => e.target.style.borderColor = "var(--lt-rgba-255-255-255-0-08, rgba(255,255,255,0.08))"}
                   >
-                    <option value="" style={{ background: "#1E293B" }}>{t("enterprise.platformAdmin.invitations.inviteModal.selectCompany")}</option>
+                    <option value="" style={{ background: "var(--lt-1e293b, #1E293B)" }}>{t("enterprise.platformAdmin.invitations.inviteModal.selectCompany")}</option>
                     {companies.map(c => (
-                      <option key={c.id} value={c.id} style={{ background: "#1E293B" }}>{c.name}</option>
+                      <option key={c.id} value={c.id} style={{ background: "var(--lt-1e293b, #1E293B)" }}>{c.name}</option>
                     ))}
                   </select>
                   <div style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: "#64748B" }}>
@@ -231,9 +231,9 @@ function InviteModal({ companies, onClose, onSent }) {
                     value={email}
                     onChange={e => { setEmail(e.target.value); setError(""); }}
                     placeholder="user@company.com"
-                    style={{ width: "100%", boxSizing: "border-box", padding: "11px 14px 11px 34px", borderRadius: 11, background: "#1E293B", border: "1px solid rgba(255,255,255,0.08)", color: "#F1F5F9", fontSize: 13, outline: "none" }}
+                    style={{ width: "100%", boxSizing: "border-box", padding: "11px 14px 11px 34px", borderRadius: 11, background: "var(--lt-1e293b, #1E293B)", border: "1px solid var(--lt-rgba-255-255-255-0-08, rgba(255,255,255,0.08))", color: "var(--lt-f1f5f9, #F1F5F9)", fontSize: 13, outline: "none" }}
                     onFocus={e => e.target.style.borderColor = "rgba(99,102,241,0.45)"}
-                    onBlur={e => e.target.style.borderColor = "rgba(255,255,255,0.08)"}
+                    onBlur={e => e.target.style.borderColor = "var(--lt-rgba-255-255-255-0-08, rgba(255,255,255,0.08))"}
                   />
                 </div>
               </div>
@@ -249,12 +249,12 @@ function InviteModal({ companies, onClose, onSent }) {
                       key={r.value}
                       onClick={() => setRole(r.value)}
                       style={{
-                        padding: "10px 6px", borderRadius: 10, border: `1px solid ${role === r.value ? r.border : "rgba(255,255,255,0.06)"}`,
+                        padding: "10px 6px", borderRadius: 10, border: `1px solid ${role === r.value ? r.border : "var(--lt-rgba-255-255-255-0-06, rgba(255,255,255,0.06))"}`,
                         background: role === r.value ? r.bg : "rgba(255,255,255,0.02)",
                         cursor: "pointer", transition: "all 150ms", textAlign: "center", minWidth: 0,
                       }}
                     >
-                      <span style={{ fontSize: 12, fontWeight: 700, color: role === r.value ? r.color : "#64748B", overflowWrap: "break-word" }}>{r.label}</span>
+                      <span style={{ fontSize: 12, fontWeight: 700, color: role === r.value ? r.color: "#64748B", overflowWrap: "break-word" }}>{r.label}</span>
                     </button>
                   ))}
                 </div>
@@ -269,11 +269,11 @@ function InviteModal({ companies, onClose, onSent }) {
                   <select
                     value={stage}
                     onChange={e => setStage(e.target.value)}
-                    style={{ width: "100%", padding: "11px 14px", borderRadius: 11, background: "#1E293B", border: "1px solid rgba(255,255,255,0.08)", color: "#F1F5F9", fontSize: 13, outline: "none", cursor: "pointer", appearance: "none" }}
+                    style={{ width: "100%", padding: "11px 14px", borderRadius: 11, background: "var(--lt-1e293b, #1E293B)", border: "1px solid var(--lt-rgba-255-255-255-0-08, rgba(255,255,255,0.08))", color: "var(--lt-f1f5f9, #F1F5F9)", fontSize: 13, outline: "none", cursor: "pointer", appearance: "none" }}
                     onFocus={e => e.target.style.borderColor = "rgba(99,102,241,0.45)"}
-                    onBlur={e => e.target.style.borderColor = "rgba(255,255,255,0.08)"}
+                    onBlur={e => e.target.style.borderColor = "var(--lt-rgba-255-255-255-0-08, rgba(255,255,255,0.08))"}
                   >
-                    {STAGES.map(s => <option key={s.value} value={s.value} style={{ background: "#1E293B" }}>{s.label}</option>)}
+                    {STAGES.map(s => <option key={s.value} value={s.value} style={{ background: "var(--lt-1e293b, #1E293B)" }}>{s.label}</option>)}
                   </select>
                   <div style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: "#64748B" }}>
                     <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M2 4l4 4 4-4"/></svg>
@@ -283,7 +283,7 @@ function InviteModal({ companies, onClose, onSent }) {
 
               {/* Error */}
               {error && (
-                <div style={{ background: "rgba(248,113,113,0.08)", border: "1px solid rgba(248,113,113,0.22)", borderRadius: 10, padding: "11px 14px", fontSize: 13, color: "#F87171" }}>
+                <div style={{ background: "rgba(248,113,113,0.08)", border: "1px solid rgba(248,113,113,0.22)", borderRadius: 10, padding: "11px 14px", fontSize: 13, color: "var(--lt-f87171, #F87171)" }}>
                   {error}
                 </div>
               )}
@@ -291,10 +291,10 @@ function InviteModal({ companies, onClose, onSent }) {
               {/* Prominent email preview */}
               {activeEmail && companyId && (
                 <div style={{ background: "rgba(99,102,241,0.07)", border: "1px solid rgba(99,102,241,0.18)", borderRadius: 11, padding: "12px 16px", display: "flex", alignItems: "center", gap: 10 }}>
-                  <EnvelopeIcon style={{ width: 15, height: 15, color: "#818CF8", flexShrink: 0 }} />
+                  <EnvelopeIcon style={{ width: 15, height: 15, color: "var(--lt-818cf8, #818CF8)", flexShrink: 0 }} />
                   <div>
                     <span style={{ fontSize: 11, color: "#64748B", display: "block", marginBottom: 1 }}>{t("enterprise.platformAdmin.invitations.inviteModal.sendingTo")}</span>
-                    <span style={{ fontSize: 13, fontWeight: 800, color: "#818CF8" }}>{activeEmail}</span>
+                    <span style={{ fontSize: 13, fontWeight: 800, color: "var(--lt-818cf8, #818CF8)" }}>{activeEmail}</span>
                     {selectedRole && (
                       <span style={{ fontSize: 11, color: "#64748B", marginLeft: 8 }}>
                         {t("enterprise.platformAdmin.invitations.inviteModal.as")} <span style={{ color: selectedRole.color, fontWeight: 700 }}>{selectedRole.label}</span>
@@ -312,7 +312,7 @@ function InviteModal({ companies, onClose, onSent }) {
                   width: "100%", padding: 14, borderRadius: 12,
                   background: (activeEmail && companyId) ? "linear-gradient(135deg, #6366F1, #818CF8)" : "#1E293B",
                   border: "none",
-                  color: (activeEmail && companyId) ? "#fff" : "#334155",
+                  color: (activeEmail && companyId) ? "#fff" : "var(--lt-334155, #334155)",
                   fontSize: 14, fontWeight: 800,
                   cursor: (activeEmail && companyId && !sending) ? "pointer" : "not-allowed",
                   opacity: sending ? 0.7 : 1, transition: "all 200ms",
@@ -395,7 +395,7 @@ export default function PlatformAdminInvitations() {
       {/* Header */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 28, gap: 16, flexWrap: "wrap" }}>
         <div>
-          <h1 style={{ fontSize: 22, fontWeight: 800, color: "#F1F5F9", margin: 0, letterSpacing: "-0.01em" }}>
+          <h1 style={{ fontSize: 22, fontWeight: 800, color: "var(--lt-f1f5f9, #F1F5F9)", margin: 0, letterSpacing: "-0.01em" }}>
             {t("enterprise.platformAdmin.invitations.title")}
           </h1>
           <p style={{ fontSize: 13, color: "#64748B", margin: "4px 0 0" }}>{t("enterprise.platformAdmin.invitations.subtitle")}</p>
@@ -419,7 +419,7 @@ export default function PlatformAdminInvitations() {
       </div>
 
       {/* Top tabs */}
-      <div style={{ display: "flex", gap: 2, marginBottom: 20, borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
+      <div style={{ display: "flex", gap: 2, marginBottom: 20, borderBottom: "1px solid var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))" }}>
         {TOP_TABS.map(tb => (
           <button
             key={tb}
@@ -427,7 +427,7 @@ export default function PlatformAdminInvitations() {
             style={{
               padding: "8px 18px", border: "none", background: "transparent",
               fontSize: 13, fontWeight: 600, cursor: "pointer",
-              color: topTab === tb ? "#818CF8" : "#64748B",
+              color: topTab === tb ? "var(--lt-818cf8, #818CF8)" : "#64748B",
               borderBottom: topTab === tb ? "2px solid #6366F1" : "2px solid transparent",
               transition: "all 150ms", marginBottom: -1,
             }}
@@ -438,7 +438,7 @@ export default function PlatformAdminInvitations() {
       </div>
 
       {/* Status filter */}
-      <div style={{ display: "flex", gap: 4, marginBottom: 20, background: "#0F172A", borderRadius: 10, padding: 4, border: "1px solid rgba(255,255,255,0.06)", width: "fit-content" }}>
+      <div style={{ display: "flex", gap: 4, marginBottom: 20, background: "var(--lt-0f172a, #0F172A)", borderRadius: 10, padding: 4, border: "1px solid var(--lt-rgba-255-255-255-0-06, rgba(255,255,255,0.06))", width: "fit-content" }}>
         {STATUS_TABS.map(s => (
           <button
             key={s}
@@ -447,13 +447,13 @@ export default function PlatformAdminInvitations() {
               padding: "6px 14px", borderRadius: 7, border: "none",
               fontSize: 12, fontWeight: 600, cursor: "pointer",
               background: statusTab === s ? "rgba(99,102,241,0.2)" : "transparent",
-              color: statusTab === s ? "#818CF8" : "#64748B",
+              color: statusTab === s ? "var(--lt-818cf8, #818CF8)" : "#64748B",
               transition: "all 150ms",
             }}
           >
             {STATUS_TAB_LABELS[s]}
             {counts[s] > 0 && (
-              <span style={{ marginLeft: 6, fontSize: 10, fontWeight: 700, background: statusTab === s ? "rgba(99,102,241,0.3)" : "rgba(100,116,139,0.15)", color: statusTab === s ? "#818CF8" : "#64748B", padding: "1px 6px", borderRadius: 10 }}>
+              <span style={{ marginLeft: 6, fontSize: 10, fontWeight: 700, background: statusTab === s ? "rgba(99,102,241,0.3)" : "rgba(100,116,139,0.15)", color: statusTab === s ? "var(--lt-818cf8, #818CF8)" : "#64748B", padding: "1px 6px", borderRadius: 10 }}>
                 {counts[s]}
               </span>
             )}
@@ -462,23 +462,23 @@ export default function PlatformAdminInvitations() {
       </div>
 
       {/* Table */}
-      <div style={{ background: "#0F172A", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 14, overflow: "hidden" }}>
+      <div style={{ background: "var(--lt-0f172a, #0F172A)", border: "1px solid var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))", borderRadius: 14, overflow: "hidden" }}>
         {loading ? (
           <div style={{ padding: 48, textAlign: "center" }}>
-            <ArrowPathIcon style={{ width: 28, height: 28, color: "#6366F1", margin: "0 auto", animation: "spin 1s linear infinite" }} />
+            <ArrowPathIcon style={{ width: 28, height: 28, color: "var(--lt-6366f1, #6366F1)", margin: "0 auto", animation: "spin 1s linear infinite" }} />
           </div>
         ) : error ? (
-          <div style={{ padding: 48, textAlign: "center", color: "#F87171", fontSize: 14 }}>{error}</div>
+          <div style={{ padding: 48, textAlign: "center", color: "var(--lt-f87171, #F87171)", fontSize: 14 }}>{error}</div>
         ) : filtered.length === 0 ? (
           <div style={{ padding: 56, textAlign: "center" }}>
-            <EnvelopeIcon style={{ width: 36, height: 36, color: "#1E293B", margin: "0 auto 12px" }} />
+            <EnvelopeIcon style={{ width: 36, height: 36, color: "var(--lt-1e293b, #1E293B)", margin: "0 auto 12px" }} />
             <p style={{ color: "#64748B", fontSize: 14 }}>{t("enterprise.platformAdmin.invitations.empty")}</p>
           </div>
         ) : (
           <div style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
-              <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+              <tr style={{ borderBottom: "1px solid var(--lt-rgba-255-255-255-0-06, rgba(255,255,255,0.06))" }}>
                 {columns.map(h => (
                   <th key={h} style={{ padding: "11px 16px", textAlign: "left", fontSize: 10, fontWeight: 700, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.07em" }}>{h}</th>
                 ))}
@@ -489,7 +489,7 @@ export default function PlatformAdminInvitations() {
                 <tr
                   key={inv.id}
                   style={{ borderBottom: idx < filtered.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none", transition: "background 150ms" }}
-                  onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.02)"}
+                  onMouseEnter={e => e.currentTarget.style.background = "var(--lt-rgba-255-255-255-0-02, rgba(255,255,255,0.02))"}
                   onMouseLeave={e => e.currentTarget.style.background = "transparent"}
                 >
                   <td style={{ padding: "12px 16px" }}>
@@ -497,18 +497,18 @@ export default function PlatformAdminInvitations() {
                       <div style={{ width: 28, height: 28, borderRadius: 7, background: "rgba(56,189,248,0.1)", border: "1px solid rgba(56,189,248,0.2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                         <BuildingOffice2Icon style={{ width: 13, height: 13, color: "#38BDF8" }} />
                       </div>
-                      <span style={{ fontSize: 12, fontWeight: 600, color: "#94A3B8" }}>{inv.company_name || `#${inv.company}`}</span>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: "var(--lt-94a3b8, #94A3B8)" }}>{inv.company_name || `#${inv.company}`}</span>
                     </div>
                   </td>
                   <td style={{ padding: "12px 16px" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                       <EnvelopeIcon style={{ width: 12, height: 12, color: "#64748B", flexShrink: 0 }} />
-                      <span style={{ fontSize: 13, color: "#F1F5F9", fontWeight: 500 }}>{inv.email}</span>
+                      <span style={{ fontSize: 13, color: "var(--lt-f1f5f9, #F1F5F9)", fontWeight: 500 }}>{inv.email}</span>
                     </div>
                   </td>
                   <td style={{ padding: "12px 16px" }}><RoleBadge role={inv.role} /></td>
                   <td style={{ padding: "12px 16px" }}><StatusBadge status={inv.status} /></td>
-                  <td style={{ padding: "12px 16px", fontSize: 12, color: "#94A3B8" }}>{inv.invited_by_email || "—"}</td>
+                  <td style={{ padding: "12px 16px", fontSize: 12, color: "var(--lt-94a3b8, #94A3B8)" }}>{inv.invited_by_email || "—"}</td>
                   <td style={{ padding: "12px 16px" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 5, color: "#64748B" }}>
                       <ClockIcon style={{ width: 11, height: 11 }} />

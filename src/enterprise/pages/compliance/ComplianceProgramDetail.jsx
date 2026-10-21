@@ -19,11 +19,11 @@ import {
 } from "./CompliancePrograms";
 
 const INPUT = {
-  width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)",
-  borderRadius: 8, padding: "9px 12px", fontSize: 13, color: "#F1F5F9", outline: "none", boxSizing: "border-box",
+  width: "100%", background: "var(--lt-rgba-255-255-255-0-05, rgba(255,255,255,0.05))", border: "1px solid var(--lt-rgba-255-255-255-0-12, rgba(255,255,255,0.12))",
+  borderRadius: 8, padding: "9px 12px", fontSize: 13, color: "var(--lt-f1f5f9, #F1F5F9)", outline: "none", boxSizing: "border-box",
 };
-const MODAL_BACKDROP = { position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 };
-const MODAL_CARD = { background: "#0F172A", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 16, width: "100%", maxWidth: 460, boxShadow: "0 20px 60px rgba(0,0,0,0.7)" };
+const MODAL_BACKDROP = { position: "fixed", inset: 0, background: "var(--lt-rgba-0-0-0-0-6, rgba(0,0,0,0.6))", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 };
+const MODAL_CARD = { background: "var(--lt-0f172a, #0F172A)", border: "1px solid var(--lt-rgba-255-255-255-0-1, rgba(255,255,255,0.1))", borderRadius: 16, width: "100%", maxWidth: 460, boxShadow: "0 20px 60px var(--lt-rgba-0-0-0-0-7, rgba(0,0,0,0.7))" };
 
 function useTypeLabels() {
   const { t, language } = useLanguage();
@@ -78,7 +78,7 @@ function EditProgramForm({ program, onSaved, onCancel }) {
   return (
     <form onSubmit={handleSubmit} noValidate className="space-y-4">
       <ProgramFormFields form={form} onChange={setForm} errors={errors} />
-      {error && <p style={{ fontSize: 12, color: "#f87171" }}>{error}</p>}
+      {error && <p style={{ fontSize: 12, color: "var(--lt-f87171, #f87171)" }}>{error}</p>}
       <div className="flex justify-end gap-2 pt-1">
         <button type="button" onClick={onCancel} className="ank-btn-ghost text-xs">{t("enterprise.compliance.programs.cancel")}</button>
         <button type="submit" disabled={saving} className="ank-btn-accent text-xs" style={{ opacity: saving ? 0.7 : 1 }}>
@@ -174,7 +174,7 @@ function AddRequirementModal({ program, existingPathIds, onClose, onAdded }) {
               <input id="req-mandatory" type="checkbox" checked={isMandatory} onChange={(e) => setIsMandatory(e.target.checked)} style={{ width: 15, height: 15, cursor: "pointer" }} />
               <label htmlFor="req-mandatory" style={{ fontSize: 12.5, color: "var(--text-primary)", cursor: "pointer" }}>{t("enterprise.compliance.programDetail.addRequirement.mandatoryLabel")}</label>
             </div>
-            {error && <p style={{ fontSize: 12, color: "#f87171" }}>{error}</p>}
+            {error && <p style={{ fontSize: 12, color: "var(--lt-f87171, #f87171)" }}>{error}</p>}
             <div className="flex justify-end gap-2">
               <button type="button" onClick={onClose} className="ank-btn-ghost text-xs">{t("enterprise.compliance.programs.cancel")}</button>
               <button type="submit" disabled={saving} className="ank-btn-accent text-xs" style={{ opacity: saving ? 0.7 : 1 }}>
@@ -219,7 +219,7 @@ function RequirementRow({ req, index, onRemoved, canRemove }) {
       </div>
       {canRemove && (
         <button onClick={handleRemove} disabled={removing} style={{ color: "var(--text-tertiary)", padding: 5, borderRadius: 5, flexShrink: 0 }}
-          onMouseEnter={(e) => { e.currentTarget.style.color = "#f87171"; e.currentTarget.style.background = "rgba(239,68,68,0.1)"; }}
+          onMouseEnter={(e) => { e.currentTarget.style.color = "var(--lt-f87171, #f87171)"; e.currentTarget.style.background = "rgba(239,68,68,0.1)"; }}
           onMouseLeave={(e) => { e.currentTarget.style.color = "var(--text-tertiary)"; e.currentTarget.style.background = "transparent"; }}>
           {removing ? <ArrowPathIcon style={{ width: 13, height: 13 }} className="animate-spin" /> : <TrashIcon style={{ width: 13, height: 13 }} />}
         </button>
@@ -301,7 +301,7 @@ function AssignModal({ program, companyId, onClose, onAssigned }) {
         <input placeholder={tab === "user" ? t("enterprise.compliance.programDetail.assignModal.searchMember") : t("enterprise.compliance.programDetail.assignModal.searchTeam")} value={search} onChange={(e) => setSearch(e.target.value)}
           style={{ ...INPUT, marginBottom: 10 }}
           onFocus={(e) => { e.target.style.borderColor = "var(--accent)"; }}
-          onBlur={(e) => { e.target.style.borderColor = "rgba(255,255,255,0.12)"; }} />
+          onBlur={(e) => { e.target.style.borderColor = "var(--lt-rgba-255-255-255-0-12, rgba(255,255,255,0.12))"; }} />
 
         <div style={{ maxHeight: 220, overflowY: "auto", marginBottom: 14 }} className="space-y-1.5">
           {loading ? (
@@ -339,7 +339,7 @@ function AssignModal({ program, companyId, onClose, onAssigned }) {
                   style={{ width: "100%", textAlign: "left", background: sel ? "rgba(99,102,241,0.12)" : "var(--bg-elevated)", border: `1px solid ${sel ? "var(--accent)" : "var(--border)"}`, borderRadius: 6, padding: "9px 11px", cursor: "pointer" }}>
                   <div className="flex items-center gap-2">
                     <div style={{ background: sel ? "var(--accent)" : "rgba(59,130,246,0.12)", borderRadius: 5, padding: 5, flexShrink: 0 }}>
-                      <UserGroupIcon style={{ width: 13, height: 13, color: sel ? "#fff" : "#60a5fa" }} />
+                      <UserGroupIcon style={{ width: 13, height: 13, color: sel ? "#fff" : "var(--lt-60a5fa, #60a5fa)" }} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p style={{ fontSize: 12.5, fontWeight: 500, color: "var(--text-primary)" }}>{tm.name}</p>
@@ -359,8 +359,8 @@ function AssignModal({ program, companyId, onClose, onAssigned }) {
             style={{ ...INPUT, width: "auto", colorScheme: "dark" }} />
         </div>
 
-        {error && <p style={{ color: "#f87171", fontSize: 12, marginBottom: 10 }}>{error}</p>}
-        {success && <p style={{ color: "#4ade80", fontSize: 12, marginBottom: 10 }}>{success}</p>}
+        {error && <p style={{ color: "var(--lt-f87171, #f87171)", fontSize: 12, marginBottom: 10 }}>{error}</p>}
+        {success && <p style={{ color: "var(--lt-4ade80, #4ade80)", fontSize: 12, marginBottom: 10 }}>{success}</p>}
 
         <div className="flex justify-end gap-2">
           <button onClick={onClose} className="ank-btn-ghost text-xs">{t("enterprise.compliance.programDetail.assignModal.close")}</button>
@@ -511,7 +511,7 @@ export function ComplianceProgramDetail() {
                     <ClockIcon style={{ width: 11, height: 11 }} /> {t("enterprise.compliance.programDetail.validDays", { n: program.validity_days })}
                   </span>
                   {program.is_mandatory && (
-                    <span style={{ fontSize: 10, fontWeight: 700, color: "#f87171", background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.25)", padding: "1px 8px", borderRadius: 20 }}>{t("enterprise.compliance.programs.required")}</span>
+                    <span style={{ fontSize: 10, fontWeight: 700, color: "var(--lt-f87171, #f87171)", background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.25)", padding: "1px 8px", borderRadius: 20 }}>{t("enterprise.compliance.programs.required")}</span>
                   )}
                   {program.requires_score && program.passing_score != null && (
                     <span style={{ color: "var(--text-tertiary)", fontSize: 11 }}>{t("enterprise.compliance.programDetail.passingScore", { n: program.passing_score })}</span>
@@ -530,7 +530,7 @@ export function ComplianceProgramDetail() {
                 <button onClick={() => navigate(`/enterprise/compliance/programs/${id}/audit`)} className="ank-btn-ghost text-xs">
                   <ChartBarIcon className="h-3.5 w-3.5" /> {t("enterprise.compliance.programDetail.auditReport")}
                 </button>
-                {actionError && <p role="alert" style={{ fontSize: 12, color: "#f87171", alignSelf: "center" }}>{actionError}</p>}
+                {actionError && <p role="alert" style={{ fontSize: 12, color: "var(--lt-f87171, #f87171)", alignSelf: "center" }}>{actionError}</p>}
                 {program.status === "draft" && (
                   <button onClick={handleActivate} disabled={busy} className="ank-btn-accent text-xs" style={{ opacity: busy ? 0.7 : 1 }}>
                     {busy ? <ArrowPathIcon className="h-3.5 w-3.5 animate-spin" /> : <><CheckCircleIcon className="h-3.5 w-3.5" /> {t("enterprise.compliance.programs.activate")}</>}

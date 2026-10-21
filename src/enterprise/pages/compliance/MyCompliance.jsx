@@ -10,8 +10,8 @@ import { EmptyState } from "../../components/EmptyState";
 import { DashboardSkeleton } from "../../components/LoadingSkeleton";
 
 const INPUT = {
-  width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)",
-  borderRadius: 8, padding: "9px 12px", fontSize: 13, color: "#F1F5F9", outline: "none", boxSizing: "border-box",
+  width: "100%", background: "var(--lt-rgba-255-255-255-0-05, rgba(255,255,255,0.05))", border: "1px solid var(--lt-rgba-255-255-255-0-12, rgba(255,255,255,0.12))",
+  borderRadius: 8, padding: "9px 12px", fontSize: 13, color: "var(--lt-f1f5f9, #F1F5F9)", outline: "none", boxSizing: "border-box",
 };
 
 // ─── Mark Complete Modal ─────────────────────────────────────────────────────
@@ -39,8 +39,8 @@ function CompleteAssignmentModal({ assignment, onClose, onDone }) {
   };
 
   return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }} onClick={onClose}>
-      <div style={{ background: "#0F172A", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 16, width: "100%", maxWidth: 400, padding: 22, boxShadow: "0 20px 60px rgba(0,0,0,0.7)" }} className="space-y-4" onClick={(e) => e.stopPropagation()}>
+    <div style={{ position: "fixed", inset: 0, background: "var(--lt-rgba-0-0-0-0-6, rgba(0,0,0,0.6))", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }} onClick={onClose}>
+      <div style={{ background: "var(--lt-0f172a, #0F172A)", border: "1px solid var(--lt-rgba-255-255-255-0-1, rgba(255,255,255,0.1))", borderRadius: 16, width: "100%", maxWidth: 400, padding: 22, boxShadow: "0 20px 60px var(--lt-rgba-0-0-0-0-7, rgba(0,0,0,0.7))" }} className="space-y-4" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between">
           <p style={{ fontWeight: 700, color: "var(--text-primary)", fontSize: 14 }}>{t("enterprise.compliance.myCompliance.completeModal.title", { name: assignment.program_name })}</p>
           <button type="button" onClick={onClose} style={{ color: "var(--text-tertiary)", background: "none", border: "none", cursor: "pointer" }} aria-label="Close">
@@ -56,7 +56,7 @@ function CompleteAssignmentModal({ assignment, onClose, onDone }) {
             <label style={{ fontSize: 11, fontWeight: 700, color: "var(--text-tertiary)", display: "block", marginBottom: 5 }} htmlFor="ca-notes">{t("enterprise.compliance.assignments.completeModal.notesLabel")}</label>
             <textarea id="ca-notes" rows={2} style={{ ...INPUT, resize: "vertical" }} value={notes} onChange={(e) => setNotes(e.target.value)} />
           </div>
-          {error && <p style={{ fontSize: 12, color: "#f87171" }}>{error}</p>}
+          {error && <p style={{ fontSize: 12, color: "var(--lt-f87171, #f87171)" }}>{error}</p>}
           <div className="flex justify-end gap-2 pt-1">
             <button type="button" onClick={onClose} className="ank-btn-ghost text-xs">{t("enterprise.compliance.programs.cancel")}</button>
             <button type="submit" disabled={saving} className="ank-btn-accent text-xs" style={{ opacity: saving ? 0.7 : 1 }}>
@@ -103,9 +103,9 @@ export function MyCompliance() {
 
   const summaryCards = [
     { label: t("enterprise.compliance.myCompliance.summary.totalPrograms"), value: summary.total_programs, color: "var(--text-primary)" },
-    { label: t("enterprise.compliance.myCompliance.summary.compliant"), value: summary.compliant, color: "#4ade80" },
-    { label: t("enterprise.compliance.myCompliance.summary.nonCompliant"), value: summary.non_compliant, color: "#f87171" },
-    { label: t("enterprise.compliance.myCompliance.summary.pending"), value: summary.pending, color: "#f59e0b" },
+    { label: t("enterprise.compliance.myCompliance.summary.compliant"), value: summary.compliant, color: "var(--lt-4ade80, #4ade80)" },
+    { label: t("enterprise.compliance.myCompliance.summary.nonCompliant"), value: summary.non_compliant, color: "var(--lt-f87171, #f87171)" },
+    { label: t("enterprise.compliance.myCompliance.summary.pending"), value: summary.pending, color: "var(--lt-f59e0b, #f59e0b)" },
   ];
 
   return (
@@ -126,7 +126,7 @@ export function MyCompliance() {
       <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border)", borderRadius: 12, padding: 18 }}>
         <div className="flex items-center justify-between mb-2.5">
           <p style={{ fontSize: 14, fontWeight: 700, color: "var(--text-primary)" }}>{t("enterprise.compliance.myCompliance.complianceRate")}</p>
-          <span style={{ fontSize: 22, fontWeight: 800, color: "#818CF8" }}>{summary.compliance_rate ?? 0}%</span>
+          <span style={{ fontSize: 22, fontWeight: 800, color: "var(--lt-818cf8, #818CF8)" }}>{summary.compliance_rate ?? 0}%</span>
         </div>
         <div style={{ height: 8, background: "var(--bg-elevated)", borderRadius: 20, overflow: "hidden" }}>
           <div style={{ height: "100%", width: `${summary.compliance_rate ?? 0}%`, background: "#6366F1", borderRadius: 20, transition: "width 400ms" }} />

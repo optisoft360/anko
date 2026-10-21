@@ -25,10 +25,10 @@ export function MyCertifications() {
   if (loading) return <DashboardSkeleton />;
 
   const statCards = stats ? [
-    { label: t("enterprise.certifications.myCertifications.stats.active"), value: stats.active, color: "#4ade80" },
-    { label: t("enterprise.certifications.myCertifications.stats.expiring"), value: stats.expiring, color: "#f59e0b" },
+    { label: t("enterprise.certifications.myCertifications.stats.active"), value: stats.active, color: "var(--lt-4ade80, #4ade80)" },
+    { label: t("enterprise.certifications.myCertifications.stats.expiring"), value: stats.expiring, color: "var(--lt-f59e0b, #f59e0b)" },
     { label: t("enterprise.certifications.myCertifications.stats.expired"), value: stats.expired, color: "#8B8B9C" },
-    { label: t("enterprise.certifications.myCertifications.stats.revoked"), value: stats.revoked, color: "#f87171" },
+    { label: t("enterprise.certifications.myCertifications.stats.revoked"), value: stats.revoked, color: "var(--lt-f87171, #f87171)" },
   ] : [];
 
   return (
@@ -63,7 +63,7 @@ export function MyCertifications() {
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1 min-w-0">
                     <p style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary)", lineHeight: 1.3 }}>{cert.template_name}</p>
-                    <p style={{ fontSize: 11, fontWeight: 700, color: "#818CF8", textTransform: "capitalize", marginTop: 2 }}>{cert.template_type}</p>
+                    <p style={{ fontSize: 11, fontWeight: 700, color: "var(--lt-818cf8, #818CF8)", textTransform: "capitalize", marginTop: 2 }}>{cert.template_type}</p>
                   </div>
                   <StatusBadge status={cert.status} />
                 </div>
@@ -73,12 +73,12 @@ export function MyCertifications() {
                 <div style={{ fontSize: 11, color: "var(--text-secondary)" }} className="space-y-1">
                   <div>{t("enterprise.certifications.myCertifications.issued")} <span style={{ fontWeight: 600 }}>{cert.issued_at ? formatDate(cert.issued_at, language) : "—"}</span></div>
                   <div>{t("enterprise.certifications.myCertifications.expires")} <span style={{ fontWeight: 600 }}>{cert.expires_at ? formatDate(cert.expires_at, language) : t("enterprise.certifications.myCertifications.noExpiry")}</span></div>
-                  {cert.score != null && <div>{t("enterprise.certifications.myCertifications.score")} <span style={{ fontWeight: 700, color: "#818CF8" }}>{cert.score}%</span></div>}
+                  {cert.score != null && <div>{t("enterprise.certifications.myCertifications.score")} <span style={{ fontWeight: 700, color: "var(--lt-818cf8, #818CF8)" }}>{cert.score}%</span></div>}
                 </div>
 
                 <div className="flex gap-2">
                   <button onClick={() => navigate(`/enterprise/certifications/${cert.id}`)}
-                    style={{ flex: 1, fontSize: 11, fontWeight: 700, color: "#818CF8", background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.25)", borderRadius: 6, padding: "7px 0", cursor: "pointer" }}>
+                    style={{ flex: 1, fontSize: 11, fontWeight: 700, color: "var(--lt-818cf8, #818CF8)", background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.25)", borderRadius: 6, padding: "7px 0", cursor: "pointer" }}>
                     {t("enterprise.certifications.myCertifications.view")}
                   </button>
                   <button style={{ flex: 1, fontSize: 11, fontWeight: 700, color: "var(--text-tertiary)", background: "none", border: "1px solid var(--border)", borderRadius: 6, padding: "7px 0", cursor: "pointer" }}>

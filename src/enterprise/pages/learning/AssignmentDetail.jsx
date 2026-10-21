@@ -52,7 +52,7 @@ export function AssignmentDetail() {
       <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border)", borderRadius: 8, padding: "18px 22px" }}>
         <div className="flex items-start gap-3">
           <div style={{ background: isDone ? "rgba(74,222,128,0.12)" : "var(--accent-muted)", borderRadius: 8, padding: 10, flexShrink: 0 }}>
-            <RectangleStackIcon style={{ width: 20, height: 20, color: isDone ? "#4ade80" : "var(--accent)" }} />
+            <RectangleStackIcon style={{ width: 20, height: 20, color: isDone ? "var(--lt-4ade80, #4ade80)" : "var(--accent)" }} />
           </div>
           <div className="flex-1 min-w-0">
             <h1 style={{ color: "var(--text-primary)", fontWeight: 700, fontSize: 17 }}>

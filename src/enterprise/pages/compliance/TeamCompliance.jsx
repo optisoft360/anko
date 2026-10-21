@@ -34,10 +34,10 @@ export function TeamCompliance() {
   const rateColor = (r) => (r >= 80 ? "#4ade80" : r >= 60 ? "#f59e0b" : "#f87171");
 
   const summaryCards = summary ? [
-    { label: t("enterprise.compliance.teamCompliance.summary.compliant"), value: summary.compliant ?? 0, color: "#4ade80" },
-    { label: t("enterprise.compliance.teamCompliance.summary.nonCompliant"), value: summary.non_compliant ?? 0, color: "#f87171" },
-    { label: t("enterprise.compliance.teamCompliance.summary.pending"), value: summary.pending ?? 0, color: "#f59e0b" },
-    { label: t("enterprise.compliance.teamCompliance.summary.avgRate"), value: `${Math.round(Number(summary.avg_compliance_rate ?? 0))}%`, color: "#818CF8" },
+    { label: t("enterprise.compliance.teamCompliance.summary.compliant"), value: summary.compliant ?? 0, color: "var(--lt-4ade80, #4ade80)" },
+    { label: t("enterprise.compliance.teamCompliance.summary.nonCompliant"), value: summary.non_compliant ?? 0, color: "var(--lt-f87171, #f87171)" },
+    { label: t("enterprise.compliance.teamCompliance.summary.pending"), value: summary.pending ?? 0, color: "var(--lt-f59e0b, #f59e0b)" },
+    { label: t("enterprise.compliance.teamCompliance.summary.avgRate"), value: `${Math.round(Number(summary.avg_compliance_rate ?? 0))}%`, color: "var(--lt-818cf8, #818CF8)" },
   ] : [];
 
   const columns = [
@@ -103,9 +103,9 @@ export function TeamCompliance() {
                           <span style={{ fontSize: 11, fontWeight: 700, color: "var(--text-secondary)" }}>{rate}%</span>
                         </div>
                       </td>
-                      <td style={{ padding: "12px 16px", color: "#4ade80", fontWeight: 700 }}>{m.compliant ?? 0}</td>
-                      <td style={{ padding: "12px 16px", color: "#f87171", fontWeight: 700 }}>{m.non_compliant ?? 0}</td>
-                      <td style={{ padding: "12px 16px", color: "#f59e0b", fontWeight: 700 }}>{m.pending ?? 0}</td>
+                      <td style={{ padding: "12px 16px", color: "var(--lt-4ade80, #4ade80)", fontWeight: 700 }}>{m.compliant ?? 0}</td>
+                      <td style={{ padding: "12px 16px", color: "var(--lt-f87171, #f87171)", fontWeight: 700 }}>{m.non_compliant ?? 0}</td>
+                      <td style={{ padding: "12px 16px", color: "var(--lt-f59e0b, #f59e0b)", fontWeight: 700 }}>{m.pending ?? 0}</td>
                       <td style={{ padding: "12px 16px" }}>
                         <StatusBadge status={rate >= 80 ? "compliant" : rate >= 60 ? "pending" : "non_compliant"} />
                       </td>

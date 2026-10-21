@@ -8,7 +8,7 @@ const TONE = {
   orange: { bg: "rgba(251,146,60,0.12)",  text: "#fb923c", border: "rgba(251,146,60,0.25)" },
   red:    { bg: "rgba(239,68,68,0.12)",   text: "#f87171", border: "rgba(239,68,68,0.25)" },
   blue:   { bg: "rgba(99,102,241,0.12)",  text: "#818CF8", border: "rgba(99,102,241,0.25)" },
-  gray:   { bg: "rgba(255,255,255,0.06)", text: "#8B8B9C", border: "rgba(255,255,255,0.09)" },
+  gray:   { bg: "rgba(255,255,255,0.06)", text: "#8B8B9C", border: "var(--lt-rgba-255-255-255-0-09, rgba(255,255,255,0.09))" },
 };
 
 const COMPLIANCE_MAP = {

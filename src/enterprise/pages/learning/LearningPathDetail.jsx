@@ -93,7 +93,7 @@ function AddProcesoModal({ pathId, currentModuleIds, onAdded, onClose }) {
 
   return (
     <div style={{
-      position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", zIndex: 50,
+      position: "fixed", inset: 0, background: "var(--lt-rgba-0-0-0-0-6, rgba(0,0,0,0.6))", zIndex: 50,
       display: "flex", alignItems: "center", justifyContent: "center", padding: 20,
     }} onClick={onClose}>
       <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border)", borderRadius: 10, width: "100%", maxWidth: 440, padding: 20 }}
@@ -152,7 +152,7 @@ function AddProcesoModal({ pathId, currentModuleIds, onAdded, onClose }) {
           </div>
         )}
 
-        {error && <p style={{ color: "#f87171", fontSize: 11, marginBottom: 10 }}>{error}</p>}
+        {error && <p style={{ color: "var(--lt-f87171, #f87171)", fontSize: 11, marginBottom: 10 }}>{error}</p>}
 
         <div className="flex justify-end gap-2">
           <button onClick={onClose} className="ank-btn-ghost text-xs">{t("enterprise.learning.pathDetail.cancel")}</button>
@@ -293,7 +293,7 @@ function ModuleRow({ mod, index, total, pathId, pathName, onRemoved, onMoveUp, o
 
         {/* Remove */}
         <button onClick={handleRemove} disabled={removing} style={{ color: "var(--text-tertiary)", padding: 5, borderRadius: 5, flexShrink: 0, transition: "all 150ms" }}
-          onMouseEnter={(e) => { e.currentTarget.style.color = "#f87171"; e.currentTarget.style.background = "rgba(239,68,68,0.1)"; }}
+          onMouseEnter={(e) => { e.currentTarget.style.color = "var(--lt-f87171, #f87171)"; e.currentTarget.style.background = "rgba(239,68,68,0.1)"; }}
           onMouseLeave={(e) => { e.currentTarget.style.color = "var(--text-tertiary)"; e.currentTarget.style.background = "transparent"; }}>
           {removing ? <ArrowPathIcon style={{ width: 13, height: 13 }} className="animate-spin" /> : <XMarkIcon style={{ width: 13, height: 13 }} />}
         </button>
@@ -355,9 +355,9 @@ function AssignModal({ pathId, companyId, onClose }) {
   );
 
   return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.65)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}
+    <div style={{ position: "fixed", inset: 0, background: "var(--lt-rgba-0-0-0-0-65, rgba(0,0,0,0.65))", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}
       onClick={onClose}>
-      <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border)", borderRadius: 10, width: "100%", maxWidth: 460, padding: 22, boxShadow: "0 20px 60px rgba(0,0,0,0.5)" }}
+      <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border)", borderRadius: 10, width: "100%", maxWidth: 460, padding: 22, boxShadow: "0 20px 60px var(--lt-rgba-0-0-0-0-5, rgba(0,0,0,0.5))" }}
         onClick={(e) => e.stopPropagation()}>
 
         {/* Header */}
@@ -419,7 +419,7 @@ function AssignModal({ pathId, companyId, onClose }) {
                   style={{ width: "100%", textAlign: "left", background: sel ? "var(--bg-accent)" : "var(--bg-elevated)", border: `1px solid ${sel ? "var(--accent)" : "var(--border)"}`, borderRadius: 6, padding: "9px 11px", cursor: "pointer", transition: "all 150ms" }}>
                   <div className="flex items-center gap-2">
                     <div style={{ background: sel ? "var(--accent)" : "rgba(59,130,246,0.12)", borderRadius: 5, padding: 5, flexShrink: 0 }}>
-                      <UserGroupIcon style={{ width: 13, height: 13, color: sel ? "#fff" : "#60a5fa" }} />
+                      <UserGroupIcon style={{ width: 13, height: 13, color: sel ? "#fff" : "var(--lt-60a5fa, #60a5fa)" }} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p style={{ fontSize: 12.5, fontWeight: 500, color: "var(--text-primary)" }}>{tm.name}</p>
@@ -442,8 +442,8 @@ function AssignModal({ pathId, companyId, onClose }) {
             onBlur={(e) => { e.target.style.borderColor = "var(--border)"; }} />
         </div>
 
-        {error && <p style={{ color: "#f87171", fontSize: 12, marginBottom: 10 }}>{error}</p>}
-        {success && <p style={{ color: "#4ade80", fontSize: 12, marginBottom: 10 }}>{success}</p>}
+        {error && <p style={{ color: "var(--lt-f87171, #f87171)", fontSize: 12, marginBottom: 10 }}>{error}</p>}
+        {success && <p style={{ color: "var(--lt-4ade80, #4ade80)", fontSize: 12, marginBottom: 10 }}>{success}</p>}
 
         <div className="flex justify-end gap-2">
           <button onClick={onClose} className="ank-btn-ghost text-xs">{t("enterprise.learning.pathDetail.assignModal.close")}</button>

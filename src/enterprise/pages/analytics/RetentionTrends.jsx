@@ -23,7 +23,7 @@ export function RetentionTrends() {
     yaxis: { min: 0, max: 100, labels: { formatter: (v) => `${v}%`, style: { colors: "#64748B" } } },
     legend: { position: "top", labels: { colors: "#94A3B8" } },
     dataLabels: { enabled: false },
-    grid: { borderColor: "rgba(255,255,255,0.07)" },
+    grid: { borderColor: "var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))" },
     tooltip: { theme: "dark", shared: true, y: { formatter: (v) => `${v}%` } },
   };
 
@@ -76,8 +76,8 @@ export function RetentionTrends() {
                 {data.slice(-10).reverse().map((row, i) => (
                   <tr key={i} style={{ borderBottom: "1px solid var(--border)" }}>
                     <td style={{ padding: "10px 16px", color: "var(--text-tertiary)", fontSize: 11 }}>{row.date}</td>
-                    <td style={{ padding: "10px 16px", fontWeight: 700, color: "#818CF8" }}>{row.avg_retention ?? 0}%</td>
-                    <td style={{ padding: "10px 16px", fontWeight: 700, color: "#f87171" }}>{row.avg_risk ?? 0}%</td>
+                    <td style={{ padding: "10px 16px", fontWeight: 700, color: "var(--lt-818cf8, #818CF8)" }}>{row.avg_retention ?? 0}%</td>
+                    <td style={{ padding: "10px 16px", fontWeight: 700, color: "var(--lt-f87171, #f87171)" }}>{row.avg_risk ?? 0}%</td>
                     <td style={{ padding: "10px 16px", color: "var(--text-secondary)" }}>{row.snapshot_count ?? 0}</td>
                   </tr>
                 ))}

@@ -40,7 +40,7 @@ export function KPICard({ title, value, subtitle, trend, trendLabel, icon: Icon,
           {value ?? "—"}
         </span>
         {urgent && (
-          <span style={{ marginBottom: 4, fontSize: 10, fontWeight: 700, color: "#f87171", background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.25)", padding: "1px 8px", borderRadius: 20 }}>
+          <span style={{ marginBottom: 4, fontSize: 10, fontWeight: 700, color: "var(--lt-f87171, #f87171)", background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.25)", padding: "1px 8px", borderRadius: 20 }}>
             Urgent
           </span>
         )}

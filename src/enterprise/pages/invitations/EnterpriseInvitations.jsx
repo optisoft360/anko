@@ -16,9 +16,9 @@ import invitationsService from "@/services/invitationsService";
 function useStatusMeta() {
   const { t } = useLanguage();
   return {
-    pending:   { label: t("enterprise.platformAdmin.invitations.status.pending"),   color: "#F59E0B", bg: "rgba(245,158,11,0.12)",  border: "rgba(245,158,11,0.28)" },
+    pending:   { label: t("enterprise.platformAdmin.invitations.status.pending"),   color: "var(--lt-f59e0b, #F59E0B)", bg: "rgba(245,158,11,0.12)",  border: "rgba(245,158,11,0.28)" },
     accepted:  { label: t("enterprise.platformAdmin.invitations.status.accepted"),  color: "#34D399", bg: "rgba(52,211,153,0.12)",  border: "rgba(52,211,153,0.28)" },
-    expired:   { label: t("enterprise.platformAdmin.invitations.status.expired"),   color: "#F87171", bg: "rgba(248,113,113,0.12)", border: "rgba(248,113,113,0.28)" },
+    expired:   { label: t("enterprise.platformAdmin.invitations.status.expired"),   color: "var(--lt-f87171, #F87171)", bg: "rgba(248,113,113,0.12)", border: "rgba(248,113,113,0.28)" },
     cancelled: { label: t("enterprise.platformAdmin.invitations.status.cancelled"), color: "#64748B", bg: "rgba(100,116,139,0.10)", border: "rgba(100,116,139,0.22)" },
   };
 }
@@ -26,12 +26,12 @@ function useStatusMeta() {
 function useRoleMeta() {
   const { t } = useLanguage();
   return {
-    owner:    { label: t("enterprise.settings.inviteUser.roles.owner"),    color: "#F59E0B" },
-    admin:    { label: t("enterprise.settings.inviteUser.roles.admin"),    color: "#818CF8" },
+    owner:    { label: t("enterprise.settings.inviteUser.roles.owner"),    color: "var(--lt-f59e0b, #F59E0B)" },
+    admin:    { label: t("enterprise.settings.inviteUser.roles.admin"),    color: "var(--lt-818cf8, #818CF8)" },
     manager:  { label: t("enterprise.settings.inviteUser.roles.manager"),  color: "#38BDF8" },
     trainer:  { label: t("enterprise.settings.inviteUser.roles.trainer"), color: "#A78BFA" },
     employee: { label: t("enterprise.settings.inviteUser.roles.employee"),color: "#34D399" },
-    auditor:  { label: t("enterprise.settings.inviteUser.roles.auditor"), color: "#94A3B8" },
+    auditor:  { label: t("enterprise.settings.inviteUser.roles.auditor"), color: "var(--lt-94a3b8, #94A3B8)" },
   };
 }
 
@@ -39,7 +39,7 @@ const TABS = ["all", "pending", "accepted", "expired", "cancelled"];
 
 function StatusBadge({ status }) {
   const STATUS_META = useStatusMeta();
-  const meta = STATUS_META[status] || { label: status, color: "#94A3B8", bg: "rgba(148,163,184,0.1)", border: "rgba(148,163,184,0.22)" };
+  const meta = STATUS_META[status] || { label: status, color: "var(--lt-94a3b8, #94A3B8)", bg: "rgba(148,163,184,0.1)", border: "rgba(148,163,184,0.22)" };
   return (
     <span style={{
       display: "inline-flex", alignItems: "center", gap: 5,
@@ -55,7 +55,7 @@ function StatusBadge({ status }) {
 
 function RoleBadge({ role }) {
   const ROLE_META = useRoleMeta();
-  const meta = ROLE_META[role] || { label: role, color: "#94A3B8" };
+  const meta = ROLE_META[role] || { label: role, color: "var(--lt-94a3b8, #94A3B8)" };
   return (
     <span style={{ fontSize: 12, fontWeight: 600, color: meta.color }}>
       {meta.label}
@@ -151,7 +151,7 @@ export default function EnterpriseInvitations() {
       {/* Header */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 28, gap: 16, flexWrap: "wrap" }}>
         <div>
-          <h1 style={{ fontSize: 22, fontWeight: 800, color: "#F1F5F9", margin: 0, letterSpacing: "-0.01em" }}>
+          <h1 style={{ fontSize: 22, fontWeight: 800, color: "var(--lt-f1f5f9, #F1F5F9)", margin: 0, letterSpacing: "-0.01em" }}>
             {t("enterprise.platformAdmin.invitations.title")}
           </h1>
           {company?.company_name && (
@@ -179,7 +179,7 @@ export default function EnterpriseInvitations() {
       </div>
 
       {/* Tabs */}
-      <div style={{ display: "flex", gap: 4, marginBottom: 20, background: "#0F172A", borderRadius: 10, padding: 4, border: "1px solid rgba(255,255,255,0.06)", width: "fit-content" }}>
+      <div style={{ display: "flex", gap: 4, marginBottom: 20, background: "var(--lt-0f172a, #0F172A)", borderRadius: 10, padding: 4, border: "1px solid var(--lt-rgba-255-255-255-0-06, rgba(255,255,255,0.06))", width: "fit-content" }}>
         {TABS.map(tb => (
           <button
             key={tb}
@@ -188,7 +188,7 @@ export default function EnterpriseInvitations() {
               padding: "6px 14px", borderRadius: 7, border: "none",
               fontSize: 12, fontWeight: 600, cursor: "pointer",
               background: tab === tb ? "rgba(99,102,241,0.2)" : "transparent",
-              color: tab === tb ? "#818CF8" : "#64748B",
+              color: tab === tb ? "var(--lt-818cf8, #818CF8)" : "#64748B",
               transition: "all 150ms",
             }}
           >
@@ -197,7 +197,7 @@ export default function EnterpriseInvitations() {
               <span style={{
                 marginLeft: 6, fontSize: 10, fontWeight: 700,
                 background: tab === tb ? "rgba(99,102,241,0.3)" : "rgba(100,116,139,0.15)",
-                color: tab === tb ? "#818CF8" : "#64748B",
+                color: tab === tb ? "var(--lt-818cf8, #818CF8)" : "#64748B",
                 padding: "1px 6px", borderRadius: 10,
               }}>
                 {counts[tb]}
@@ -208,23 +208,23 @@ export default function EnterpriseInvitations() {
       </div>
 
       {/* Content */}
-      <div style={{ background: "#0F172A", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 14, overflow: "hidden" }}>
+      <div style={{ background: "var(--lt-0f172a, #0F172A)", border: "1px solid var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))", borderRadius: 14, overflow: "hidden" }}>
         {loading ? (
           <div style={{ padding: 48, textAlign: "center" }}>
-            <ArrowPathIcon style={{ width: 28, height: 28, color: "#6366F1", margin: "0 auto", animation: "spin 1s linear infinite" }} />
+            <ArrowPathIcon style={{ width: 28, height: 28, color: "var(--lt-6366f1, #6366F1)", margin: "0 auto", animation: "spin 1s linear infinite" }} />
           </div>
         ) : error ? (
-          <div style={{ padding: 48, textAlign: "center", color: "#F87171", fontSize: 14 }}>{error}</div>
+          <div style={{ padding: 48, textAlign: "center", color: "var(--lt-f87171, #F87171)", fontSize: 14 }}>{error}</div>
         ) : filtered.length === 0 ? (
           <div style={{ padding: 56, textAlign: "center" }}>
-            <EnvelopeIcon style={{ width: 36, height: 36, color: "#1E293B", margin: "0 auto 12px" }} />
+            <EnvelopeIcon style={{ width: 36, height: 36, color: "var(--lt-1e293b, #1E293B)", margin: "0 auto 12px" }} />
             <p style={{ color: "#64748B", fontSize: 14 }}>{t("enterprise.platformAdmin.invitations.empty")}</p>
           </div>
         ) : (
           <div style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
-              <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+              <tr style={{ borderBottom: "1px solid var(--lt-rgba-255-255-255-0-06, rgba(255,255,255,0.06))" }}>
                 {columns.map(h => (
                   <th key={h} style={{
                     padding: "11px 16px", textAlign: "left",
@@ -242,7 +242,7 @@ export default function EnterpriseInvitations() {
                     borderBottom: idx < filtered.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none",
                     transition: "background 150ms",
                   }}
-                  onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.02)"}
+                  onMouseEnter={e => e.currentTarget.style.background = "var(--lt-rgba-255-255-255-0-02, rgba(255,255,255,0.02))"}
                   onMouseLeave={e => e.currentTarget.style.background = "transparent"}
                 >
                   <td style={{ padding: "13px 16px" }}>
@@ -252,9 +252,9 @@ export default function EnterpriseInvitations() {
                         background: "rgba(99,102,241,0.12)", border: "1px solid rgba(99,102,241,0.2)",
                         display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
                       }}>
-                        <EnvelopeIcon style={{ width: 13, height: 13, color: "#818CF8" }} />
+                        <EnvelopeIcon style={{ width: 13, height: 13, color: "var(--lt-818cf8, #818CF8)" }} />
                       </div>
-                      <span style={{ fontSize: 13, color: "#F1F5F9", fontWeight: 500 }}>{inv.email}</span>
+                      <span style={{ fontSize: 13, color: "var(--lt-f1f5f9, #F1F5F9)", fontWeight: 500 }}>{inv.email}</span>
                     </div>
                   </td>
                   <td style={{ padding: "13px 16px" }}>
@@ -263,7 +263,7 @@ export default function EnterpriseInvitations() {
                   <td style={{ padding: "13px 16px" }}>
                     <StatusBadge status={inv.status} />
                   </td>
-                  <td style={{ padding: "13px 16px", fontSize: 12, color: "#94A3B8" }}>
+                  <td style={{ padding: "13px 16px", fontSize: 12, color: "var(--lt-94a3b8, #94A3B8)" }}>
                     {inv.invited_by_email || "—"}
                   </td>
                   <td style={{ padding: "13px 16px" }}>
@@ -282,7 +282,7 @@ export default function EnterpriseInvitations() {
                             display: "flex", alignItems: "center", gap: 5,
                             padding: "5px 11px", borderRadius: 7,
                             background: "rgba(99,102,241,0.12)", border: "1px solid rgba(99,102,241,0.22)",
-                            color: "#818CF8", fontSize: 11, fontWeight: 600,
+                            color: "var(--lt-818cf8, #818CF8)", fontSize: 11, fontWeight: 600,
                             cursor: acting[inv.id] ? "not-allowed" : "pointer",
                             opacity: acting[inv.id] ? 0.6 : 1, transition: "all 150ms",
                           }}
@@ -297,7 +297,7 @@ export default function EnterpriseInvitations() {
                             display: "flex", alignItems: "center", gap: 5,
                             padding: "5px 11px", borderRadius: 7,
                             background: "rgba(248,113,113,0.08)", border: "1px solid rgba(248,113,113,0.18)",
-                            color: "#F87171", fontSize: 11, fontWeight: 600,
+                            color: "var(--lt-f87171, #F87171)", fontSize: 11, fontWeight: 600,
                             cursor: acting[inv.id] ? "not-allowed" : "pointer",
                             opacity: acting[inv.id] ? 0.6 : 1, transition: "all 150ms",
                           }}
@@ -307,7 +307,7 @@ export default function EnterpriseInvitations() {
                         </button>
                       </div>
                     ) : (
-                      <span style={{ fontSize: 11, color: "#334155" }}>—</span>
+                      <span style={{ fontSize: 11, color: "var(--lt-334155, #334155)" }}>—</span>
                     )}
                   </td>
                 </tr>

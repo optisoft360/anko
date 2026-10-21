@@ -12,13 +12,13 @@ import { mapApiErrors } from "@/utils/apiError";
 import { intInRange, noWheel } from "@/utils/numberInput";
 
 const INPUT = {
-  width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)",
-  borderRadius: 8, padding: "9px 12px", fontSize: 13, color: "#F1F5F9", outline: "none", boxSizing: "border-box",
+  width: "100%", background: "var(--lt-rgba-255-255-255-0-05, rgba(255,255,255,0.05))", border: "1px solid var(--lt-rgba-255-255-255-0-12, rgba(255,255,255,0.12))",
+  borderRadius: 8, padding: "9px 12px", fontSize: 13, color: "var(--lt-f1f5f9, #F1F5F9)", outline: "none", boxSizing: "border-box",
 };
 const LABEL = { fontSize: 11, fontWeight: 700, color: "var(--text-tertiary)", display: "block", marginBottom: 5 };
 
 function FieldError({ message }) {
-  return message ? <p role="alert" style={{ fontSize: 11, color: "#f87171", marginTop: 4 }}>{message}</p> : null;
+  return message ? <p role="alert" style={{ fontSize: 11, color: "var(--lt-f87171, #f87171)", marginTop: 4 }}>{message}</p> : null;
 }
 
 /** 17: same rules as ComplianceProgramSerializer. Returns { field: message }. */
@@ -213,8 +213,8 @@ function CreateProgramModal({ onClose, onCreated }) {
   };
 
   return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }} onClick={onClose}>
-      <div style={{ background: "#0F172A", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 16, width: "100%", maxWidth: 520, maxHeight: "88vh", overflowY: "auto", padding: 24, boxShadow: "0 20px 60px rgba(0,0,0,0.7)" }} className="space-y-4" onClick={(e) => e.stopPropagation()}>
+    <div style={{ position: "fixed", inset: 0, background: "var(--lt-rgba-0-0-0-0-6, rgba(0,0,0,0.6))", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }} onClick={onClose}>
+      <div style={{ background: "var(--lt-0f172a, #0F172A)", border: "1px solid var(--lt-rgba-255-255-255-0-1, rgba(255,255,255,0.1))", borderRadius: 16, width: "100%", maxWidth: 520, maxHeight: "88vh", overflowY: "auto", padding: 24, boxShadow: "0 20px 60px var(--lt-rgba-0-0-0-0-7, rgba(0,0,0,0.7))" }} className="space-y-4" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between">
           <p style={{ fontWeight: 700, color: "var(--text-primary)", fontSize: 15 }}>{t("enterprise.compliance.programs.createModal.title")}</p>
           <button type="button" onClick={onClose} style={{ color: "var(--text-tertiary)", background: "none", border: "none", cursor: "pointer" }} aria-label="Close">
@@ -223,7 +223,7 @@ function CreateProgramModal({ onClose, onCreated }) {
         </div>
         <form onSubmit={handleSubmit} noValidate className="space-y-4">
           <ProgramFormFields form={form} onChange={setForm} errors={errors} />
-          {error && <p style={{ fontSize: 12, color: "#f87171" }}>{error}</p>}
+          {error && <p style={{ fontSize: 12, color: "var(--lt-f87171, #f87171)" }}>{error}</p>}
           <div className="flex justify-end gap-2 pt-1">
             <button type="button" onClick={onClose} className="ank-btn-ghost text-xs">{t("enterprise.compliance.programs.cancel")}</button>
             <button type="submit" disabled={saving} className="ank-btn-accent text-xs" style={{ opacity: saving ? 0.7 : 1 }}>
@@ -328,7 +328,7 @@ export function CompliancePrograms() {
                     <td style={{ padding: "12px 16px" }}><StatusBadge status={p.status} /></td>
                     <td style={{ padding: "12px 16px" }}>
                       {p.is_mandatory ? (
-                        <span style={{ fontSize: 10, fontWeight: 700, color: "#f87171", background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.25)", padding: "1px 8px", borderRadius: 20 }}>{t("enterprise.compliance.programs.required")}</span>
+                        <span style={{ fontSize: 10, fontWeight: 700, color: "var(--lt-f87171, #f87171)", background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.25)", padding: "1px 8px", borderRadius: 20 }}>{t("enterprise.compliance.programs.required")}</span>
                       ) : (
                         <span style={{ fontSize: 11, color: "var(--text-tertiary)" }}>{t("enterprise.compliance.programs.optional")}</span>
                       )}
@@ -337,7 +337,7 @@ export function CompliancePrograms() {
                     {canEdit && (
                       <td style={{ padding: "12px 16px" }}>
                         <div className="flex gap-1 flex-wrap">
-                          {p.status === "draft" && <button style={{ ...btn, color: "#4ade80" }} onClick={(e) => activate(e, p.id)}>{t("enterprise.compliance.programs.activate")}</button>}
+                          {p.status === "draft" && <button style={{ ...btn, color: "var(--lt-4ade80, #4ade80)" }} onClick={(e) => activate(e, p.id)}>{t("enterprise.compliance.programs.activate")}</button>}
                           {p.status === "active" && <button style={{ ...btn, color: "var(--text-tertiary)" }} onClick={(e) => archive(e, p.id)}>{t("enterprise.compliance.programs.archive")}</button>}
                         </div>
                       </td>

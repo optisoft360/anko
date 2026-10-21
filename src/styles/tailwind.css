@@ -270,3 +270,137 @@ th { color: var(--text-tertiary) !important; }
 
 .ank-progress-track { height: 3px; border-radius: 2px; background: var(--bg-elevated); overflow: hidden; }
 .ank-progress-fill  { height: 100%; border-radius: 2px; background: var(--accent); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Enterprise light theme — palette C (toned-down Ankard indigo), Mosaic-style.
+   Turned on by the enterprise layout (html.theme-light). The personal app keeps
+   the dark theme: the --lt-* variables only exist under this class, and every
+   hard-coded color is written as var(--lt-…, <original dark color>).
+   ═══════════════════════════════════════════════════════════════════════════ */
+html.theme-light {
+  color-scheme: light;
+
+  /* Backgrounds */
+  --bg-app:       #F5F7FB;
+  --bg-surface:   #FFFFFF;
+  --bg-elevated:  #F8FAFC;
+  --bg-hover:     rgba(15,23,42,0.04);
+  --bg-active:    rgba(79,70,229,0.08);
+  --bg-accent:    rgba(79,70,229,0.08);
+
+  /* Borders */
+  --border:       #E2E8F0;
+  --border-hover: #CBD5E1;
+  --border-focus: rgba(79,70,229,0.5);
+
+  /* Text (WCAG AA on white) */
+  --text-primary:   #0F172A;
+  --text-secondary: #475569;
+  --text-tertiary:  #64748B;
+  --text-accent:    #4F46E5;
+
+  /* Accent */
+  --accent:        #4F46E5;
+  --accent-hover:  #4338CA;
+  --accent-muted:  rgba(79,70,229,0.08);
+
+  /* Status (darker shades readable on white) */
+  --success:  #16A34A;
+  --warning:  #D97706;
+  --error:    #DC2626;
+  --info:     #2563EB;
+
+  /* Sidebar */
+  --sidebar-bg:     #FFFFFF;
+  --sidebar-border: #E2E8F0;
+
+  /* Elevation */
+  --shadow-card: 0 1px 2px rgba(15,23,42,0.04), 0 1px 3px rgba(15,23,42,0.06);
+  --shadow-pop:  0 10px 30px rgba(15,23,42,0.12);
+
+  /* Hard-coded dark colors of enterprise screens → light equivalents (generated) */
+  --lt-162032: #F8FAFC;
+  --lt-footer: rgba(248,250,252,0.96);
+  --lt-64748b: #64748B;
+  --lt-card-back: linear-gradient(135deg, #F0FDF4 0%, #ECFDF5 100%);
+  --lt-8b8b9c: #64748B;
+  --lt-rgba-255-255-255-0-055: rgba(15,23,42,0.072);
+  --lt-22c55e: #15803D;
+  --lt-rgba-255-255-255-0-20: rgba(15,23,42,0.26);
+  --lt-rgba-255-255-255-0-22: rgba(15,23,42,0.286);
+  --lt-060d1a: #FFFFFF;
+  --lt-0f172a: #FFFFFF;
+  --lt-1e293b: #F1F5F9;
+  --lt-334155: #94A3B8;
+  --lt-475569: #64748B;
+  --lt-4ade80: #15803D;
+  --lt-60a5fa: #2563EB;
+  --lt-6366f1: #4F46E5;
+  --lt-818cf8: #4F46E5;
+  --lt-94a3b8: #475569;
+  --lt-a5b4fc: #4F46E5;
+  --lt-cbd5e1: #334155;
+  --lt-e2e8f0: #1E293B;
+  --lt-ef4444: #DC2626;
+  --lt-f1f5f9: #0F172A;
+  --lt-f59e0b: #B45309;
+  --lt-f87171: #DC2626;
+  --lt-rgba-0-0-0-0-04: rgba(15,23,42,0.018);
+  --lt-rgba-0-0-0-0-15: rgba(15,23,42,0.068);
+  --lt-rgba-0-0-0-0-2: rgba(15,23,42,0.09);
+  --lt-rgba-0-0-0-0-3: rgba(15,23,42,0.135);
+  --lt-rgba-0-0-0-0-4: rgba(15,23,42,0.18);
+  --lt-rgba-0-0-0-0-5: rgba(15,23,42,0.225);
+  --lt-rgba-0-0-0-0-6: rgba(15,23,42,0.27);
+  --lt-rgba-0-0-0-0-65: rgba(15,23,42,0.293);
+  --lt-rgba-0-0-0-0-7: rgba(15,23,42,0.315);
+  --lt-rgba-0-0-0-0-75: rgba(15,23,42,0.338);
+  --lt-rgba-0-0-0-0-78: rgba(15,23,42,0.351);
+  --lt-rgba-0-0-0-0-8: rgba(15,23,42,0.36);
+  --lt-rgba-0-0-0-0-82: rgba(15,23,42,0.369);
+  --lt-rgba-255-255-255-0-02: rgba(15,23,42,0.026);
+  --lt-rgba-255-255-255-0-025: rgba(15,23,42,0.033);
+  --lt-rgba-255-255-255-0-03: rgba(15,23,42,0.039);
+  --lt-rgba-255-255-255-0-04: rgba(15,23,42,0.052);
+  --lt-rgba-255-255-255-0-05: rgba(15,23,42,0.065);
+  --lt-rgba-255-255-255-0-06: rgba(15,23,42,0.078);
+  --lt-rgba-255-255-255-0-07: rgba(15,23,42,0.091);
+  --lt-rgba-255-255-255-0-08: rgba(15,23,42,0.104);
+  --lt-rgba-255-255-255-0-09: rgba(15,23,42,0.117);
+  --lt-rgba-255-255-255-0-1: rgba(15,23,42,0.13);
+  --lt-rgba-255-255-255-0-12: rgba(15,23,42,0.156);
+  --lt-rgba-255-255-255-0-14: rgba(15,23,42,0.182);
+  --lt-rgba-255-255-255-0-15: rgba(15,23,42,0.195);
+  --lt-rgba-255-255-255-0-18: rgba(15,23,42,0.234);
+  --lt-rgba-255-255-255-0-2: rgba(15,23,42,0.26);
+  --lt-rgba-255-255-255-0-25: rgba(15,23,42,0.325);
+  --lt-rgba-255-255-255-0-28: rgba(15,23,42,0.364);
+  --lt-rgba-255-255-255-0-3: rgba(15,23,42,0.39);
+  --lt-rgba-255-255-255-0-30: rgba(15,23,42,0.39);
+  --lt-rgba-255-255-255-0-60: rgba(15,23,42,0.78);
+  --lt-rgba-255-255-255-08: rgba(15,23,42,0.104);
+  --lt-rgba-255-255-255-13: rgba(15,23,42,0.169);
+  --lt-rgba-255-255-255-18: rgba(15,23,42,0.234);
+  --lt-rgba-255-255-255-4: rgba(15,23,42,0.52);
+  --lt-rgba-255-255-255-6: rgba(15,23,42,0.78);
+}
+
+html.theme-light ::-webkit-scrollbar-thumb { background: rgba(15,23,42,0.15); }
+html.theme-light ::-webkit-scrollbar-thumb:hover { background: rgba(15,23,42,0.28); }
+
+html.theme-light .ank-card { box-shadow: var(--shadow-card); border-radius: 12px; }
+html.theme-light .shadow-sm[class*="rounded"] { box-shadow: var(--shadow-card) !important; }
+html.theme-light .ank-nav-item.active { color: var(--accent); font-weight: 600; }
+html.theme-light .ank-nav-item.active .ank-nav-icon { color: var(--accent); }
+html.theme-light .ank-btn-accent { box-shadow: 0 1px 2px rgba(79,70,229,0.25); }
+html.theme-light .ank-btn-ghost { background: var(--bg-surface); }
+html.theme-light .glass { background: rgba(255,255,255,0.85); }
+html.theme-light .ank-pill-green { background: #DCFCE7; color: #15803D; }
+html.theme-light .ank-pill-amber { background: #FEF3C7; color: #B45309; }
+html.theme-light .ank-pill-teal  { background: #CCFBF1; color: #0F766E; }
+html.theme-light .ank-pill-red   { background: #FEE2E2; color: #B91C1C; }
+html.theme-light input, html.theme-light textarea { color: var(--text-primary); }
+html.theme-light input::placeholder, html.theme-light textarea::placeholder { color: #94A3B8 !important; }
+@media (prefers-reduced-motion: reduce) {
+  html.theme-light * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}

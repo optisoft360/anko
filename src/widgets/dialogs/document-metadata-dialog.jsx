@@ -102,14 +102,14 @@ export function DocumentMetadataDialog({ open, onClose, document }) {
     /* ── reusable inline card style ── */
     const infoCard = {
         background: "#f8fafc", borderRadius: 13, padding: "12px 14px",
-        border: "1.5px solid #e2e8f0", position: "relative", overflow: "hidden",
+        border: "1.5px solid var(--lt-e2e8f0, #e2e8f0)", position: "relative", overflow: "hidden",
     };
     const infoBar = {
         position: "absolute", left: 0, top: 0, bottom: 0,
         width: 3, background: "#3949AB", borderRadius: "13px 0 0 13px",
     };
     const labelStyle = {
-        fontSize: 10, fontWeight: 600, color: "#94a3b8",
+        fontSize: 10, fontWeight: 600, color: "var(--lt-94a3b8, #94a3b8)",
         textTransform: "uppercase", letterSpacing: "1.1px", marginBottom: 5,
     };
 
@@ -124,21 +124,21 @@ export function DocumentMetadataDialog({ open, onClose, document }) {
             {/* ── Indigo header strip ── */}
             <div style={{ background: "#3949AB", padding: "16px 20px 20px", flexShrink: 0 }}>
                 {/* Drag handle (mobile) */}
-                <div className="md:hidden" style={{ width: 38, height: 4, background: "rgba(255,255,255,0.30)", borderRadius: 2, margin: "0 auto 18px" }} />
+                <div className="md:hidden" style={{ width: 38, height: 4, background: "var(--lt-rgba-255-255-255-0-30, rgba(255,255,255,0.30))", borderRadius: 2, margin: "0 auto 18px" }} />
 
                 <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
                     <div style={{ minWidth: 0, flex: 1 }}>
                         <p style={{ fontSize: 18, fontWeight: 700, color: "#fff", marginBottom: 4, letterSpacing: "-0.3px" }}>
                             {language === "es" ? "Metadatos y Contenido" : "Metadata & Content"}
                         </p>
-                        <p style={{ fontSize: 12, color: "rgba(255,255,255,0.60)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        <p style={{ fontSize: 12, color: "var(--lt-rgba-255-255-255-0-60, rgba(255,255,255,0.60))", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                             {document.filename}
                         </p>
                     </div>
                     <div style={{
-                        width: 40, height: 40, background: "rgba(255,255,255,0.15)",
+                        width: 40, height: 40, background: "var(--lt-rgba-255-255-255-0-15, rgba(255,255,255,0.15))",
                         borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center",
-                        border: "1px solid rgba(255,255,255,0.20)", flexShrink: 0,
+                        border: "1px solid var(--lt-rgba-255-255-255-0-20, rgba(255,255,255,0.20))", flexShrink: 0,
                     }}>
                         <DocumentTextIcon style={{ width: 17, height: 17, color: "#fff", strokeWidth: 1.8 }} />
                     </div>
@@ -152,7 +152,7 @@ export function DocumentMetadataDialog({ open, onClose, document }) {
                         </span>
                     )}
                     {document.size ? (
-                        <span style={{ padding: "4px 12px", borderRadius: 20, fontSize: 11, fontWeight: 600, background: "rgba(255,255,255,0.18)", color: "#fff", border: "1px solid rgba(255,255,255,0.28)" }}>
+                        <span style={{ padding: "4px 12px", borderRadius: 20, fontSize: 11, fontWeight: 600, background: "var(--lt-rgba-255-255-255-0-18, rgba(255,255,255,0.18))", color: "#fff", border: "1px solid var(--lt-rgba-255-255-255-0-28, rgba(255,255,255,0.28))" }}>
                             {formatFileSize(document.size)}
                         </span>
                     ) : null}
@@ -170,7 +170,7 @@ export function DocumentMetadataDialog({ open, onClose, document }) {
                 <div style={{ ...infoCard, marginBottom: 14 }}>
                     <div style={infoBar} />
                     <p style={labelStyle}>{language === "es" ? "Nombre de archivo" : "Filename"}</p>
-                    <p style={{ fontSize: 13, fontWeight: 500, color: "#0f172a", lineHeight: 1.5 }}>
+                    <p style={{ fontSize: 13, fontWeight: 500, color: "var(--lt-0f172a, #0f172a)", lineHeight: 1.5 }}>
                         {document.filename}
                     </p>
                 </div>
@@ -184,7 +184,7 @@ export function DocumentMetadataDialog({ open, onClose, document }) {
                         <div key={i} style={infoCard}>
                             <div style={infoBar} />
                             <p style={labelStyle}>{item.lbl}</p>
-                            <p style={{ fontSize: 13, fontWeight: 600, color: "#0f172a" }}>{item.val}</p>
+                            <p style={{ fontSize: 13, fontWeight: 600, color: "var(--lt-0f172a, #0f172a)" }}>{item.val}</p>
                         </div>
                     ))}
                 </div>
@@ -196,16 +196,16 @@ export function DocumentMetadataDialog({ open, onClose, document }) {
                             onClick={() => setSummaryOpen(o => !o)}
                             style={{
                                 width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between",
-                                background: "#f8fafc", border: "1.5px solid #e2e8f0", borderRadius: summaryOpen ? "13px 13px 0 0" : 13,
+                                background: "#f8fafc", border: "1.5px solid var(--lt-e2e8f0, #e2e8f0)", borderRadius: summaryOpen ? "13px 13px 0 0" : 13,
                                 padding: "10px 14px", cursor: "pointer", marginBottom: 0,
                             }}
                         >
-                            <span style={{ fontSize: 11, fontWeight: 600, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "1.1px" }}>
+                            <span style={{ fontSize: 11, fontWeight: 600, color: "var(--lt-94a3b8, #94a3b8)", textTransform: "uppercase", letterSpacing: "1.1px" }}>
                                 {language === "es" ? "Resumen" : "Summary"}
                             </span>
                             <ChevronRightIcon
                                 style={{
-                                    width: 14, height: 14, color: "#94a3b8", flexShrink: 0,
+                                    width: 14, height: 14, color: "var(--lt-94a3b8, #94a3b8)", flexShrink: 0,
                                     transition: "transform 0.2s",
                                     transform: summaryOpen ? "rotate(90deg)" : "rotate(0deg)",
                                 }}
@@ -214,14 +214,14 @@ export function DocumentMetadataDialog({ open, onClose, document }) {
                         </button>
                         {summaryOpen && (
                             loadingSummary ? (
-                                <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 14px", background: "#f8fafc", border: "1.5px solid #e2e8f0", borderTop: "none", borderRadius: "0 0 13px 13px" }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 14px", background: "#f8fafc", border: "1.5px solid var(--lt-e2e8f0, #e2e8f0)", borderTop: "none", borderRadius: "0 0 13px 13px" }}>
                                     <Spinner className="h-4 w-4" style={{ color: "#3949AB" }} />
-                                    <span style={{ fontSize: 13, color: "#94a3b8" }}>{language === "es" ? "Cargando..." : "Loading..."}</span>
+                                    <span style={{ fontSize: 13, color: "var(--lt-94a3b8, #94a3b8)" }}>{language === "es" ? "Cargando..." : "Loading..."}</span>
                                 </div>
                             ) : (
                                 <div style={{ ...infoCard, borderTop: "none", borderRadius: "0 0 13px 13px", marginBottom: 0 }}>
                                     <div style={infoBar} />
-                                    <p style={{ fontSize: 13, color: "#475569", lineHeight: 1.6 }}>{summary}</p>
+                                    <p style={{ fontSize: 13, color: "var(--lt-475569, #475569)", lineHeight: 1.6 }}>{summary}</p>
                                 </div>
                             )
                         )}
@@ -230,7 +230,7 @@ export function DocumentMetadataDialog({ open, onClose, document }) {
 
                 {/* Sections header */}
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-                    <p style={{ fontSize: 14, fontWeight: 700, color: "#0f172a" }}>
+                    <p style={{ fontSize: 14, fontWeight: 700, color: "var(--lt-0f172a, #0f172a)" }}>
                         {language === "es" ? "Secciones Extraídas" : "Extracted Sections"}
                     </p>
                     {!loadingSections && sections.length > 0 && (
@@ -244,7 +244,7 @@ export function DocumentMetadataDialog({ open, onClose, document }) {
                 {loadingSections ? (
                     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "32px 0", gap: 8 }}>
                         <Spinner className="h-7 w-7" style={{ color: "#3949AB" }} />
-                        <span style={{ fontSize: 13, color: "#94a3b8" }}>
+                        <span style={{ fontSize: 13, color: "var(--lt-94a3b8, #94a3b8)" }}>
                             {language === "es" ? "Cargando secciones..." : "Loading sections..."}
                         </span>
                     </div>
@@ -262,9 +262,9 @@ export function DocumentMetadataDialog({ open, onClose, document }) {
                                     padding: "11px 14px",
                                     background: "#fff",
                                     borderRadius: 13,
-                                    border: "1.5px solid #e2e8f0",
+                                    border: "1.5px solid var(--lt-e2e8f0, #e2e8f0)",
                                     marginBottom: 8,
-                                    boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
+                                    boxShadow: "0 1px 4px var(--lt-rgba-0-0-0-0-04, rgba(0,0,0,0.04))",
                                 }}
                             >
                                 <div style={{
@@ -277,19 +277,19 @@ export function DocumentMetadataDialog({ open, onClose, document }) {
                                     {section.order ?? index + 1}
                                 </div>
                                 <span style={{
-                                    flex: 1, fontSize: 13, fontWeight: 500, color: "#0f172a",
+                                    flex: 1, fontSize: 13, fontWeight: 500, color: "var(--lt-0f172a, #0f172a)",
                                     whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
                                 }}>
                                     {section.title
                                         ? section.title.charAt(0).toUpperCase() + section.title.slice(1)
                                         : (language === "es" ? "Sección sin título" : "Untitled Section")}
                                 </span>
-                                <ChevronRightIcon style={{ width: 13, height: 13, color: "#94a3b8", flexShrink: 0, strokeWidth: 2 }} />
+                                <ChevronRightIcon style={{ width: 13, height: 13, color: "var(--lt-94a3b8, #94a3b8)", flexShrink: 0, strokeWidth: 2 }} />
                             </div>
                         ))}
                     </div>
                 ) : (
-                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "32px 0 20px", color: "#94a3b8", gap: 8 }}>
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "32px 0 20px", color: "var(--lt-94a3b8, #94a3b8)", gap: 8 }}>
                         <DocumentIcon style={{ width: 40, height: 40, opacity: 0.4 }} />
                         <p style={{ fontSize: 13 }}>
                             {language === "es" ? "No hay secciones para este documento" : "No sections found for this document"}
@@ -304,15 +304,15 @@ export function DocumentMetadataDialog({ open, onClose, document }) {
                 padding: "16px 20px",
                 paddingBottom: "max(16px, env(safe-area-inset-bottom, 16px))",
                 flexShrink: 0,
-                borderTop: "1px solid #e2e8f0",
+                borderTop: "1px solid var(--lt-e2e8f0, #e2e8f0)",
                 background: "#fff",
             }}>
                 {/* <button
                     onClick={onClose}
                     style={{
                         flex: 1, padding: 13,
-                        background: "#f8fafc", color: "#475569",
-                        border: "1.5px solid #e2e8f0", borderRadius: 13,
+                        background: "#f8fafc", color: "var(--lt-475569, #475569)",
+                        border: "1.5px solid var(--lt-e2e8f0, #e2e8f0)", borderRadius: 13,
                         fontSize: 14, fontWeight: 600, cursor: "pointer",
                     }}
                 >

@@ -49,7 +49,7 @@ function CompanyBanner({ company, role, showSettings = true }) {
         </div>
         <div>
           <div className="flex items-center gap-2">
-            <p style={{ color: "#F1F5F9", fontWeight: 700, fontSize: 15 }}>{name}</p>
+            <p style={{ color: "var(--lt-f1f5f9, #F1F5F9)", fontWeight: 700, fontSize: 15 }}>{name}</p>
             <RoleBadge role={role || "employee"} />
           </div>
           <p style={{ color: "#64748B", fontSize: 12, marginTop: 2 }}>
@@ -59,7 +59,7 @@ function CompanyBanner({ company, role, showSettings = true }) {
       </div>
       {showSettings && (
         <button onClick={() => navigate("/enterprise/settings")}
-          style={{ fontSize: 12, fontWeight: 600, color: "#94A3B8", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "7px 13px", cursor: "pointer", display: "flex", alignItems: "center", gap: 6, transition: "all 0.15s", flexShrink: 0 }}
+          style={{ fontSize: 12, fontWeight: 600, color: "var(--lt-94a3b8, #94A3B8)", background: "var(--lt-rgba-255-255-255-0-05, rgba(255,255,255,0.05))", border: "1px solid var(--lt-rgba-255-255-255-0-1, rgba(255,255,255,0.1))", borderRadius: 8, padding: "7px 13px", cursor: "pointer", display: "flex", alignItems: "center", gap: 6, transition: "all 0.15s", flexShrink: 0 }}
           onMouseEnter={(e) => { e.currentTarget.style.color = "#F1F5F9"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.22)"; }}
           onMouseLeave={(e) => { e.currentTarget.style.color = "#94A3B8"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)"; }}>
           <Cog6ToothIcon className="h-3.5 w-3.5" />
@@ -175,13 +175,13 @@ function GettingStarted() {
     <div style={{ background: "var(--bg-surface)", border: "1px solid rgba(99,102,241,0.2)", borderRadius: 14, padding: "24px 22px" }}>
       <div className="flex items-center gap-3 mb-4">
         <RocketLaunchIcon className="h-5 w-5" style={{ color: "#818CF8" }} />
-        <p style={{ color: "#F1F5F9", fontWeight: 700, fontSize: 14 }}>{t("enterprise.dashboard.getStarted.title")}</p>
+        <p style={{ color: "var(--lt-f1f5f9, #F1F5F9)", fontWeight: 700, fontSize: 14 }}>{t("enterprise.dashboard.getStarted.title")}</p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-5">
         {steps.map(({ n, icon: Icon, title, desc }) => (
           <div key={n} style={{ background: "var(--bg-elevated)", borderRadius: 10, padding: 14 }}>
             <div className="flex items-center gap-2 mb-2">
-              <span style={{ fontSize: 10, fontWeight: 800, color: "#6366F1", background: "rgba(99,102,241,0.12)", borderRadius: 4, padding: "1px 6px" }}>{n}</span>
+              <span style={{ fontSize: 10, fontWeight: 800, color: "var(--lt-6366f1, #6366F1)", background: "rgba(99,102,241,0.12)", borderRadius: 4, padding: "1px 6px" }}>{n}</span>
               <Icon style={{ width: 14, height: 14, color: "var(--text-secondary)" }} />
             </div>
             <p style={{ color: "var(--text-primary)", fontWeight: 600, fontSize: 12, marginBottom: 3 }}>{title}</p>

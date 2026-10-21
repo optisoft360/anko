@@ -34,7 +34,7 @@ export function CompanyCompliance() {
     xaxis: { categories: trends.map((tr) => tr.month || tr.date), labels: { style: { fontSize: "11px", colors: "#64748B" } } },
     yaxis: { max: 100, labels: { formatter: (v) => `${v}%`, style: { colors: "#64748B" } } },
     dataLabels: { enabled: false },
-    grid: { borderColor: "rgba(255,255,255,0.07)" },
+    grid: { borderColor: "var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))" },
     tooltip: { theme: "dark", y: { formatter: (v) => `${v}%` } },
   };
 
@@ -77,7 +77,7 @@ export function CompanyCompliance() {
                 <thead style={{ background: "rgba(245,158,11,0.08)", borderBottom: "1px solid rgba(245,158,11,0.2)" }}>
                   <tr>
                     {columns.map((h) => (
-                      <th key={h} style={{ textAlign: "left", padding: "10px 16px", fontSize: 10, fontWeight: 700, color: "#f59e0b", textTransform: "uppercase", letterSpacing: "0.05em" }}>{h}</th>
+                      <th key={h} style={{ textAlign: "left", padding: "10px 16px", fontSize: 10, fontWeight: 700, color: "var(--lt-f59e0b, #f59e0b)", textTransform: "uppercase", letterSpacing: "0.05em" }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -86,8 +86,8 @@ export function CompanyCompliance() {
                     <tr key={a.id} style={{ borderBottom: "1px solid var(--border)" }}>
                       <td style={{ padding: "12px 16px", fontWeight: 600, color: "var(--text-primary)" }}>{a.user_name}</td>
                       <td style={{ padding: "12px 16px", color: "var(--text-secondary)" }}>{a.program_name}</td>
-                      <td style={{ padding: "12px 16px", color: "#f59e0b", fontWeight: 600, fontSize: 11 }}>{a.expires_at}</td>
-                      <td style={{ padding: "12px 16px" }}><span style={{ fontSize: 10, fontWeight: 700, color: "#f59e0b", background: "rgba(245,158,11,0.12)", border: "1px solid rgba(245,158,11,0.25)", padding: "2px 9px", borderRadius: 20 }}>{t("enterprise.compliance.companyCompliance.expiringBadge")}</span></td>
+                      <td style={{ padding: "12px 16px", color: "var(--lt-f59e0b, #f59e0b)", fontWeight: 600, fontSize: 11 }}>{a.expires_at}</td>
+                      <td style={{ padding: "12px 16px" }}><span style={{ fontSize: 10, fontWeight: 700, color: "var(--lt-f59e0b, #f59e0b)", background: "rgba(245,158,11,0.12)", border: "1px solid rgba(245,158,11,0.25)", padding: "2px 9px", borderRadius: 20 }}>{t("enterprise.compliance.companyCompliance.expiringBadge")}</span></td>
                     </tr>
                   ))}
                 </tbody>

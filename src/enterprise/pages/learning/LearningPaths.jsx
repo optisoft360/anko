@@ -53,7 +53,7 @@ function WizardStep1({ form, onChange, onNext, onCancel }) {
           onBlur={(e) => { e.target.style.borderColor = "var(--border)"; }}
           onKeyDown={(e) => { if (e.key === "Enter") handleNext(); }}
         />
-        {error && <p style={{ color: "#f87171", fontSize: 11, marginTop: 4 }}>{error}</p>}
+        {error && <p style={{ color: "var(--lt-f87171, #f87171)", fontSize: 11, marginTop: 4 }}>{error}</p>}
       </div>
       <div>
         <p style={{ color: "var(--text-primary)", fontWeight: 600, fontSize: 13, marginBottom: 6 }}>
@@ -178,7 +178,7 @@ function WizardStep2({ selectedIds, onToggle, sources, loadingSources, onBack, o
 
       {error && (
         <div style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 6, padding: "8px 12px" }}>
-          <p style={{ color: "#f87171", fontSize: 12 }}>{error}</p>
+          <p style={{ color: "var(--lt-f87171, #f87171)", fontSize: 12 }}>{error}</p>
         </div>
       )}
 
@@ -358,7 +358,7 @@ function PathCard({ path, onClick, onDelete }) {
           <ArrowRightIcon style={{ width: 13, height: 13, color: "var(--text-tertiary)" }} />
           <button onClick={handleDelete} disabled={deleting}
             style={{ color: "var(--text-tertiary)", padding: 5, borderRadius: 5, transition: "all 150ms", marginLeft: 4 }}
-            onMouseEnter={(e) => { e.currentTarget.style.color = "#f87171"; e.currentTarget.style.background = "rgba(239,68,68,0.1)"; }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = "var(--lt-f87171, #f87171)"; e.currentTarget.style.background = "rgba(239,68,68,0.1)"; }}
             onMouseLeave={(e) => { e.currentTarget.style.color = "var(--text-tertiary)"; e.currentTarget.style.background = "transparent"; }}>
             <TrashIcon style={{ width: 13, height: 13 }} />
           </button>
