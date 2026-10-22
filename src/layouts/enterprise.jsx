@@ -1,15 +1,14 @@
-import { Routes, Route, Navigate, Link } from "react-router-dom";
-import { ChatBubbleLeftEllipsisIcon, Bars3Icon } from "@heroicons/react/24/solid";
+import { Routes, Route, Navigate } from "react-router-dom";
+import { ChatBubbleLeftEllipsisIcon } from "@heroicons/react/24/solid";
 import { DashboardNavbar, ChatPanel } from "@/widgets/layout";
 import { EnterpriseSidenav } from "@/widgets/layout/enterprise-sidenav";
 import { useLightTheme } from "@/hooks/useLightTheme";
 import { EmployeeMobileTabBar } from "@/enterprise/components/EmployeeMobileTabBar";
 import { AdminMobileTabBar } from "@/enterprise/components/AdminMobileTabBar";
 import routes from "@/routes";
-import { useMaterialTailwindController, setOpenConfigurator, setOpenSidenav } from "@/context";
+import { useMaterialTailwindController, setOpenConfigurator } from "@/context";
 import { useAuth } from "@/context/auth-context";
 import { useEnterprise } from "@/enterprise/context/enterprise-context";
-import { APP_NAME } from "@/config/app";
 
 import KnowledgeSources from "@/enterprise/pages/knowledge/KnowledgeSources";
 import KnowledgeSourceNew from "@/enterprise/pages/knowledge/KnowledgeSourceNew";
@@ -94,27 +93,8 @@ export function Enterprise() {
       <div
         className="min-h-screen flex flex-col transition-all duration-200 md:ml-[var(--sidebar-w)]"
       >
-        <div className="hidden md:block">
+        <div className="sticky top-0 z-30 bg-white/95 backdrop-blur md:static md:bg-transparent md:backdrop-blur-none">
           <DashboardNavbar />
-        </div>
-
-        {/* Minimal mobile header — the desktop DashboardNavbar (with the only
-            Bars3Icon trigger for the Sidenav) is hidden below md, so without
-            this, admin/manager/etc. roles had no way to open the nav at all
-            on mobile. The Sidenav itself already supports the openSidenav
-            drawer state; this just gives mobile a button to flip it. */}
-        <div className="md:hidden flex items-center justify-between px-4 py-3"
-          style={{ background: "var(--bg-surface)", borderBottom: "1px solid var(--border)" }}>
-          <button onClick={() => setOpenSidenav(dispatch, true)} style={{ color: "var(--text-secondary)" }}>
-            <Bars3Icon className="h-5 w-5" />
-          </button>
-          <Link to="/enterprise/dashboard" className="flex items-center gap-2">
-            <div className="w-5 h-5 rounded flex items-center justify-center text-white font-bold text-[10px] flex-shrink-0" style={{ background: "var(--accent)" }}>
-              A
-            </div>
-            <span className="font-semibold text-sm" style={{ color: "var(--text-primary)" }}>{APP_NAME || "Ankard"}</span>
-          </Link>
-          <div className="w-5 h-5" />
         </div>
 
         <ChatPanel />

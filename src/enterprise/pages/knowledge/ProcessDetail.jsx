@@ -2972,8 +2972,8 @@ export function ProcessDetail() {
       </button>
 
       {/* Header */}
-      <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border)", borderRadius: 8, padding: "20px 24px" }}>
-        <div className="flex items-start gap-4">
+      <div className="p-4 sm:px-6 sm:py-5" style={{ background: "var(--bg-surface)", border: "1px solid var(--border)", borderRadius: 8 }}>
+        <div className="flex flex-wrap items-start gap-3 sm:flex-nowrap sm:gap-4">
           <div style={{ width: 44, height: 44, borderRadius: 8, background: "var(--accent)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 20, flexShrink: 0 }}>
             {(ks.title || "P").charAt(0).toUpperCase()}
           </div>
@@ -3020,18 +3020,18 @@ export function ProcessDetail() {
             </div>
           </div>
           {/* Header actions — always visible */}
-          <div className="flex items-center gap-2 flex-shrink-0">
+          <div className="flex w-full items-center gap-2 sm:w-auto sm:flex-shrink-0">
             <button
               onClick={handleAutoGen}
               disabled={isRunning}
-              className="ank-btn-accent text-xs"
+              className="ank-btn-accent text-xs flex-1 justify-center min-h-[40px] sm:flex-none sm:min-h-0"
               style={{ opacity: isRunning ? 0.7 : 1 }}
               title={docs.length === 0 ? t("enterprise.knowledge.processDetail.attachDocumentFirst") : t("enterprise.knowledge.processDetail.generateFromDocumentsTitle")}>
               {isRunning
                 ? <><ArrowPathIcon className="h-3.5 w-3.5 animate-spin" /> {t("enterprise.knowledge.processDetail.generating")}</>
                 : <><SparklesIcon className="h-3.5 w-3.5" /> {t("enterprise.knowledge.processDetail.autoGenerate")}</>}
             </button>
-            <button onClick={() => setShowAddDoc(true)} className="ank-btn-ghost text-xs">
+            <button onClick={() => setShowAddDoc(true)} className="ank-btn-ghost text-xs flex-1 justify-center min-h-[40px] sm:flex-none sm:min-h-0">
               <PlusIcon className="h-3.5 w-3.5" /> {t("enterprise.knowledge.processDetail.addDoc")}
             </button>
           </div>

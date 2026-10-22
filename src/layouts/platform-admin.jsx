@@ -48,14 +48,14 @@ export function PlatformAdmin() {
       <div
         className="min-h-screen flex flex-col transition-all duration-200 md:ml-[var(--sidebar-w)]"
       >
-        <div className="hidden md:block">
+        <div className="sticky top-0 z-30 bg-white/95 backdrop-blur md:static md:bg-transparent md:backdrop-blur-none">
           <DashboardNavbar />
         </div>
 
         <ChatPanel />
 
         <button
-          className="fixed bottom-6 right-6 z-40 rounded-full flex items-center justify-center cursor-pointer"
+          className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-40 rounded-full flex items-center justify-center cursor-pointer"
           style={{ width: 44, height: 44, background: "var(--accent)", border: "none", boxShadow: "0 4px 16px rgba(94,106,210,0.4)" }}
           onClick={() => setOpenConfigurator(dispatch, true)}
         >

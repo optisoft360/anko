@@ -19,14 +19,14 @@ import { useLanguage } from "@/context/language-context";
 // Bottom tab bar for company owner/admin/manager/trainer/auditor roles on
 // mobile — mirrors the icons already used for these destinations in the
 // desktop Sidenav (src/routes.jsx), so the same page always has the same
-// icon on both surfaces. Reuses the existing sidenav.* translation keys
-// instead of adding new ones, since these labels already exist there.
+// icon on both surfaces. Labels are the short enterprise.dashboard.mobileNav.*
+// ones so they fit a phone-width tab.
 const ITEMS = [
-  { to: "/enterprise/dashboard", end: true, key: "ent-dashboard", outline: HomeIcon, solid: HomeIconSolid },
-  { to: "/enterprise/knowledge", key: "ent-knowledge", outline: DocumentTextIcon, solid: DocumentTextIconSolid },
-  { to: "/enterprise/learning/paths", key: "ent-paths", outline: RectangleStackIcon, solid: RectangleStackIconSolid },
-  { to: "/enterprise/compliance/programs", key: "ent-compliance-programs", outline: ShieldCheckIcon, solid: ShieldCheckIconSolid },
-  { to: "/enterprise/settings", key: "ent-settings", outline: Cog6ToothIcon, solid: Cog6ToothIconSolid },
+  { to: "/enterprise/dashboard", end: true, key: "ent-dashboard", label: "home", outline: HomeIcon, solid: HomeIconSolid },
+  { to: "/enterprise/knowledge", key: "ent-knowledge", label: "processes", outline: DocumentTextIcon, solid: DocumentTextIconSolid },
+  { to: "/enterprise/learning/paths", key: "ent-paths", label: "paths", outline: RectangleStackIcon, solid: RectangleStackIconSolid },
+  { to: "/enterprise/compliance/programs", key: "ent-compliance-programs", label: "compliance", outline: ShieldCheckIcon, solid: ShieldCheckIconSolid },
+  { to: "/enterprise/settings", key: "ent-settings", label: "settings", outline: Cog6ToothIcon, solid: Cog6ToothIconSolid },
 ];
 
 export function AdminMobileTabBar() {
@@ -42,7 +42,7 @@ export function AdminMobileTabBar() {
         paddingBottom: "env(safe-area-inset-bottom, 0px)",
       }}
     >
-      {ITEMS.map(({ to, end, key, outline: Icon, solid: IconSolid }) => (
+      {ITEMS.map(({ to, end, label, outline: Icon, solid: IconSolid }) => (
         <NavLink
           key={to}
           to={to}
@@ -69,7 +69,7 @@ export function AdminMobileTabBar() {
                     padding: "0 2px",
                   }}
                 >
-                  {t(`sidenav.${key}`)}
+                  {t(`enterprise.dashboard.mobileNav.${label}`)}
                 </span>
               </>
             );

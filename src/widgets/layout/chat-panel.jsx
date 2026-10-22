@@ -182,7 +182,7 @@ export function ChatPanel() {
 
     return (
         <aside
-            className={`fixed top-0 right-0 z-[9999] h-[100dvh] w-full md:w-[400px] bg-white shadow-2xl transition-transform duration-500 ease-in-out flex flex-col border-l border-zinc-100 ${openConfigurator ? "translate-x-0" : "translate-x-full"
+            className={`fixed top-0 right-0 z-[9999] h-[100dvh] w-full md:w-[400px] bg-white shadow-2xl transition-[transform,visibility] duration-500 ease-in-out flex flex-col border-l border-zinc-100 ${openConfigurator ? "visible translate-x-0" : "invisible translate-x-full"
                 }`}
         >
             {/* Header */}

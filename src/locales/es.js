@@ -1121,7 +1121,10 @@ export const es = {
                 assignments: "Tareas",
                 retention: "Retención",
                 compliance: "Compliance",
-                certificates: "Certificados"
+                certificates: "Certificados",
+                processes: "Procesos",
+                paths: "Rutas",
+                settings: "Ajustes"
             }
         },
         dashboards: {

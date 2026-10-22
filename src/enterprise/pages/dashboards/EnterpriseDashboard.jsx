@@ -310,7 +310,7 @@ function DashboardHeader({ company, role, userName }) {
         <p className="mt-1 text-sm text-[#64748B]">{t("enterprise.dashboard.adminSubtitle")}</p>
       </div>
       <div className="flex flex-wrap items-center gap-2">
-        <span className={`inline-flex items-center gap-2 rounded-lg border border-[#E2E8F0] bg-white px-3 py-2 text-sm shadow-[0_1px_2px_0_rgb(15_23_42/0.04)]`}>
+        <span className={`inline-flex w-full items-center gap-2 rounded-lg border border-[#E2E8F0] bg-white px-3 py-2 text-sm sm:w-auto shadow-[0_1px_2px_0_rgb(15_23_42/0.04)]`}>
           <span className="grid h-5 w-5 place-items-center rounded bg-[#4F46E5] text-[10px] font-bold text-white">{name.charAt(0).toUpperCase()}</span>
           <span className="max-w-[160px] truncate font-medium text-[#0F172A]">{name}</span>
           {LIGHT_ROLE[role] && (
@@ -321,11 +321,11 @@ function DashboardHeader({ company, role, userName }) {
           </span>
         </span>
         <button type="button" onClick={() => navigate("/enterprise/settings")}
-          className={`inline-flex h-10 cursor-pointer items-center gap-2 rounded-lg border border-[#E2E8F0] bg-white px-4 text-sm font-medium text-[#334155] shadow-[0_1px_2px_0_rgb(15_23_42/0.04)] transition-colors duration-150 hover:bg-[#F8FAFC] ${FOCUS}`}>
+          className={`inline-flex h-11 flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border border-[#E2E8F0] bg-white px-4 text-sm font-medium sm:h-10 sm:flex-none text-[#334155] shadow-[0_1px_2px_0_rgb(15_23_42/0.04)] transition-colors duration-150 hover:bg-[#F8FAFC] ${FOCUS}`}>
           <Cog6ToothIcon className="h-4 w-4" /> {t("enterprise.dashboard.settingsBtn")}
         </button>
         <button type="button" onClick={() => navigate("/enterprise/knowledge/new")}
-          className={`inline-flex h-10 cursor-pointer items-center gap-2 rounded-lg bg-[#4F46E5] px-4 text-sm font-semibold text-white shadow-[0_1px_2px_0_rgb(79_70_229/0.25)] transition-colors duration-150 hover:bg-[#4338CA] ${FOCUS}`}>
+          className={`inline-flex h-11 flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg bg-[#4F46E5] px-4 text-sm font-semibold text-white sm:h-10 sm:flex-none shadow-[0_1px_2px_0_rgb(79_70_229/0.25)] transition-colors duration-150 hover:bg-[#4338CA] ${FOCUS}`}>
           <PlusIcon className="h-4 w-4" /> {t("enterprise.dashboard.newProcess")}
         </button>
       </div>
@@ -333,19 +333,19 @@ function DashboardHeader({ company, role, userName }) {
   );
 }
 
-function StatCard({ icon: Icon, tone, value, label, sub, href, loading }) {
+function StatCard({ icon: Icon, tone, value, label, sub, href, loading, className = "" }) {
   const navigate = useNavigate();
   const c = TONES[tone];
   return (
     <button type="button" onClick={() => navigate(href)}
-      className={`group ${CARD} cursor-pointer p-5 text-left transition duration-200 hover:-translate-y-0.5 hover:shadow-md ${c.hover} ${FOCUS}`}>
+      className={`group ${CARD} ${className} cursor-pointer p-4 text-left sm:p-5 transition duration-200 hover:-translate-y-0.5 hover:shadow-md ${c.hover} ${FOCUS}`}>
       <div className="flex items-center justify-between">
-        <span className={`grid h-10 w-10 place-items-center rounded-lg ${c.icon}`}><Icon className="h-5 w-5" /></span>
+        <span className={`grid h-9 w-9 place-items-center rounded-lg sm:h-10 sm:w-10 ${c.icon}`}><Icon className="h-5 w-5" /></span>
         <ArrowUpRightIcon className={`h-4 w-4 text-[#CBD5E1] transition-colors ${c.arrow}`} />
       </div>
-      {loading ? <Skeleton className="mt-4 h-9 w-12" /> : <p className="mt-4 text-3xl font-semibold tabular-nums text-[#0F172A]">{value}</p>}
-      <p className="mt-1 text-sm font-medium text-[#334155]">{label}</p>
-      <p className="text-xs text-[#64748B]">{sub}</p>
+      {loading ? <Skeleton className="mt-3 h-8 w-12 sm:mt-4 sm:h-9" /> : <p className="mt-3 text-2xl font-semibold tabular-nums text-[#0F172A] sm:mt-4 sm:text-3xl">{value}</p>}
+      <p className="mt-1 truncate text-sm font-medium text-[#334155]">{label}</p>
+      <p className="truncate text-xs text-[#64748B]">{sub}</p>
     </button>
   );
 }
@@ -360,7 +360,7 @@ function ComplianceStatCard({ compliance, loading }) {
   const pct = Math.max(0, Math.min(100, rate || 0));
   return (
     <button type="button" onClick={() => navigate("/enterprise/compliance/company")}
-      className={`group rounded-xl border p-5 text-left shadow-[0_1px_2px_0_rgb(15_23_42/0.04),0_1px_3px_0_rgb(15_23_42/0.06)] transition duration-200 hover:-translate-y-0.5 hover:shadow-md cursor-pointer ${FOCUS} ${atRisk ? "border-[#FECDD3] bg-[#FFF1F2]/40" : "border-[#E2E8F0] bg-white hover:border-[#A7F3D0]"}`}>
+      className={`group col-span-2 rounded-xl border p-4 text-left sm:col-span-1 sm:p-5 shadow-[0_1px_2px_0_rgb(15_23_42/0.04),0_1px_3px_0_rgb(15_23_42/0.06)] transition duration-200 hover:-translate-y-0.5 hover:shadow-md cursor-pointer ${FOCUS} ${atRisk ? "border-[#FECDD3] bg-[#FFF1F2]/40" : "border-[#E2E8F0] bg-white hover:border-[#A7F3D0]"}`}>
       <div className="flex items-center justify-between">
         <span className={`grid h-10 w-10 place-items-center rounded-lg ${atRisk ? "bg-[#FFE4E6] text-[#E11D48]" : "bg-[#ECFDF5] text-[#059669]"}`}>
           {atRisk ? <ShieldExclamationIcon className="h-5 w-5" /> : <ShieldCheckIcon className="h-5 w-5" />}
@@ -391,22 +391,24 @@ function QuickActions() {
   ];
   return (
     <div className={CARD}>
-      <div className="border-b border-[#F1F5F9] px-6 py-4">
+      <div className="border-b border-[#F1F5F9] px-4 py-4 sm:px-6">
         <h2 className="text-base font-semibold text-[#0F172A]">{t("enterprise.dashboard.home.quickActions")}</h2>
         <p className="text-sm text-[#64748B]">{t("enterprise.dashboard.home.quickActionsSub")}</p>
       </div>
       <div className="grid grid-cols-1 divide-y divide-[#F1F5F9] md:grid-cols-3 md:divide-x md:divide-y-0">
         {actions.map(({ icon: Icon, tone, title, desc, cta, href }) => (
           <button key={href} type="button" onClick={() => navigate(href)}
-            className={`group flex cursor-pointer flex-col gap-3 p-6 text-left transition-colors duration-150 hover:bg-[#F8FAFC] first:rounded-bl-xl last:rounded-br-xl ${FOCUS}`}>
-            <span className={`grid h-10 w-10 place-items-center rounded-lg text-white ${TONES[tone].solid}`}><Icon className="h-5 w-5" /></span>
-            <div>
-              <p className="font-medium text-[#0F172A]">{title}</p>
-              <p className="mt-1 text-sm text-[#64748B]">{desc}</p>
+            className={`group flex cursor-pointer gap-3 p-4 text-left transition-colors duration-150 hover:bg-[#F8FAFC] active:bg-[#F1F5F9] md:flex-col md:p-6 last:rounded-b-xl md:first:rounded-bl-xl md:last:rounded-bl-none md:last:rounded-br-xl ${FOCUS}`}>
+            <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-lg text-white ${TONES[tone].solid}`}><Icon className="h-5 w-5" /></span>
+            <div className="flex min-w-0 flex-1 flex-col gap-2 md:gap-3">
+              <div>
+                <p className="font-medium text-[#0F172A]">{title}</p>
+                <p className="mt-1 text-sm text-[#64748B]">{desc}</p>
+              </div>
+              <span className={`mt-auto inline-flex items-center gap-1 text-sm font-medium ${TONES[tone].link}`}>
+                {cta} <ArrowRightIcon className="h-4 w-4 transition-transform duration-150 group-hover:translate-x-0.5" />
+              </span>
             </div>
-            <span className={`mt-auto inline-flex items-center gap-1 text-sm font-medium ${TONES[tone].link}`}>
-              {cta} <ArrowRightIcon className="h-4 w-4 transition-transform duration-150 group-hover:translate-x-0.5" />
-            </span>
           </button>
         ))}
       </div>
@@ -422,7 +424,7 @@ function RecentProcesses({ processes, loading }) {
   const head = "px-6 py-3 font-medium";
   return (
     <div className={CARD}>
-      <div className="flex items-center justify-between border-b border-[#F1F5F9] px-6 py-4">
+      <div className="flex items-center justify-between border-b border-[#F1F5F9] px-4 py-4 sm:px-6">
         <h2 className="text-base font-semibold text-[#0F172A]">{t("enterprise.dashboard.home.recentProcesses")}</h2>
         <button type="button" onClick={() => navigate("/enterprise/knowledge")}
           className={`cursor-pointer rounded text-sm font-medium text-[#4F46E5] hover:text-[#4338CA] ${FOCUS}`}>
@@ -440,7 +442,35 @@ function RecentProcesses({ processes, loading }) {
           </button>
         </div>
       ) : (
-        <div className="overflow-x-auto">
+        <>
+        {/* Mobile: list of cards (the table below is for md and up) */}
+        <ul className="divide-y divide-[#F1F5F9] md:hidden">
+          {loading
+            ? [0, 1, 2].map((i) => (
+              <li key={i} className="flex items-center gap-3 px-4 py-3.5"><Skeleton className="h-9 w-9" /><div className="flex-1 space-y-2"><Skeleton className="h-4 w-3/4" /><Skeleton className="h-3 w-1/2" /></div></li>
+            ))
+            : processes.map((p) => {
+              const st = PROCESS_STATUS[p.status];
+              return (
+                <li key={p.id}>
+                  <button type="button" onClick={() => navigate(`/enterprise/knowledge/${p.id}`)}
+                    className={`flex w-full cursor-pointer items-center gap-3 px-4 py-3.5 text-left active:bg-[#F8FAFC] ${FOCUS}`}>
+                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-md bg-[#EEF2FF] text-[#4F46E5]"><DocumentTextIcon className="h-4 w-4" /></span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-sm font-medium text-[#0F172A]">{p.title}</span>
+                      <span className="mt-0.5 block truncate text-xs text-[#64748B]">{processType(p.process_type) || "—"} · {fmtDate(p.updated_at || p.created_at)}</span>
+                    </span>
+                    {st && (
+                      <span className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-2 py-0.5 text-[11px] font-medium ${st.badge}`}>
+                        <span className={`h-1.5 w-1.5 rounded-full ${st.dot}`} />{t(`enterprise.dashboard.home.status.${p.status}`)}
+                      </span>
+                    )}
+                  </button>
+                </li>
+              );
+            })}
+        </ul>
+        <div className="hidden overflow-x-auto md:block">
           <table className="w-full text-left text-sm">
             <thead className="bg-[#F8FAFC] text-xs uppercase tracking-wide text-[#64748B]">
               <tr>
@@ -494,6 +524,7 @@ function RecentProcesses({ processes, loading }) {
             </tbody>
           </table>
         </div>
+        </>
       )}
     </div>
   );
@@ -512,7 +543,7 @@ function ComplianceStatus({ compliance, loading }) {
     { dot: "bg-[#94A3B8]", label: t("enterprise.dashboard.home.totalAssignments"), value: total },
   ];
   return (
-    <div className={`${CARD} p-6`}>
+    <div className={`${CARD} p-4 sm:p-6`}>
       <div className="flex items-center justify-between">
         <h2 className="text-base font-semibold text-[#0F172A]">{t("enterprise.dashboard.home.complianceStatus")}</h2>
         <button type="button" onClick={() => navigate("/enterprise/compliance/company")}
@@ -563,7 +594,7 @@ function SetupChecklist({ metrics, loading }) {
   ];
   const done = steps.filter((s) => s.done).length;
   return (
-    <div className={`${CARD} p-6`}>
+    <div className={`${CARD} p-4 sm:p-6`}>
       <div className="flex items-center justify-between">
         <h2 className="text-base font-semibold text-[#0F172A]">{t("enterprise.dashboard.home.setupTitle")}</h2>
         <span className="text-sm font-medium tabular-nums text-[#64748B]">{loading ? "…" : `${done} / ${steps.length}`}</span>
@@ -600,27 +631,27 @@ function AdminDashboard({ activeCompany, role, metrics, loadingMetrics }) {
   const userName = user?.first_name || user?.username || "";
   const fmt = (v) => (loadingMetrics ? "…" : v);
   return (
-    <div className="mx-auto w-full max-w-screen-2xl space-y-8 md:py-2">
+    <div className="mx-auto w-full max-w-screen-2xl space-y-5 sm:space-y-8 md:py-2">
       <DashboardHeader company={activeCompany} role={role} userName={userName} />
 
       <section aria-labelledby="kpi-title">
         <h2 id="kpi-title" className="sr-only">{t("enterprise.dashboard.metrics")}</h2>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-6">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 2xl:grid-cols-6">
           <StatCard icon={RectangleGroupIcon} tone="indigo" loading={loadingMetrics} value={fmt(metrics.processes)} label={t("enterprise.dashboard.processes")} sub={t("enterprise.dashboard.processesSub")} href="/enterprise/knowledge" />
           <StatCard icon={SparklesIcon} tone="sky" loading={loadingMetrics} value={fmt(metrics.learningModules)} label={t("enterprise.dashboard.learningModules")} sub={t("enterprise.dashboard.learningModulesSub")} href="/enterprise/knowledge" />
           <StatCard icon={MapIcon} tone="emerald" loading={loadingMetrics} value={fmt(metrics.paths)} label={t("enterprise.dashboard.nav.learningPaths")} sub={t("enterprise.dashboard.learningRoutes")} href="/enterprise/learning/paths" />
           <StatCard icon={UsersIcon} tone="amber" loading={loadingMetrics} value={fmt(metrics.assignments)} label={t("enterprise.dashboard.assignments")} sub={t("enterprise.dashboard.activeTrainings")} href="/enterprise/learning/manage-assignments" />
-          <StatCard icon={DocumentTextIcon} tone="violet" loading={loadingMetrics} value={fmt(metrics.sources)} label={t("enterprise.dashboard.sources")} sub={t("enterprise.dashboard.nav.knowledgeSources")} href="/enterprise/knowledge" />
+          <StatCard className="col-span-2 sm:col-span-1" icon={DocumentTextIcon} tone="violet" loading={loadingMetrics} value={fmt(metrics.sources)} label={t("enterprise.dashboard.sources")} sub={t("enterprise.dashboard.nav.knowledgeSources")} href="/enterprise/knowledge" />
           <ComplianceStatCard compliance={metrics.compliance} loading={loadingMetrics} />
         </div>
       </section>
 
-      <section className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-        <div className="min-w-0 space-y-6 xl:col-span-2">
+      <section className="grid grid-cols-1 gap-5 sm:gap-6 xl:grid-cols-3">
+        <div className="min-w-0 space-y-5 sm:space-y-6 xl:col-span-2">
           <QuickActions />
           <RecentProcesses processes={metrics.recentProcesses || []} loading={loadingMetrics} />
         </div>
-        <aside className="space-y-6">
+        <aside className="space-y-5 sm:space-y-6">
           <ComplianceStatus compliance={metrics.compliance} loading={loadingMetrics} />
           <SetupChecklist metrics={metrics} loading={loadingMetrics} />
         </aside>

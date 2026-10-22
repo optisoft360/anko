@@ -236,7 +236,7 @@ export function GlobalCrudPage({ title, resource, columns, fields, extraParams =
   };
 
   return (
-    <div style={{ marginTop: 48, display: "flex", flexDirection: "column" }}>
+    <div className="mt-2 md:mt-12" style={{ display: "flex", flexDirection: "column" }}>
 
       {/* ── Main Table Card ── */}
       <div style={{ background: "var(--lt-0f172a, #0F172A)", border: "1px solid var(--lt-rgba-255-255-255-0-08, rgba(255,255,255,0.08))", borderRadius: 20, overflow: "hidden", boxShadow: "0 4px 24px var(--lt-rgba-0-0-0-0-4, rgba(0,0,0,0.4))" }}>
@@ -245,7 +245,7 @@ export function GlobalCrudPage({ title, resource, columns, fields, extraParams =
         <div style={{ height: 3, background: "linear-gradient(90deg, #6366F1, #818CF8, #A78BFA)" }} />
 
         {/* Header */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "18px 24px", borderBottom: "1px solid var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))" }}>
+        <div className="px-4 py-3.5 md:px-6 md:py-[18px]" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, borderBottom: "1px solid var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))" }}>
           <p style={{ fontSize: 15, fontWeight: 800, color: "var(--lt-f1f5f9, #F1F5F9)", letterSpacing: "-0.01em" }}>{title}</p>
           {!disableCreate && (
             <button onClick={() => handleOpenDialog()}
@@ -258,8 +258,54 @@ export function GlobalCrudPage({ title, resource, columns, fields, extraParams =
           )}
         </div>
 
+        {/* Mobile: one card per record (the table below is for md and up) */}
+        <div className="md:hidden">
+          {loading && (
+            <div style={{ padding: "40px 0", display: "flex", alignItems: "center", justifyContent: "center", gap: 12 }}>
+              <Spin size={20} />
+              <span style={{ fontSize: 12, color: "var(--text-tertiary)" }}>Cargando...</span>
+            </div>
+          )}
+          {!loading && items.length === 0 && (
+            <p style={{ padding: "40px 16px", textAlign: "center", fontSize: 13, color: "var(--text-tertiary)" }}>{t("global.crud.no_items")}</p>
+          )}
+          {!loading && items.length > 0 && (
+            <ul className="divide-y divide-[#F1F5F9]">
+              {items.map((item, key) => {
+                const [first, ...rest] = columns;
+                return (
+                  <li key={item.id || key} className="px-4 py-3.5">
+                    <p className="truncate text-sm font-semibold text-[#0F172A]">{first ? getCellValue(item, first.accessor) : ""}</p>
+                    {rest.length > 0 && (
+                      <dl className="mt-2 grid grid-cols-[auto,1fr] gap-x-3 gap-y-1.5 text-xs">
+                        {rest.map((col) => (
+                          <React.Fragment key={col.header}>
+                            <dt className="whitespace-nowrap font-medium uppercase tracking-wide text-[10px] leading-5 text-[#64748B]">{col.header}</dt>
+                            <dd className="min-w-0 break-words leading-5 text-[#334155]">{getCellValue(item, col.accessor)}</dd>
+                          </React.Fragment>
+                        ))}
+                      </dl>
+                    )}
+                    <div className="mt-3 flex items-center justify-end gap-2">
+                      <button onClick={() => handleOpenDialog(item)} aria-label="Edit"
+                        className="grid h-10 w-10 place-items-center rounded-lg border border-[#E2E8F0] bg-white text-[#475569] active:bg-[#F1F5F9]">
+                        <PencilIcon style={{ width: 16, height: 16 }} />
+                      </button>
+                      {extraActions && extraActions(item)}
+                      <button onClick={() => { setCurrentItem(item); setOpenDeleteDialog(true); }} aria-label="Delete"
+                        className="grid h-10 w-10 place-items-center rounded-lg border border-[#FECACA] bg-white text-[#DC2626] active:bg-[#FEF2F2]">
+                        <TrashIcon style={{ width: 16, height: 16 }} />
+                      </button>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </div>
+
         {/* Table */}
-        <div style={{ overflowX: "auto" }}>
+        <div className="hidden md:block" style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 640 }}>
             <thead>
               <tr style={{ borderBottom: "1px solid var(--lt-rgba-255-255-255-0-06, rgba(255,255,255,0.06))" }}>

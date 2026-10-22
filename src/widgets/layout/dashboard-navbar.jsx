@@ -31,6 +31,7 @@ import {
   setOpenSidenav,
 } from "@/context";
 import { useAuth } from "@/context/auth-context";
+import { APP_NAME } from "@/config/app";
 import { useLanguage } from "@/context/language-context";
 import { useProjects } from "@/context/projects-context";
 import { EditProfileDialog } from "@/widgets/dialogs/edit-profile-dialog";
@@ -154,16 +155,22 @@ export function DashboardNavbar() {
         fullWidth
         blurred={fixedNavbar}
       >
-        <div className="flex flex-col-reverse justify-between gap-6 md:flex-row md:items-center px-4">
-          <div className="capitalize flex items-center gap-4">
+        <div className="flex flex-row items-center justify-between gap-2 px-1 md:gap-6 md:px-4">
+          <div className="capitalize flex min-w-0 items-center gap-1 md:gap-4">
             <IconButton
               variant="text"
               className="grid text-zinc-600"
+              aria-label={language === "es" ? "Abrir menú" : "Open menu"}
               onClick={() => setOpenSidenav(dispatch, !openSidenav)}
             >
               <Bars3Icon strokeWidth={3} className="h-6 w-6" />
             </IconButton>
-            <div>
+            {/* Mobile: brand instead of the breadcrumb */}
+            <Link to={pathParts[0] === "enterprise" ? "/enterprise/dashboard" : "/dashboard/home"} className="flex items-center gap-2 normal-case md:hidden">
+              <span className="grid h-7 w-7 place-items-center rounded-lg bg-[#4F46E5] text-xs font-bold text-white">A</span>
+              <span className="text-sm font-semibold text-[#0F172A]">{APP_NAME || "Ankard"}</span>
+            </Link>
+            <div className="hidden md:block">
               <Breadcrumbs className="bg-transparent p-0 transition-all">
                 {pathParts.map((part, index) => {
                   const isLast = index === pathParts.length - 1;
@@ -190,11 +197,11 @@ export function DashboardNavbar() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-1 md:gap-2">
             {/* Language */}
             <Button
               variant="text"
-              className="flex items-center gap-2 px-3 py-2 normal-case text-zinc-600 hover:bg-zinc-100"
+              className="flex items-center gap-2 px-2.5 py-2 normal-case text-zinc-600 hover:bg-zinc-100 md:px-3"
               onClick={() => changeLanguage(language === "es" ? "en" : "es")}
             >
               <img
@@ -202,7 +209,7 @@ export function DashboardNavbar() {
                 alt={language}
                 className="h-3.5 w-5 rounded-sm"
               />
-              <span className="text-xs font-bold">{language.toUpperCase()}</span>
+              <span className="hidden text-xs font-bold sm:inline">{language.toUpperCase()}</span>
             </Button>
 
             {/* Notification Bell */}
@@ -210,8 +217,8 @@ export function DashboardNavbar() {
               <button
                 onClick={() => { setNotifOpen(v => { if (!v && !notifLoading) fetchNotifications(); return !v; }); }}
                 style={{ position: "relative", width: 36, height: 36, borderRadius: "50%", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--lt-94a3b8, #94A3B8)", transition: "background 0.15s, color 0.15s" }}
-                onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.07)"; e.currentTarget.style.color = "#F1F5F9"; }}
-                onMouseLeave={(e) => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "#94A3B8"; }}>
+                onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(15,23,42,0.05)"; e.currentTarget.style.color = "#0F172A"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "#475569"; }}>
                 <BellIcon className="h-5 w-5" />
                 {unreadCount > 0 && (
                   <span style={{ position: "absolute", top: 0, right: 0, minWidth: 16, height: 16, borderRadius: 999, background: "#EF4444", color: "#fff", fontSize: 9, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 3px", boxShadow: "0 0 6px rgba(239,68,68,0.6)" }}>
@@ -223,7 +230,7 @@ export function DashboardNavbar() {
               {notifOpen && (
                 <>
                   <div style={{ position: "fixed", inset: 0, zIndex: 40 }} onClick={() => setNotifOpen(false)} />
-                  <div style={{ position: "absolute", right: 0, top: 46, zIndex: 50, background: "var(--lt-0f172a, #0F172A)", border: "1px solid var(--lt-rgba-255-255-255-0-1, rgba(255,255,255,0.1))", borderRadius: 16, width: 320, boxShadow: "0 20px 60px var(--lt-rgba-0-0-0-0-7, rgba(0,0,0,0.7)), 0 0 0 1px rgba(99,102,241,0.08)", overflow: "hidden" }}>
+                  <div style={{ position: "absolute", right: 0, top: 46, zIndex: 50, background: "var(--lt-0f172a, #0F172A)", border: "1px solid var(--lt-rgba-255-255-255-0-1, rgba(255,255,255,0.1))", borderRadius: 16, width: "min(320px, calc(100vw - 24px))", boxShadow: "0 20px 60px var(--lt-rgba-0-0-0-0-7, rgba(0,0,0,0.7)), 0 0 0 1px rgba(99,102,241,0.08)", overflow: "hidden" }}>
                     {/* Top accent strip */}
                     <div style={{ height: 2, background: "linear-gradient(90deg, #6366F1, #818CF8, #A78BFA)" }} />
 
@@ -276,14 +283,14 @@ export function DashboardNavbar() {
                           <div
                             key={notif.id}
                             style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "10px 12px", borderRadius: 10, marginBottom: 2, cursor: "pointer", transition: "background 0.15s", background: !isRead ? "rgba(99,102,241,0.08)" : "transparent", border: !isRead ? "1px solid rgba(99,102,241,0.15)" : "1px solid transparent", position: "relative" }}
-                            onMouseEnter={(e) => { e.currentTarget.style.background = !isRead ? "rgba(99,102,241,0.13)" : "rgba(255,255,255,0.04)"; }}
+                            onMouseEnter={(e) => { e.currentTarget.style.background = !isRead ? "rgba(99,102,241,0.13)" : "rgba(15,23,42,0.04)"; }}
                             onMouseLeave={(e) => { e.currentTarget.style.background = !isRead ? "rgba(99,102,241,0.08)" : "transparent"; }}
                             onClick={() => { if (!isRead) markRead(notif.id); }}
                           >
                             <span style={{ width: 7, height: 7, borderRadius: "50%", background: dotColor, flexShrink: 0, marginTop: 4, boxShadow: `0 0 6px ${dotColor}80` }} />
                             <div style={{ flex: 1, minWidth: 0 }}>
                               {title && (
-                                <p style={{ fontSize: 11, fontWeight: !isRead ? 700 : 500, color: !isRead ? "#E2E8F0" : "#94A3B8", lineHeight: 1.4, marginBottom: 2 }}>
+                                <p style={{ fontSize: 11, fontWeight: !isRead ? 700 : 500, color: !isRead ? "#0F172A" : "#475569", lineHeight: 1.4, marginBottom: 2 }}>
                                   {title}
                                 </p>
                               )}
@@ -319,7 +326,7 @@ export function DashboardNavbar() {
                 <button
                   onClick={() => setShowUserMenu(v => !v)}
                   style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px", borderRadius: 999, background: "none", border: "none", cursor: "pointer", transition: "background 0.15s" }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.06)"}
+                  onMouseEnter={(e) => e.currentTarget.style.background = "rgba(15,23,42,0.05)"}
                   onMouseLeave={(e) => e.currentTarget.style.background = "none"}>
                   <div style={{ width: 32, height: 32, borderRadius: "50%", background: "linear-gradient(135deg, #6366F1, #A78BFA)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 12, border: "1px solid var(--lt-rgba-255-255-255-0-2, rgba(255,255,255,0.2))", boxShadow: "0 0 12px rgba(99,102,241,0.4)", flexShrink: 0 }}>
                     {user.first_name?.[0] || user.username?.[0] || "U"}
@@ -359,8 +366,8 @@ export function DashboardNavbar() {
                         ].map(({ label, icon: Icon, action }) => (
                           <button key={label} onClick={action}
                             style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", borderRadius: 10, background: "none", border: "none", cursor: "pointer", color: "var(--lt-94a3b8, #94A3B8)", fontSize: 13, fontWeight: 600, textAlign: "left", transition: "background 0.15s, color 0.15s" }}
-                            onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(99,102,241,0.1)"; e.currentTarget.style.color = "#C7D2FE"; }}
-                            onMouseLeave={(e) => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "#94A3B8"; }}>
+                            onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(79,70,229,0.08)"; e.currentTarget.style.color = "#4338CA"; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "#475569"; }}>
                             <Icon style={{ width: 16, height: 16, flexShrink: 0 }} />
                             {label}
                           </button>
@@ -370,8 +377,8 @@ export function DashboardNavbar() {
 
                         <button onClick={() => { setShowUserMenu(false); logout(); }}
                           style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", borderRadius: 10, background: "none", border: "none", cursor: "pointer", color: "var(--lt-f87171, #F87171)", fontSize: 13, fontWeight: 600, textAlign: "left", transition: "background 0.15s, color 0.15s" }}
-                          onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(239,68,68,0.08)"; e.currentTarget.style.color = "#FCA5A5"; }}
-                          onMouseLeave={(e) => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "#F87171"; }}>
+                          onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(239,68,68,0.08)"; e.currentTarget.style.color = "#B91C1C"; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "#DC2626"; }}>
                           <PowerIcon style={{ width: 16, height: 16, flexShrink: 0 }} />
                           {t("sidenav.signout") || "Sign Out"}
                         </button>

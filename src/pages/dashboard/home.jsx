@@ -21,8 +21,6 @@ import { useLanguage } from "@/context/language-context";
 import { useAuth } from "@/context/auth-context";
 import { useProjects } from "@/context/projects-context";
 import projectService from "@/services/projectService";
-import { EditProfileDialog } from "@/widgets/dialogs/edit-profile-dialog";
-import { UserStatisticsDialog } from "@/widgets/dialogs/user-statistics-dialog";
 
 
 // Light theme (palette C), same visual language as the enterprise dashboard.
@@ -67,13 +65,10 @@ function SectionTitle({ children }) {
 }
 
 export function Home() {
-  const { language, changeLanguage } = useLanguage();
+  const { language } = useLanguage();
   const navigate = useNavigate();
-  const { user, logout, isAdmin } = useAuth();
+  const { user, isAdmin } = useAuth();
   const { projects, batteries } = useProjects();
-  const [showProfileMenu, setShowProfileMenu] = React.useState(false);
-  const [showEditProfile, setShowEditProfile] = React.useState(false);
-  const [showStats, setShowStats] = React.useState(false);
   const [deckCount, setDeckCount] = React.useState(null);
   const [recentDecks, setRecentDecks] = React.useState([]);
 
@@ -123,11 +118,7 @@ export function Home() {
   ];
 
   return (
-    <div className="mx-auto w-full max-w-screen-2xl space-y-8 md:py-2">
-      {/* Dialogs */}
-      <EditProfileDialog open={showEditProfile} handler={() => setShowEditProfile(false)} />
-      <UserStatisticsDialog open={showStats} handler={() => setShowStats(false)} userId={user?.id} />
-
+    <div className="mx-auto w-full max-w-screen-2xl space-y-5 sm:space-y-8 md:py-2">
       {/* Header */}
       <section className="flex items-start justify-between gap-4">
         <div className="min-w-0">
@@ -141,57 +132,19 @@ export function Home() {
           )}
         </div>
 
-        {/* Mobile: profile menu (the top bar is hidden below md) */}
-        <div className="relative md:hidden">
-          <button type="button" onClick={() => setShowProfileMenu(v => !v)} aria-label={es ? "Menú de usuario" : "User menu"}
-            className={`grid h-10 w-10 cursor-pointer place-items-center rounded-full bg-[#4F46E5] text-sm font-semibold text-white ${FOCUS}`}>
-            {(user?.first_name?.[0] || user?.username?.[0] || "A").toUpperCase()}
-          </button>
-          {showProfileMenu && (
-            <>
-              <div className="fixed inset-0 z-40" onClick={() => setShowProfileMenu(false)} />
-              <div className={`absolute right-0 top-12 z-50 min-w-[190px] overflow-hidden ${CARD} shadow-[0_10px_30px_rgba(15,23,42,0.12)]`}>
-                <div className="flex items-center justify-between border-b border-[#F1F5F9] px-4 py-3">
-                  <span className="text-xs text-[#64748B]">{es ? "Idioma" : "Language"}</span>
-                  <div className="flex gap-1">
-                    {["es", "en"].map(lang => (
-                      <button key={lang} type="button" onClick={() => changeLanguage(lang)}
-                        className={`cursor-pointer rounded-md px-2 py-0.5 text-[10px] font-bold ${language === lang ? "bg-[#4F46E5] text-white" : "bg-[#F1F5F9] text-[#64748B]"}`}>
-                        {lang.toUpperCase()}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                {[
-                  { label: es ? "Mi perfil" : "My profile", action: () => { setShowProfileMenu(false); setShowEditProfile(true); } },
-                  { label: es ? "Estadísticas" : "Statistics", action: () => { setShowProfileMenu(false); setShowStats(true); } },
-                ].map(item => (
-                  <button key={item.label} type="button" onClick={item.action}
-                    className="w-full cursor-pointer border-b border-[#F1F5F9] px-4 py-2.5 text-left text-sm text-[#475569] hover:bg-[#F8FAFC]">
-                    {item.label}
-                  </button>
-                ))}
-                <button type="button" onClick={() => { setShowProfileMenu(false); logout(); }}
-                  className="w-full cursor-pointer px-4 py-2.5 text-left text-sm font-semibold text-[#DC2626] hover:bg-[#FEF2F2]">
-                  {es ? "Cerrar sesión" : "Sign out"}
-                </button>
-              </div>
-            </>
-          )}
-        </div>
       </section>
 
       {/* Quick stats */}
-      <section className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <section className="grid grid-cols-3 gap-3 sm:gap-4">
         {stats.map((s) => (
           <button key={s.label} type="button" onClick={() => navigate(s.path)}
-            className={`group ${CARD} flex cursor-pointer items-center gap-4 p-5 text-left transition duration-200 hover:-translate-y-0.5 hover:shadow-md ${FOCUS}`}>
-            <span className={`grid h-11 w-11 shrink-0 place-items-center rounded-lg ${TONE[s.tone]}`}><s.icon className="h-5 w-5" /></span>
+            className={`group ${CARD} flex cursor-pointer flex-col items-start gap-2 p-3 text-left transition duration-200 hover:-translate-y-0.5 hover:shadow-md sm:flex-row sm:items-center sm:gap-4 sm:p-5 ${FOCUS}`}>
+            <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-lg sm:h-11 sm:w-11 ${TONE[s.tone]}`}><s.icon className="h-5 w-5" /></span>
             <span className="min-w-0 flex-1">
-              <span className="block text-3xl font-semibold tabular-nums text-[#0F172A]">{s.num}</span>
-              <span className="block text-sm font-medium text-[#64748B]">{s.label}</span>
+              <span className="block text-2xl font-semibold tabular-nums text-[#0F172A] sm:text-3xl">{s.num}</span>
+              <span className="block truncate text-xs font-medium text-[#64748B] sm:text-sm">{s.label}</span>
             </span>
-            <ArrowRightIcon className="h-4 w-4 text-[#CBD5E1] transition-colors group-hover:text-[#4F46E5]" />
+            <ArrowRightIcon className="hidden h-4 w-4 text-[#CBD5E1] transition-colors group-hover:text-[#4F46E5] sm:block" />
           </button>
         ))}
       </section>
@@ -199,7 +152,7 @@ export function Home() {
       {/* Administration modules */}
       {isAdmin && (
         <section className={CARD}>
-          <div className="border-b border-[#F1F5F9] px-6 py-4">
+          <div className="border-b border-[#F1F5F9] px-4 py-4 sm:px-6">
             <SectionTitle>{es ? "Módulos de Administración" : "Administration Modules"}</SectionTitle>
             <p className="text-sm text-[#64748B]">{es ? "Toda la configuración de la plataforma, a un clic." : "Every platform setting, one click away."}</p>
           </div>
@@ -216,8 +169,8 @@ export function Home() {
       )}
 
       {/* Platform overview */}
-      <section className={`grid grid-cols-1 gap-6 ${isAdmin ? "xl:grid-cols-2" : ""}`}>
-        <div className={`${CARD} p-6`}>
+      <section className={`grid grid-cols-1 gap-5 sm:gap-6 ${isAdmin ? "xl:grid-cols-2" : ""}`}>
+        <div className={`${CARD} p-4 sm:p-6`}>
           <div className="flex items-center gap-3">
             <span className={`grid h-9 w-9 place-items-center rounded-lg ${TONE.indigo}`}><ChartBarIcon className="h-4 w-4" /></span>
             <SectionTitle>{es ? "Contenido de la Plataforma" : "Platform Content"}</SectionTitle>
@@ -242,7 +195,7 @@ export function Home() {
         </div>
 
         {isAdmin && (
-          <div className={`${CARD} p-6`}>
+          <div className={`${CARD} p-4 sm:p-6`}>
             <div className="flex items-center gap-3">
               <span className={`grid h-9 w-9 place-items-center rounded-lg ${TONE.rose}`}><ShieldCheckIcon className="h-4 w-4" /></span>
               <SectionTitle>{es ? "Acciones Críticas de Admin" : "Critical Admin Actions"}</SectionTitle>
