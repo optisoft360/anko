@@ -159,7 +159,7 @@ export function Modal({ title, onClose, children, footer, width = "max-w-md" }) 
     return () => document.removeEventListener("keydown", onKey);
   }, [onClose]);
   return (
-    <div className="fixed inset-0 z-[10050] flex items-end justify-center bg-[#0F172A]/40 p-0 sm:items-center sm:p-6" onClick={onClose}>
+    <div className="fixed inset-0 !m-0 z-[10050] flex items-end justify-center bg-[#0F172A]/40 p-0 sm:items-center sm:p-6" onClick={onClose}>
       <div role="dialog" aria-modal="true" aria-label={title} onClick={(e) => e.stopPropagation()}
         className={`flex max-h-[92dvh] w-full ${width} flex-col overflow-hidden rounded-t-2xl bg-white shadow-[0_20px_50px_rgba(15,23,42,0.2)] sm:rounded-xl`}>
         <div className="flex items-center justify-between gap-3 border-b border-[#F1F5F9] px-5 py-4">

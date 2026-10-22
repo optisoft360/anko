@@ -1,45 +1,23 @@
 import { useState, useEffect, useCallback } from "react";
 import {
-  EnvelopeIcon, ArrowPathIcon, ClockIcon,
-  BuildingOffice2Icon, PlusIcon, XMarkIcon,
-  PaperAirplaneIcon, CheckCircleIcon,
-} from "@heroicons/react/24/solid";
+  EnvelopeIcon, ClockIcon, BuildingOffice2Icon, PlusIcon,
+  PaperAirplaneIcon, CheckCircleIcon, ExclamationTriangleIcon,
+} from "@heroicons/react/24/outline";
 import api from "@/services/api";
 import invitationsService from "@/services/invitationsService";
 import { useLanguage } from "../../../context/language-context";
+import {
+  BTN_PRIMARY, BTN_SECONDARY, Badge, Card, EmptyBlock, FOCUS, Field, Modal, PageHeader, ROLE_TONE,
+  Segmented, SelectInput, Spinner, TONE, TextInput,
+} from "../../components/ui/kit";
 
-function useStatusMeta() {
-  const { t } = useLanguage();
-  return {
-    pending:   { label: t("enterprise.platformAdmin.invitations.status.pending"),   color: "var(--lt-f59e0b, #F59E0B)", bg: "rgba(245,158,11,0.12)",  border: "rgba(245,158,11,0.28)" },
-    accepted:  { label: t("enterprise.platformAdmin.invitations.status.accepted"),  color: "#34D399", bg: "rgba(52,211,153,0.12)",  border: "rgba(52,211,153,0.28)" },
-    expired:   { label: t("enterprise.platformAdmin.invitations.status.expired"),   color: "var(--lt-f87171, #F87171)", bg: "rgba(248,113,113,0.12)", border: "rgba(248,113,113,0.28)" },
-    cancelled: { label: t("enterprise.platformAdmin.invitations.status.cancelled"), color: "#64748B", bg: "rgba(100,116,139,0.10)", border: "rgba(100,116,139,0.22)" },
-  };
-}
-
-function useRoleMeta() {
-  const { t } = useLanguage();
-  return {
-    owner:    { label: t("enterprise.settings.inviteUser.roles.owner"),    color: "var(--lt-f59e0b, #F59E0B)" },
-    admin:    { label: t("enterprise.settings.inviteUser.roles.admin"),    color: "var(--lt-818cf8, #818CF8)" },
-    manager:  { label: t("enterprise.settings.inviteUser.roles.manager"),  color: "#38BDF8" },
-    trainer:  { label: t("enterprise.settings.inviteUser.roles.trainer"), color: "#A78BFA" },
-    employee: { label: t("enterprise.settings.inviteUser.roles.employee"),color: "#34D399" },
-    auditor:  { label: t("enterprise.settings.inviteUser.roles.auditor"), color: "var(--lt-94a3b8, #94A3B8)" },
-  };
-}
+// Same look as the company Invitations page (enterprise/pages/invitations).
+const STATUS_TONE = { pending: "amber", accepted: "emerald", expired: "rose", cancelled: "slate" };
+const ROLE_VALUES = ["admin", "manager", "trainer", "employee", "auditor", "owner"];
 
 function useRoles() {
   const { t } = useLanguage();
-  return [
-    { value: "admin",    label: t("enterprise.settings.inviteUser.roles.admin"),    color: "var(--lt-818cf8, #818CF8)", bg: "rgba(129,140,248,0.12)", border: "rgba(129,140,248,0.28)" },
-    { value: "manager",  label: t("enterprise.settings.inviteUser.roles.manager"),  color: "#38BDF8", bg: "rgba(56,189,248,0.12)",  border: "rgba(56,189,248,0.28)"  },
-    { value: "trainer",  label: t("enterprise.settings.inviteUser.roles.trainer"),  color: "#A78BFA", bg: "rgba(167,139,250,0.12)", border: "rgba(167,139,250,0.28)" },
-    { value: "employee", label: t("enterprise.settings.inviteUser.roles.employee"), color: "#34D399", bg: "rgba(52,211,153,0.12)",  border: "rgba(52,211,153,0.28)"  },
-    { value: "auditor",  label: t("enterprise.settings.inviteUser.roles.auditor"),  color: "var(--lt-94a3b8, #94A3B8)", bg: "rgba(148,163,184,0.10)", border: "rgba(148,163,184,0.22)" },
-    { value: "owner",    label: t("enterprise.settings.inviteUser.roles.owner"),    color: "var(--lt-f59e0b, #F59E0B)", bg: "rgba(245,158,11,0.12)",  border: "rgba(245,158,11,0.28)"  },
-  ];
+  return ROLE_VALUES.map((value) => ({ value, label: t(`enterprise.settings.inviteUser.roles.${value}`) }));
 }
 
 function useStages() {
@@ -58,30 +36,19 @@ const TOP_TABS  = ["global", "recent"];
 const STATUS_TABS = ["all", "pending", "accepted", "expired", "cancelled"];
 
 function StatusBadge({ status }) {
-  const STATUS_META = useStatusMeta();
-  const meta = STATUS_META[status] || { label: status, color: "var(--lt-94a3b8, #94A3B8)", bg: "rgba(148,163,184,0.1)", border: "rgba(148,163,184,0.22)" };
-  return (
-    <span style={{
-      display: "inline-flex", alignItems: "center", gap: 5,
-      padding: "3px 10px", borderRadius: 20,
-      fontSize: 11, fontWeight: 700, letterSpacing: "0.04em", textTransform: "uppercase",
-      color: meta.color, background: meta.bg, border: `1px solid ${meta.border}`,
-    }}>
-      <span style={{ width: 5, height: 5, borderRadius: "50%", background: meta.color, flexShrink: 0 }} />
-      {meta.label}
-    </span>
-  );
+  const { t } = useLanguage();
+  const label = STATUS_TONE[status] ? t(`enterprise.platformAdmin.invitations.status.${status}`) : status;
+  return <Badge tone={STATUS_TONE[status] || "slate"} dot>{label}</Badge>;
 }
 
 function RoleBadge({ role }) {
-  const ROLE_META = useRoleMeta();
-  const meta = ROLE_META[role] || { label: role, color: "var(--lt-94a3b8, #94A3B8)" };
-  return <span style={{ fontSize: 12, fontWeight: 600, color: meta.color }}>{meta.label}</span>;
+  const { t } = useLanguage();
+  return <Badge tone={ROLE_TONE[role] || "slate"}>{ROLE_TONE[role] ? t(`enterprise.settings.inviteUser.roles.${role}`) : role}</Badge>;
 }
 
-function formatDate(iso) {
+function formatDate(iso, language) {
   if (!iso) return "—";
-  return new Date(iso).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+  return new Date(iso).toLocaleDateString(language === "es" ? "es" : "en", { year: "numeric", month: "short", day: "numeric" });
 }
 
 /* ── Invite Modal ──────────────────────────────────────────────────────── */
@@ -115,225 +82,88 @@ function InviteModal({ companies, onClose, onSent }) {
     }
   };
 
+  const k = (key) => t(`enterprise.platformAdmin.invitations.inviteModal.${key}`);
+  const ready = Boolean(activeEmail && companyId);
+
   return (
-    <>
-      {/* Backdrop */}
-      <div
-        style={{ position: "fixed", inset: 0, zIndex: 1000, background: "var(--lt-rgba-0-0-0-0-78, rgba(0,0,0,0.78))", backdropFilter: "blur(4px)" }}
-        onClick={onClose}
-      />
-
-      {/* Modal */}
-      <div style={{
-        position: "fixed", inset: 0, zIndex: 1001,
-        display: "flex", alignItems: "center", justifyContent: "center", padding: 20,
-      }}>
-        <div style={{
-          background: "var(--lt-0f172a, #0F172A)", border: "1px solid var(--lt-rgba-255-255-255-0-1, rgba(255,255,255,0.1))",
-          borderRadius: 22, width: "100%", maxWidth: 520,
-          boxShadow: "0 30px 80px var(--lt-rgba-0-0-0-0-6, rgba(0,0,0,0.6)), 0 0 0 1px rgba(99,102,241,0.12)",
-          overflow: "hidden",
-        }}>
-          {/* Top accent */}
-          <div style={{ height: 3, background: "linear-gradient(90deg, #6366F1, #818CF8, #A78BFA)" }} />
-
-          {/* Header */}
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "22px 24px 18px" }}>
-            <div>
-              <h2 style={{ fontSize: 18, fontWeight: 800, color: "var(--lt-f1f5f9, #F1F5F9)", margin: 0, letterSpacing: "-0.01em" }}>
-                {t("enterprise.platformAdmin.invitations.inviteModal.title")}
-              </h2>
-              <p style={{ fontSize: 12, color: "#64748B", margin: "3px 0 0" }}>{t("enterprise.platformAdmin.invitations.inviteModal.subtitle")}</p>
+    <Modal
+      title={k("title")}
+      onClose={onClose}
+      width="max-w-lg"
+      footer={success ? (
+        <>
+          <button type="button" onClick={() => { setSuccess(false); setEmail(""); setCompanyId(""); }} className={BTN_SECONDARY}>{k("sendAnother")}</button>
+          <button type="button" onClick={onClose} className={BTN_PRIMARY}>{k("done")}</button>
+        </>
+      ) : (
+        <>
+          <button type="button" onClick={onClose} className={BTN_SECONDARY}>{t("enterprise.compliance.programs.cancel")}</button>
+          <button type="button" onClick={handleSend} disabled={sending || !ready} className={BTN_PRIMARY}>
+            <PaperAirplaneIcon className="h-4 w-4" />
+            {sending ? t("enterprise.settings.inviteUser.sending") : t("enterprise.settings.inviteUser.sendInvitation")}
+          </button>
+        </>
+      )}
+    >
+      {success ? (
+        <div className="flex flex-col items-center py-4 text-center">
+          <span className={`grid h-14 w-14 place-items-center rounded-full ${TONE.emerald.icon}`}><CheckCircleIcon className="h-7 w-7" /></span>
+          <p className="mt-3 text-base font-semibold text-[#0F172A]">{t("enterprise.settings.inviteUser.sentTitle")}</p>
+          <p className="mt-2 inline-flex items-center gap-2 rounded-lg border border-[#C7D2FE] bg-[#EEF2FF] px-3 py-2 text-sm font-medium text-[#4338CA]">
+            <EnvelopeIcon className="h-4 w-4" /> <span className="break-all">{email}</span>
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          <p className="-mt-1 text-sm text-[#64748B]">{k("subtitle")}</p>
+          <Field label={k("companyLabel")} required>
+            <SelectInput value={companyId} onChange={(e) => setCompanyId(e.target.value)}>
+              <option value="">{k("selectCompany")}</option>
+              {companies.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+            </SelectInput>
+          </Field>
+          <Field label={k("emailLabel")} required>
+            <TextInput type="email" value={email} onChange={(e) => { setEmail(e.target.value); setError(""); }} placeholder="user@company.com" />
+          </Field>
+          <div>
+            <span className="mb-1.5 block text-sm font-medium text-[#334155]">{t("enterprise.settings.company.members.addModal.roleLabel")}</span>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+              {ROLES.map((r) => {
+                const active = role === r.value;
+                return (
+                  <button key={r.value} type="button" onClick={() => setRole(r.value)} aria-pressed={active}
+                    className={`h-11 cursor-pointer rounded-lg border px-2 text-sm font-medium transition-colors duration-150 sm:h-10 ${FOCUS} ${
+                      active ? "border-[#6366F1] bg-[#EEF2FF] text-[#4338CA]" : "border-[#E2E8F0] bg-white text-[#475569] hover:bg-[#F8FAFC]"}`}>
+                    {r.label}
+                  </button>
+                );
+              })}
             </div>
-            <button
-              onClick={onClose}
-              style={{
-                width: 34, height: 34, borderRadius: 9,
-                background: "var(--lt-rgba-255-255-255-0-04, rgba(255,255,255,0.04))", border: "1px solid var(--lt-rgba-255-255-255-0-08, rgba(255,255,255,0.08))",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                cursor: "pointer", color: "#64748B",
-              }}
-            >
-              <XMarkIcon style={{ width: 16, height: 16 }} />
-            </button>
           </div>
-
-          {success ? (
-            <div style={{ padding: "24px 24px 32px", textAlign: "center" }}>
-              <div style={{
-                width: 56, height: 56, borderRadius: 16, margin: "0 auto 16px",
-                background: "rgba(52,211,153,0.1)", border: "1px solid rgba(52,211,153,0.28)",
-                display: "flex", alignItems: "center", justifyContent: "center",
-              }}>
-                <CheckCircleIcon style={{ width: 28, height: 28, color: "#34D399" }} />
-              </div>
-              <p style={{ fontSize: 16, fontWeight: 800, color: "var(--lt-f1f5f9, #F1F5F9)", margin: "0 0 8px" }}>{t("enterprise.settings.inviteUser.sentTitle")}</p>
-              <div style={{
-                background: "rgba(99,102,241,0.08)", border: "1px solid rgba(99,102,241,0.22)",
-                borderRadius: 11, padding: "12px 18px", marginBottom: 20,
-                display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-              }}>
-                <EnvelopeIcon style={{ width: 15, height: 15, color: "var(--lt-818cf8, #818CF8)" }} />
-                <span style={{ fontSize: 13, fontWeight: 700, color: "var(--lt-818cf8, #818CF8)" }}>{email}</span>
-              </div>
-              <div style={{ display: "flex", gap: 10 }}>
-                <button
-                  onClick={() => { setSuccess(false); setEmail(""); setCompanyId(""); }}
-                  style={{ flex: 1, padding: 11, borderRadius: 10, background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.22)", color: "var(--lt-818cf8, #818CF8)", fontSize: 13, fontWeight: 700, cursor: "pointer" }}
-                >
-                  {t("enterprise.platformAdmin.invitations.inviteModal.sendAnother")}
-                </button>
-                <button
-                  onClick={onClose}
-                  style={{ flex: 1, padding: 11, borderRadius: 10, background: "linear-gradient(135deg, #6366F1, #818CF8)", border: "none", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer" }}
-                >
-                  {t("enterprise.platformAdmin.invitations.inviteModal.done")}
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div style={{ padding: "0 24px 24px", display: "flex", flexDirection: "column", gap: 16 }}>
-
-              {/* Company selector */}
-              <div>
-                <label style={{ fontSize: 10, fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.1em", display: "block", marginBottom: 8 }}>
-                  {t("enterprise.platformAdmin.invitations.inviteModal.companyLabel")}
-                </label>
-                <div style={{ position: "relative" }}>
-                  <BuildingOffice2Icon style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", width: 14, height: 14, color: "#64748B", pointerEvents: "none" }} />
-                  <select
-                    value={companyId}
-                    onChange={e => setCompanyId(e.target.value)}
-                    style={{ width: "100%", padding: "11px 14px 11px 34px", borderRadius: 11, background: "var(--lt-1e293b, #1E293B)", border: "1px solid var(--lt-rgba-255-255-255-0-08, rgba(255,255,255,0.08))", color: companyId ? "var(--lt-f1f5f9, #F1F5F9)" : "#64748B", fontSize: 13, outline: "none", cursor: "pointer", appearance: "none" }}
-                    onFocus={e => e.target.style.borderColor = "rgba(99,102,241,0.45)"}
-                    onBlur={e => e.target.style.borderColor = "var(--lt-rgba-255-255-255-0-08, rgba(255,255,255,0.08))"}
-                  >
-                    <option value="" style={{ background: "var(--lt-1e293b, #1E293B)" }}>{t("enterprise.platformAdmin.invitations.inviteModal.selectCompany")}</option>
-                    {companies.map(c => (
-                      <option key={c.id} value={c.id} style={{ background: "var(--lt-1e293b, #1E293B)" }}>{c.name}</option>
-                    ))}
-                  </select>
-                  <div style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: "#64748B" }}>
-                    <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M2 4l4 4 4-4"/></svg>
-                  </div>
-                </div>
-              </div>
-
-              {/* Email */}
-              <div>
-                <label style={{ fontSize: 10, fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.1em", display: "block", marginBottom: 8 }}>
-                  {t("enterprise.platformAdmin.invitations.inviteModal.emailLabel")}
-                </label>
-                <div style={{ position: "relative" }}>
-                  <EnvelopeIcon style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", width: 14, height: 14, color: "#64748B", pointerEvents: "none" }} />
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={e => { setEmail(e.target.value); setError(""); }}
-                    placeholder="user@company.com"
-                    style={{ width: "100%", boxSizing: "border-box", padding: "11px 14px 11px 34px", borderRadius: 11, background: "var(--lt-1e293b, #1E293B)", border: "1px solid var(--lt-rgba-255-255-255-0-08, rgba(255,255,255,0.08))", color: "var(--lt-f1f5f9, #F1F5F9)", fontSize: 13, outline: "none" }}
-                    onFocus={e => e.target.style.borderColor = "rgba(99,102,241,0.45)"}
-                    onBlur={e => e.target.style.borderColor = "var(--lt-rgba-255-255-255-0-08, rgba(255,255,255,0.08))"}
-                  />
-                </div>
-              </div>
-
-              {/* Role */}
-              <div>
-                <label style={{ fontSize: 10, fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.1em", display: "block", marginBottom: 10 }}>
-                  {t("enterprise.settings.company.members.addModal.roleLabel")}
-                </label>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: 8 }}>
-                  {ROLES.map(r => (
-                    <button
-                      key={r.value}
-                      onClick={() => setRole(r.value)}
-                      style={{
-                        padding: "10px 6px", borderRadius: 10, border: `1px solid ${role === r.value ? r.border : "var(--lt-rgba-255-255-255-0-06, rgba(255,255,255,0.06))"}`,
-                        background: role === r.value ? r.bg : "rgba(255,255,255,0.02)",
-                        cursor: "pointer", transition: "all 150ms", textAlign: "center", minWidth: 0,
-                      }}
-                    >
-                      <span style={{ fontSize: 12, fontWeight: 700, color: role === r.value ? r.color: "#64748B", overflowWrap: "break-word" }}>{r.label}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Stage */}
-              <div>
-                <label style={{ fontSize: 10, fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.1em", display: "block", marginBottom: 8 }}>
-                  {t("enterprise.settings.inviteUser.employeeStage")}
-                </label>
-                <div style={{ position: "relative" }}>
-                  <select
-                    value={stage}
-                    onChange={e => setStage(e.target.value)}
-                    style={{ width: "100%", padding: "11px 14px", borderRadius: 11, background: "var(--lt-1e293b, #1E293B)", border: "1px solid var(--lt-rgba-255-255-255-0-08, rgba(255,255,255,0.08))", color: "var(--lt-f1f5f9, #F1F5F9)", fontSize: 13, outline: "none", cursor: "pointer", appearance: "none" }}
-                    onFocus={e => e.target.style.borderColor = "rgba(99,102,241,0.45)"}
-                    onBlur={e => e.target.style.borderColor = "var(--lt-rgba-255-255-255-0-08, rgba(255,255,255,0.08))"}
-                  >
-                    {STAGES.map(s => <option key={s.value} value={s.value} style={{ background: "var(--lt-1e293b, #1E293B)" }}>{s.label}</option>)}
-                  </select>
-                  <div style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: "#64748B" }}>
-                    <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M2 4l4 4 4-4"/></svg>
-                  </div>
-                </div>
-              </div>
-
-              {/* Error */}
-              {error && (
-                <div style={{ background: "rgba(248,113,113,0.08)", border: "1px solid rgba(248,113,113,0.22)", borderRadius: 10, padding: "11px 14px", fontSize: 13, color: "var(--lt-f87171, #F87171)" }}>
-                  {error}
-                </div>
-              )}
-
-              {/* Prominent email preview */}
-              {activeEmail && companyId && (
-                <div style={{ background: "rgba(99,102,241,0.07)", border: "1px solid rgba(99,102,241,0.18)", borderRadius: 11, padding: "12px 16px", display: "flex", alignItems: "center", gap: 10 }}>
-                  <EnvelopeIcon style={{ width: 15, height: 15, color: "var(--lt-818cf8, #818CF8)", flexShrink: 0 }} />
-                  <div>
-                    <span style={{ fontSize: 11, color: "#64748B", display: "block", marginBottom: 1 }}>{t("enterprise.platformAdmin.invitations.inviteModal.sendingTo")}</span>
-                    <span style={{ fontSize: 13, fontWeight: 800, color: "var(--lt-818cf8, #818CF8)" }}>{activeEmail}</span>
-                    {selectedRole && (
-                      <span style={{ fontSize: 11, color: "#64748B", marginLeft: 8 }}>
-                        {t("enterprise.platformAdmin.invitations.inviteModal.as")} <span style={{ color: selectedRole.color, fontWeight: 700 }}>{selectedRole.label}</span>
-                      </span>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Send button */}
-              <button
-                onClick={handleSend}
-                disabled={sending || !activeEmail || !companyId}
-                style={{
-                  width: "100%", padding: 14, borderRadius: 12,
-                  background: (activeEmail && companyId) ? "linear-gradient(135deg, #6366F1, #818CF8)" : "#1E293B",
-                  border: "none",
-                  color: (activeEmail && companyId) ? "#fff" : "var(--lt-334155, #334155)",
-                  fontSize: 14, fontWeight: 800,
-                  cursor: (activeEmail && companyId && !sending) ? "pointer" : "not-allowed",
-                  opacity: sending ? 0.7 : 1, transition: "all 200ms",
-                  display: "flex", alignItems: "center", justifyContent: "center", gap: 9,
-                  boxShadow: (activeEmail && companyId) ? "0 6px 20px rgba(99,102,241,0.35)" : "none",
-                }}
-              >
-                <PaperAirplaneIcon style={{ width: 16, height: 16 }} />
-                {sending ? t("enterprise.settings.inviteUser.sending") : t("enterprise.settings.inviteUser.sendInvitation")}
-              </button>
+          <Field label={t("enterprise.settings.inviteUser.employeeStage")}>
+            <SelectInput value={stage} onChange={(e) => setStage(e.target.value)}>
+              {STAGES.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
+            </SelectInput>
+          </Field>
+          {error && <p className="rounded-lg border border-[#FECDD3] bg-[#FFF1F2] px-3 py-2 text-sm text-[#BE123C]">{error}</p>}
+          {ready && (
+            <div className="flex items-start gap-3 rounded-lg border border-[#C7D2FE] bg-[#EEF2FF] px-3.5 py-3">
+              <EnvelopeIcon className="mt-0.5 h-4 w-4 shrink-0 text-[#4F46E5]" />
+              <p className="min-w-0 text-sm text-[#475569]">
+                {k("sendingTo")} <span className="break-all font-semibold text-[#3730A3]">{activeEmail}</span>
+                {selectedRole && <> {k("as")} <span className="font-semibold text-[#3730A3]">{selectedRole.label}</span></>}
+              </p>
             </div>
           )}
         </div>
-      </div>
-    </>
+      )}
+    </Modal>
   );
 }
 
 /* ── Main Page ─────────────────────────────────────────────────────────── */
 export default function PlatformAdminInvitations() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [topTab, setTopTab]       = useState("global");
   const [statusTab, setStatusTab] = useState("all");
   const [invitations, setInvitations] = useState([]);
@@ -390,139 +220,97 @@ export default function PlatformAdminInvitations() {
     t("enterprise.platformAdmin.invitations.columns.expires"),
   ];
 
+  const head = "px-6 py-3 text-left text-xs font-medium uppercase tracking-wide text-[#64748B]";
+  const newInvitation = (
+    <button type="button" onClick={() => setShowModal(true)} className={BTN_PRIMARY}>
+      <PlusIcon className="h-4 w-4" /> {t("enterprise.platformAdmin.invitations.inviteModal.title")}
+    </button>
+  );
+
   return (
-    <div style={{ maxWidth: 1080, margin: "0 auto" }}>
-      {/* Header */}
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 28, gap: 16, flexWrap: "wrap" }}>
-        <div>
-          <h1 style={{ fontSize: 22, fontWeight: 800, color: "var(--lt-f1f5f9, #F1F5F9)", margin: 0, letterSpacing: "-0.01em" }}>
-            {t("enterprise.platformAdmin.invitations.title")}
-          </h1>
-          <p style={{ fontSize: 13, color: "#64748B", margin: "4px 0 0" }}>{t("enterprise.platformAdmin.invitations.subtitle")}</p>
-        </div>
-        <button
-          onClick={() => setShowModal(true)}
-          style={{
-            display: "flex", alignItems: "center", gap: 7,
-            padding: "9px 18px", borderRadius: 10,
-            background: "linear-gradient(135deg, #6366F1, #818CF8)",
-            border: "none", color: "#fff", fontSize: 13, fontWeight: 700,
-            cursor: "pointer", flexShrink: 0,
-            boxShadow: "0 4px 16px rgba(99,102,241,0.35)",
-          }}
-          onMouseEnter={e => e.currentTarget.style.boxShadow = "0 6px 22px rgba(99,102,241,0.5)"}
-          onMouseLeave={e => e.currentTarget.style.boxShadow = "0 4px 16px rgba(99,102,241,0.35)"}
-        >
-          <PlusIcon style={{ width: 15, height: 15 }} />
-          {t("enterprise.platformAdmin.invitations.inviteModal.title")}
-        </button>
+    <div className="mx-auto w-full max-w-6xl space-y-5 sm:space-y-6 md:py-2">
+      <PageHeader
+        title={t("enterprise.platformAdmin.invitations.title")}
+        subtitle={t("enterprise.platformAdmin.invitations.subtitle")}
+        actions={newInvitation}
+      />
+
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <Segmented
+          ariaLabel={t("enterprise.platformAdmin.invitations.title")}
+          value={topTab}
+          onChange={setTopTab}
+          items={TOP_TABS.map((tb) => ({ value: tb, label: tb === "recent" ? t("enterprise.platformAdmin.invitations.recentTab") : t("enterprise.platformAdmin.invitations.globalTab") }))}
+        />
+        <Segmented
+          ariaLabel={t("enterprise.platformAdmin.invitations.columns.status")}
+          value={statusTab}
+          onChange={setStatusTab}
+          items={STATUS_TABS.map((st) => ({ value: st, label: STATUS_TAB_LABELS[st], count: counts[st] }))}
+        />
       </div>
 
-      {/* Top tabs */}
-      <div style={{ display: "flex", gap: 2, marginBottom: 20, borderBottom: "1px solid var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))" }}>
-        {TOP_TABS.map(tb => (
-          <button
-            key={tb}
-            onClick={() => setTopTab(tb)}
-            style={{
-              padding: "8px 18px", border: "none", background: "transparent",
-              fontSize: 13, fontWeight: 600, cursor: "pointer",
-              color: topTab === tb ? "var(--lt-818cf8, #818CF8)" : "#64748B",
-              borderBottom: topTab === tb ? "2px solid #6366F1" : "2px solid transparent",
-              transition: "all 150ms", marginBottom: -1,
-            }}
-          >
-            {tb === "recent" ? t("enterprise.platformAdmin.invitations.recentTab") : t("enterprise.platformAdmin.invitations.globalTab")}
-          </button>
-        ))}
-      </div>
-
-      {/* Status filter */}
-      <div style={{ display: "flex", gap: 4, marginBottom: 20, background: "var(--lt-0f172a, #0F172A)", borderRadius: 10, padding: 4, border: "1px solid var(--lt-rgba-255-255-255-0-06, rgba(255,255,255,0.06))", width: "fit-content" }}>
-        {STATUS_TABS.map(s => (
-          <button
-            key={s}
-            onClick={() => setStatusTab(s)}
-            style={{
-              padding: "6px 14px", borderRadius: 7, border: "none",
-              fontSize: 12, fontWeight: 600, cursor: "pointer",
-              background: statusTab === s ? "rgba(99,102,241,0.2)" : "transparent",
-              color: statusTab === s ? "var(--lt-818cf8, #818CF8)" : "#64748B",
-              transition: "all 150ms",
-            }}
-          >
-            {STATUS_TAB_LABELS[s]}
-            {counts[s] > 0 && (
-              <span style={{ marginLeft: 6, fontSize: 10, fontWeight: 700, background: statusTab === s ? "rgba(99,102,241,0.3)" : "rgba(100,116,139,0.15)", color: statusTab === s ? "var(--lt-818cf8, #818CF8)" : "#64748B", padding: "1px 6px", borderRadius: 10 }}>
-                {counts[s]}
-              </span>
-            )}
-          </button>
-        ))}
-      </div>
-
-      {/* Table */}
-      <div style={{ background: "var(--lt-0f172a, #0F172A)", border: "1px solid var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))", borderRadius: 14, overflow: "hidden" }}>
+      <Card>
         {loading ? (
-          <div style={{ padding: 48, textAlign: "center" }}>
-            <ArrowPathIcon style={{ width: 28, height: 28, color: "var(--lt-6366f1, #6366F1)", margin: "0 auto", animation: "spin 1s linear infinite" }} />
-          </div>
+          <div className="grid place-items-center py-16"><Spinner className="h-7 w-7" /></div>
         ) : error ? (
-          <div style={{ padding: 48, textAlign: "center", color: "var(--lt-f87171, #F87171)", fontSize: 14 }}>{error}</div>
+          <EmptyBlock icon={ExclamationTriangleIcon} title={error} />
         ) : filtered.length === 0 ? (
-          <div style={{ padding: 56, textAlign: "center" }}>
-            <EnvelopeIcon style={{ width: 36, height: 36, color: "var(--lt-1e293b, #1E293B)", margin: "0 auto 12px" }} />
-            <p style={{ color: "#64748B", fontSize: 14 }}>{t("enterprise.platformAdmin.invitations.empty")}</p>
-          </div>
+          <EmptyBlock icon={EnvelopeIcon} title={t("enterprise.platformAdmin.invitations.empty")} action={newInvitation} />
         ) : (
-          <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead>
-              <tr style={{ borderBottom: "1px solid var(--lt-rgba-255-255-255-0-06, rgba(255,255,255,0.06))" }}>
-                {columns.map(h => (
-                  <th key={h} style={{ padding: "11px 16px", textAlign: "left", fontSize: 10, fontWeight: 700, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.07em" }}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((inv, idx) => (
-                <tr
-                  key={inv.id}
-                  style={{ borderBottom: idx < filtered.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none", transition: "background 150ms" }}
-                  onMouseEnter={e => e.currentTarget.style.background = "var(--lt-rgba-255-255-255-0-02, rgba(255,255,255,0.02))"}
-                  onMouseLeave={e => e.currentTarget.style.background = "transparent"}
-                >
-                  <td style={{ padding: "12px 16px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <div style={{ width: 28, height: 28, borderRadius: 7, background: "rgba(56,189,248,0.1)", border: "1px solid rgba(56,189,248,0.2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                        <BuildingOffice2Icon style={{ width: 13, height: 13, color: "#38BDF8" }} />
-                      </div>
-                      <span style={{ fontSize: 12, fontWeight: 600, color: "var(--lt-94a3b8, #94A3B8)" }}>{inv.company_name || `#${inv.company}`}</span>
+          <>
+            {/* Phones: one card per invitation */}
+            <ul className="divide-y divide-[#F1F5F9] md:hidden">
+              {filtered.map((inv) => (
+                <li key={inv.id} className="space-y-3 px-4 py-4">
+                  <div className="flex items-start gap-3">
+                    <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-lg ${TONE.indigo.icon}`}><EnvelopeIcon className="h-4 w-4" /></span>
+                    <div className="min-w-0 flex-1">
+                      <p className="break-all text-sm font-medium text-[#0F172A]">{inv.email}</p>
+                      <p className="mt-0.5 flex items-center gap-1 text-xs text-[#64748B]"><BuildingOffice2Icon className="h-3.5 w-3.5" />{inv.company_name || `#${inv.company}`}</p>
+                      <div className="mt-1.5 flex flex-wrap gap-1.5"><RoleBadge role={inv.role} /><StatusBadge status={inv.status} /></div>
                     </div>
-                  </td>
-                  <td style={{ padding: "12px 16px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <EnvelopeIcon style={{ width: 12, height: 12, color: "#64748B", flexShrink: 0 }} />
-                      <span style={{ fontSize: 13, color: "var(--lt-f1f5f9, #F1F5F9)", fontWeight: 500 }}>{inv.email}</span>
-                    </div>
-                  </td>
-                  <td style={{ padding: "12px 16px" }}><RoleBadge role={inv.role} /></td>
-                  <td style={{ padding: "12px 16px" }}><StatusBadge status={inv.status} /></td>
-                  <td style={{ padding: "12px 16px", fontSize: 12, color: "var(--lt-94a3b8, #94A3B8)" }}>{inv.invited_by_email || "—"}</td>
-                  <td style={{ padding: "12px 16px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 5, color: "#64748B" }}>
-                      <ClockIcon style={{ width: 11, height: 11 }} />
-                      <span style={{ fontSize: 12 }}>{formatDate(inv.created_at)}</span>
-                    </div>
-                  </td>
-                  <td style={{ padding: "12px 16px", fontSize: 12, color: "#64748B" }}>{formatDate(inv.expires_at)}</td>
-                </tr>
+                  </div>
+                  <dl className="grid grid-cols-3 gap-2 text-xs">
+                    <div className="min-w-0"><dt className="text-[#64748B]">{columns[4]}</dt><dd className="truncate text-[#334155]">{inv.invited_by_email || "—"}</dd></div>
+                    <div><dt className="text-[#64748B]">{columns[5]}</dt><dd className="text-[#334155]">{formatDate(inv.created_at, language)}</dd></div>
+                    <div><dt className="text-[#64748B]">{columns[6]}</dt><dd className="text-[#334155]">{formatDate(inv.expires_at, language)}</dd></div>
+                  </dl>
+                </li>
               ))}
-            </tbody>
-          </table>
-          </div>
+            </ul>
+
+            {/* md and up: table */}
+            <div className="hidden overflow-x-auto md:block">
+              <table className="w-full text-sm">
+                <thead className="bg-[#F8FAFC]">
+                  <tr>{columns.map((h) => <th key={h} scope="col" className={head}>{h}</th>)}</tr>
+                </thead>
+                <tbody className="divide-y divide-[#F1F5F9]">
+                  {filtered.map((inv) => (
+                    <tr key={inv.id} className="transition-colors duration-150 hover:bg-[#F8FAFC]">
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-2.5">
+                          <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-md ${TONE.sky.icon}`}><BuildingOffice2Icon className="h-4 w-4" /></span>
+                          <span className="font-medium text-[#334155]">{inv.company_name || `#${inv.company}`}</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 font-medium text-[#0F172A]">{inv.email}</td>
+                      <td className="px-6 py-4"><RoleBadge role={inv.role} /></td>
+                      <td className="px-6 py-4"><StatusBadge status={inv.status} /></td>
+                      <td className="px-6 py-4 text-[#64748B]">{inv.invited_by_email || "—"}</td>
+                      <td className="whitespace-nowrap px-6 py-4 text-[#64748B]">
+                        <span className="inline-flex items-center gap-1.5"><ClockIcon className="h-4 w-4 text-[#94A3B8]" />{formatDate(inv.created_at, language)}</span>
+                      </td>
+                      <td className="whitespace-nowrap px-6 py-4 text-[#64748B]">{formatDate(inv.expires_at, language)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
-      </div>
+      </Card>
 
       {showModal && (
         <InviteModal
@@ -531,8 +319,6 @@ export default function PlatformAdminInvitations() {
           onSent={() => { load(); }}
         />
       )}
-
-      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }
