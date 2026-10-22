@@ -96,5 +96,22 @@ for (const vp of VIEWPORTS) {
       await page.mouse.wheel(0, -300);
       await expect(fab).toHaveCSS("opacity", "1");
     });
+
+    test("M-03 assignments: one readable card per assignment", async ({ page }) => {
+      await setupApp(page, withCompany);
+      await page.goto("/enterprise/learning/manage-assignments");
+      const cards = page.getByTestId("assignment-card");
+      await expect(cards).toHaveCount(2);
+      const first = cards.first();
+      await expect(first.getByText("QA-TEST Ruta de incorporación de operarios de planta")).toBeVisible();
+      await expect(first.getByText("Leo Gómez Martínez")).toBeVisible();
+      await expect(first.getByText(/Nov 15, 2026/)).toBeVisible();
+      await expect(cards.nth(1).getByText("Ventas Norte")).toBeVisible();
+      // Filters scroll inside their row, never the page.
+      await expect(page.getByRole("button", { name: "Overdue" })).toBeAttached();
+      await expectNoHorizontalOverflow(page);
+      await page.getByRole("button", { name: "Overdue" }).scrollIntoViewIfNeeded();
+      await expectNoHorizontalOverflow(page);
+    });
   });
 }

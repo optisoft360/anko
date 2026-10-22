@@ -328,13 +328,50 @@ function NewAssignmentModal({ companyId, onCreated, onClose }) {
 const COLUMN_FLEX = ["2 1 160px", "2 1 130px", "1 0 100px", "2 1 120px", "1 0 90px"];
 const EMPTY_CELL = <span style={{ fontSize: 11, color: "var(--text-tertiary)" }}>—</span>;
 
-function AssignmentRow({ a, onClick }) {
+function AssignmentRow({ a, onClick, variant = "row" }) {
   const { t, language } = useLanguage();
   const pct = a.progress?.percent_required ?? a.progress?.percent_total ?? 0;
   const completedMods = a.progress?.completed_modules ?? 0;
   const totalMods = a.progress?.total_modules ?? 0;
   const dueStr = formatCalendarDate(a.due_date, language);
   const isOverdue = a.is_overdue || a.status === "overdue";
+
+  const pathName = a.learning_path_name || a.path_name || a.name || "—";
+  const assignee = a.user_username || a.user
+    ? (a.full_name || a.user_username || `ID ${a.user}`)
+    : (a.team_name || a.team ? (a.team_name || t("enterprise.learning.assignmentsManager.row.team", { id: a.team })) : null);
+  const AssigneeIcon = a.user_username || a.user ? UsersIcon : UserGroupIcon;
+
+  if (variant === "card") return (
+    <div data-testid="assignment-card" onClick={onClick}
+      style={{ background: "var(--bg-surface)", border: `1px solid ${isOverdue ? "rgba(239,68,68,0.3)" : "var(--border)"}`, borderRadius: 10, padding: "14px", cursor: onClick ? "pointer" : "default" }}>
+      <div className="flex items-start justify-between gap-3">
+        <p className="min-w-0 text-sm font-semibold leading-snug [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2] overflow-hidden" style={{ color: "var(--text-primary)" }} title={pathName}>
+          {pathName}
+        </p>
+        <span className="shrink-0"><StatusPill status={isOverdue ? "overdue" : a.status} /></span>
+      </div>
+      <p className="mt-1.5 flex min-w-0 items-center gap-1.5 text-xs" style={{ color: "var(--text-secondary)" }}>
+        <AssigneeIcon className="h-3.5 w-3.5 shrink-0" style={{ color: "var(--text-tertiary)" }} />
+        <span className="shrink-0" style={{ color: "var(--text-tertiary)" }}>{t("enterprise.learning.assignmentsManager.columns.assignedTo")}:</span>
+        <span className="truncate">{assignee || "—"}</span>
+      </p>
+      {totalMods > 0 && (
+        <div className="mt-3 flex items-center gap-2">
+          <div className="flex-1"><ProgressBar value={pct} /></div>
+          <span className="shrink-0 text-[11px] font-bold tabular-nums" style={{ color: "var(--text-tertiary)" }}>{completedMods}/{totalMods}</span>
+        </div>
+      )}
+      {dueStr && (
+        <p className="mt-2 flex items-center gap-1 text-xs" style={{ color: isOverdue ? "var(--lt-f87171, #f87171)" : "var(--text-tertiary)" }}>
+          <ClockIcon className="h-3.5 w-3.5" /> {t("enterprise.learning.assignmentsManager.columns.dueDate")}: {dueStr}
+        </p>
+      )}
+      {a.assigned_by_username && (
+        <p className="mt-1 text-[11px]" style={{ color: "var(--text-tertiary)" }}>{t("enterprise.learning.assignmentsManager.row.by", { name: a.assigned_by_username })}</p>
+      )}
+    </div>
+  );
 
   return (
     <div style={{ background: "var(--bg-surface)", border: `1px solid ${isOverdue ? "rgba(239,68,68,0.3)" : "var(--border)"}`, borderRadius: 7, padding: "12px 16px", cursor: onClick ? "pointer" : "default", transition: "border-color 150ms, background 150ms" }}
@@ -453,7 +490,7 @@ export function AssignmentsManager() {
       </div>
 
       {/* Filters */}
-      <div className="flex items-center gap-1.5 flex-wrap">
+      <div className="-mx-4 flex items-center gap-1.5 overflow-x-auto px-4 pb-1 md:mx-0 md:flex-wrap md:overflow-visible md:px-0 md:pb-0 [&>button]:shrink-0 [&>button]:min-h-[40px] md:[&>button]:min-h-0">
         <FilterChip label={t("enterprise.learning.assignmentsManager.filters.all")} active={statusFilter === ""} onClick={() => setStatusFilter("")} />
         <FilterChip label={t("enterprise.learning.assignmentsManager.status.pending")} active={statusFilter === "pending"} onClick={() => setStatusFilter("pending")} />
         <FilterChip label={t("enterprise.learning.assignmentsManager.status.inProgress")} active={statusFilter === "in_progress"} onClick={() => setStatusFilter("in_progress")} />
@@ -463,7 +500,7 @@ export function AssignmentsManager() {
 
       {/* Column labels */}
       {!loading && filtered.length > 0 && (
-        <div data-testid="assignments-header" style={{ display: "flex", gap: 12, padding: "0 17px" }}>
+        <div data-testid="assignments-header" className="hidden md:flex" style={{ gap: 12, padding: "0 17px" }}>
           {columnHeaders.map((h, i) => (
             <p key={h} style={{ flex: COLUMN_FLEX[i], minWidth: 0, fontSize: 10, fontWeight: 700, color: "var(--text-tertiary)", textTransform: "uppercase", letterSpacing: "0.06em" }}>
               {h}
@@ -495,11 +532,17 @@ export function AssignmentsManager() {
           )}
         </div>
       ) : (
-        <div className="space-y-2">
-          {filtered.map((a) => (
-            <AssignmentRow key={a.id} a={a} />
-          ))}
-        </div>
+        <>
+          {/* Phones: cards. md and up: the original rows. */}
+          <div className="space-y-2 md:hidden">
+            {filtered.map((a) => <AssignmentRow key={a.id} a={a} variant="card" />)}
+          </div>
+          <div className="hidden space-y-2 md:block">
+            {filtered.map((a) => (
+              <AssignmentRow key={a.id} a={a} />
+            ))}
+          </div>
+        </>
       )}
 
       {!loading && filtered.length > 0 && (
