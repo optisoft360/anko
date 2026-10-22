@@ -1,12 +1,11 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import { ChatBubbleLeftEllipsisIcon } from "@heroicons/react/24/solid";
 import { DashboardNavbar, ChatPanel } from "@/widgets/layout";
 import { EnterpriseSidenav } from "@/widgets/layout/enterprise-sidenav";
 import { useLightTheme } from "@/hooks/useLightTheme";
+import { ChatFab } from "@/widgets/layout/chat-fab";
 import { EmployeeMobileTabBar } from "@/enterprise/components/EmployeeMobileTabBar";
 import { AdminMobileTabBar } from "@/enterprise/components/AdminMobileTabBar";
 import routes from "@/routes";
-import { useMaterialTailwindController, setOpenConfigurator } from "@/context";
 import { useAuth } from "@/context/auth-context";
 import { useEnterprise } from "@/enterprise/context/enterprise-context";
 
@@ -54,7 +53,6 @@ import OnboardingCompany from "@/enterprise/pages/onboarding/OnboardingCompany";
 import OnboardingInvite from "@/enterprise/pages/onboarding/OnboardingInvite";
 
 export function Enterprise() {
-  const [, dispatch] = useMaterialTailwindController();
   const { loading, hasCompany, allowedRoutes, isAdmin } = useAuth();
   const { role, activeCompany } = useEnterprise();
 
@@ -99,15 +97,9 @@ export function Enterprise() {
 
         <ChatPanel />
 
-        <button
-          className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-40 rounded-full flex items-center justify-center cursor-pointer"
-          style={{ width: 44, height: 44, background: "var(--accent)", border: "none", boxShadow: "0 4px 16px rgba(94,106,210,0.4)" }}
-          onClick={() => setOpenConfigurator(dispatch, true)}
-        >
-          <ChatBubbleLeftEllipsisIcon className="h-5 w-5 text-white" />
-        </button>
+        <ChatFab />
 
-        <div className="flex-grow flex flex-col px-4 pt-4 pb-24 md:p-6">
+        <div className="flex-grow flex flex-col px-4 pt-4 pb-36 md:p-6">
           <Routes>
             {/* Paths are relative to /enterprise/* */}
             <Route path="knowledge" element={<KnowledgeSources />} />

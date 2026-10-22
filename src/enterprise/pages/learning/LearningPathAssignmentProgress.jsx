@@ -468,7 +468,7 @@ function ProcessKnowledgeView({ ksId, moduleId, assignmentId, alreadyCompleted, 
 
       {!isDone && (
         <div style={{ borderTop: "1px solid var(--border)", padding: "12px 18px", background: "var(--bg-surface)", display: "flex", justifyContent: "flex-end" }}>
-          <button onClick={handleComplete} disabled={completing} className="ank-btn-accent text-xs" style={{ opacity: completing ? 0.7 : 1 }}>
+          <button onClick={handleComplete} disabled={completing} className="ank-btn-accent text-xs min-h-[44px] w-full justify-center sm:min-h-0 sm:w-auto" style={{ opacity: completing ? 0.7 : 1 }}>
             {completing ? <ArrowPathIcon className="h-3.5 w-3.5 animate-spin" /> : <><CheckCircleIcon className="h-3.5 w-3.5" /> {t("enterprise.learning.progress.markComplete")}</>}
           </button>
         </div>

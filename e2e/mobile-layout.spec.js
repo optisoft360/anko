@@ -77,5 +77,24 @@ for (const vp of VIEWPORTS) {
       await expectTappable(battery.getByRole("button", { name: /Simulate/ }));
       await expectNoHorizontalOverflow(page);
     });
+
+    test("M-06 chat button: hides on scroll down, never covers Mark process complete", async ({ page }) => {
+      await setupApp(page, withCompany);
+      await page.goto("/enterprise/learning/assignments/90");
+      const fab = page.getByTestId("chat-fab");
+      await expect(fab).toBeVisible();
+      const done = page.getByRole("button", { name: /Mark process complete/ });
+      await expect(done).toBeVisible();
+      await page.mouse.wheel(0, 2000);
+      await expect(fab).toHaveCSS("opacity", "0");
+      await expectTappable(done);
+      // The last content can scroll above the bottom bar.
+      await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+      const doneBox = await done.boundingBox();
+      const barTop = (await page.locator("nav.fixed.bottom-0").boundingBox()).y;
+      expect(doneBox.y + doneBox.height).toBeLessThanOrEqual(barTop);
+      await page.mouse.wheel(0, -300);
+      await expect(fab).toHaveCSS("opacity", "1");
+    });
   });
 }

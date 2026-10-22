@@ -1,11 +1,10 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import { ChatBubbleLeftEllipsisIcon } from "@heroicons/react/24/solid";
 import { DashboardNavbar, ChatPanel } from "@/widgets/layout";
 import { EnterpriseSidenav } from "@/widgets/layout/enterprise-sidenav";
 import { useLightTheme } from "@/hooks/useLightTheme";
+import { ChatFab } from "@/widgets/layout/chat-fab";
 import { MobileTabBar } from "@/widgets/layout/mobile-tab-bar";
 import routes from "@/routes";
-import { useMaterialTailwindController, setOpenConfigurator } from "@/context";
 import { useEnterprise } from "@/enterprise/context/enterprise-context";
 import { useAuth } from "@/context/auth-context";
 
@@ -14,7 +13,6 @@ import PlatformAdminUsers from "@/enterprise/pages/platform-admin/PlatformAdminU
 import PlatformAdminInvitations from "@/enterprise/pages/platform-admin/PlatformAdminInvitations";
 
 export function PlatformAdmin() {
-  const [, dispatch] = useMaterialTailwindController();
   const { isPlatformAdmin, initialized, activeCompany, role } = useEnterprise();
   const { allowedRoutes } = useAuth();
   useLightTheme();
@@ -54,15 +52,9 @@ export function PlatformAdmin() {
 
         <ChatPanel />
 
-        <button
-          className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-40 rounded-full flex items-center justify-center cursor-pointer"
-          style={{ width: 44, height: 44, background: "var(--accent)", border: "none", boxShadow: "0 4px 16px rgba(94,106,210,0.4)" }}
-          onClick={() => setOpenConfigurator(dispatch, true)}
-        >
-          <ChatBubbleLeftEllipsisIcon className="h-5 w-5 text-white" />
-        </button>
+        <ChatFab />
 
-        <div className="flex-grow flex flex-col px-4 pt-4 pb-24 md:p-6">
+        <div className="flex-grow flex flex-col px-4 pt-4 pb-36 md:p-6">
           <Routes>
             <Route path="companies" element={<PlatformAdminCompanies />} />
             <Route path="companies/:id/users" element={<PlatformAdminUsers />} />
