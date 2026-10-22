@@ -885,7 +885,7 @@ export function CompanySettings() {
     <div className="mx-auto w-full max-w-6xl space-y-5 sm:space-y-6 md:py-2">
       <PageHeader
         title={t("enterprise.settings.company.title")}
-        subtitle={company?.name.toUpperCase || activeCompany?.company_name || t("enterprise.settings.company.yourCompany")}
+        subtitle={company?.name?.toUpperCase() || activeCompany?.company_name || t("enterprise.settings.company.yourCompany")}
       />
 
       <Segmented
