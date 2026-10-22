@@ -10,6 +10,7 @@ import {
   PaperAirplaneIcon,
 } from "@heroicons/react/24/solid";
 import { useAuth } from "@/context/auth-context";
+import { useEnterprise } from "@/enterprise/context/enterprise-context";
 import { useLanguage } from "../../../context/language-context";
 import api from "@/services/api";
 import invitationsService from "@/services/invitationsService";
@@ -66,9 +67,9 @@ export default function InviteUser() {
   const navigate = useNavigate();
   const { t } = useLanguage();
   // Only platform admins may browse the platform-wide user directory (/api/users/).
-  const { companies, isAdmin } = useAuth();
-  const company = companies?.[0];
-  const companyId = company?.company_id;
+  const { isAdmin } = useAuth();
+  // The company selected in the enterprise area (same as Settings / Invitations), not the first one.
+  const { activeCompany: company, activeCompanyId: companyId } = useEnterprise();
   const ROLES = useRoles();
   const STAGES = useStages();
 

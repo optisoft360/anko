@@ -1,13 +1,16 @@
 import { useCompanySizes, useIndustries } from "../platform-admin/PlatformAdminCompanies";
-import React, { useEffect, useState, useCallback, useRef } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
-  PlusIcon, XMarkIcon, EllipsisHorizontalIcon, TrashIcon,
-  PencilIcon, UsersIcon, BuildingOfficeIcon, CheckCircleIcon,
-  UserPlusIcon, ChevronDownIcon,
+  PlusIcon, XMarkIcon, UsersIcon, BuildingOfficeIcon, CheckCircleIcon,
+  UserPlusIcon, ChevronDownIcon, InformationCircleIcon, Squares2X2Icon, UserGroupIcon,
 } from "@heroicons/react/24/outline";
 import { useEnterprise } from "../../context/enterprise-context";
 import { useLanguage } from "../../../context/language-context";
 import { companyApi, businessUnitApi, teamsApi } from "../../api/enterpriseApi";
+import {
+  Avatar, BTN_PRIMARY, BTN_SECONDARY, Badge, Card, CardHeader, DotMenu, EmptyBlock, FOCUS, Field,
+  Modal as KitModal, PageHeader, ROLE_TONE, SelectInput, Segmented, SkeletonRows, TONE, TextArea, TextInput,
+} from "../../components/ui/kit";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -15,20 +18,7 @@ const ALL_ROLES        = ["admin", "manager", "trainer", "employee", "auditor"];
 const PLATFORM_ROLES   = ["owner", "admin", "manager", "trainer", "employee", "auditor"];
 const STAGES = ["candidate", "onboarding", "trainee", "active_employee", "contractor", "former_employee"];
 
-const ROLE_COLORS = {
-  owner:    { bg: "rgba(168,85,247,0.15)", text: "#a855f7" },
-  admin:    { bg: "rgba(239,68,68,0.12)",  text: "#f87171" },
-  manager:  { bg: "rgba(59,130,246,0.12)", text: "#60a5fa" },
-  trainer:  { bg: "rgba(34,197,94,0.12)",  text: "#4ade80" },
-  employee: { bg: "rgba(255,255,255,0.07)","text": "#8B8B9C" },
-  auditor:  { bg: "rgba(245,158,11,0.12)", text: "#fbbf24" },
-};
-
-const STATUS_COLORS = {
-  active:    { bg: "rgba(74,222,128,0.12)",  text: "#4ade80"  },
-  suspended: { bg: "rgba(245,158,11,0.12)",  text: "#f59e0b"  },
-  removed:   { bg: "rgba(255,255,255,0.07)", text: "#8B8B9C" },
-};
+const STATUS_TONE = { active: "emerald", suspended: "amber", removed: "slate" };
 
 function useStageLabels() {
   const { t } = useLanguage();
@@ -42,132 +32,72 @@ function useStageLabels() {
   };
 }
 
+function useRoleLabel() {
+  const { t } = useLanguage();
+  return (role) => (ROLE_TONE[role] ? t(`enterprise.roles.${role}`) : role);
+}
+
 function RolePill({ role }) {
-  const c = ROLE_COLORS[role] || { bg: "var(--bg-elevated)", text: "var(--text-secondary)" };
-  return (
-    <span style={{ background: c.bg, color: c.text, fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 4, textTransform: "capitalize" }}>
-      {role}
-    </span>
-  );
+  const label = useRoleLabel();
+  return <Badge tone={ROLE_TONE[role] || "slate"}>{label(role)}</Badge>;
 }
 
 function StatusPill({ status }) {
   const { t } = useLanguage();
-  const c = STATUS_COLORS[status] || STATUS_COLORS.removed;
   const labels = {
     active: t("enterprise.settings.company.status.active"),
     suspended: t("enterprise.settings.company.status.suspended"),
     removed: t("enterprise.settings.company.status.removed"),
   };
-  return (
-    <span style={{ background: c.bg, color: c.text, fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 4 }}>
-      {labels[status] || status}
-    </span>
-  );
+  return <Badge tone={STATUS_TONE[status] || "slate"} dot>{labels[status] || status}</Badge>;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function FieldInput({ label, value, onChange, placeholder, type = "text", required }) {
   return (
-    <div>
-      <p style={{ color: "var(--text-primary)", fontWeight: 600, fontSize: 12, marginBottom: 5 }}>
-        {label}{required && " *"}
-      </p>
-      <input type={type} value={value} onChange={onChange} placeholder={placeholder} required={required}
-        style={{ width: "100%", background: "var(--bg-elevated)", border: "1px solid var(--border)", borderRadius: 6, padding: "8px 11px", color: "var(--text-primary)", fontSize: 13, outline: "none" }}
-        onFocus={(e) => { e.target.style.borderColor = "var(--accent)"; }}
-        onBlur={(e) => { e.target.style.borderColor = "var(--border)"; }} />
-    </div>
+    <Field label={label} required={required}>
+      <TextInput type={type} value={value} onChange={onChange} placeholder={placeholder} required={required} />
+    </Field>
   );
 }
 
 function FieldSelect({ label, value, onChange, children, required }) {
   return (
-    <div>
-      <p style={{ color: "var(--text-primary)", fontWeight: 600, fontSize: 12, marginBottom: 5 }}>
-        {label}{required && " *"}
-      </p>
-      <select value={value} onChange={(e) => onChange(e.target.value)}
-        style={{ width: "100%", background: "var(--bg-elevated)", border: "1px solid var(--border)", borderRadius: 6, padding: "8px 11px", color: "var(--text-primary)", fontSize: 13, outline: "none", cursor: "pointer" }}>
-        {children}
-      </select>
-    </div>
+    <Field label={label} required={required}>
+      <SelectInput value={value} onChange={(e) => onChange(e.target.value)}>{children}</SelectInput>
+    </Field>
   );
 }
 
 function FieldTextarea({ label, value, onChange, placeholder, rows = 2 }) {
   return (
-    <div>
-      <p style={{ color: "var(--text-primary)", fontWeight: 600, fontSize: 12, marginBottom: 5 }}>{label}</p>
-      <textarea rows={rows} value={value} onChange={onChange} placeholder={placeholder}
-        style={{ width: "100%", background: "var(--bg-elevated)", border: "1px solid var(--border)", borderRadius: 6, padding: "8px 11px", color: "var(--text-primary)", fontSize: 13, outline: "none", resize: "vertical" }}
-        onFocus={(e) => { e.target.style.borderColor = "var(--accent)"; }}
-        onBlur={(e) => { e.target.style.borderColor = "var(--border)"; }} />
-    </div>
+    <Field label={label}>
+      <TextArea rows={rows} value={value} onChange={onChange} placeholder={placeholder} />
+    </Field>
   );
 }
-
-// ─── Dropdown Menu ────────────────────────────────────────────────────────────
-
-function DotMenu({ items }) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef(null);
-  useEffect(() => {
-    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
-  return (
-    <div ref={ref} style={{ position: "relative" }}>
-      <button onClick={() => setOpen((v) => !v)}
-        style={{ padding: "4px 6px", borderRadius: 5, color: "var(--text-secondary)", cursor: "pointer", transition: "background 150ms" }}
-        onMouseEnter={(e) => { e.currentTarget.style.background = "var(--bg-elevated)"; }}
-        onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}>
-        <EllipsisHorizontalIcon style={{ width: 16, height: 16 }} />
-      </button>
-      {open && (
-        <div style={{ position: "absolute", right: 0, top: "100%", zIndex: 40, background: "var(--bg-surface)", border: "1px solid var(--border)", borderRadius: 7, minWidth: 160, boxShadow: "0 8px 24px var(--lt-rgba-0-0-0-0-4, rgba(0,0,0,0.4))", overflow: "hidden" }}>
-          {items.map((item, i) => (
-            <button key={i} onClick={() => { item.action(); setOpen(false); }}
-              style={{ width: "100%", textAlign: "left", padding: "8px 14px", fontSize: 12.5, color: item.danger ? "var(--lt-f87171, #f87171)" : "var(--text-primary)", cursor: "pointer", transition: "background 150ms" }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = item.danger ? "rgba(239,68,68,0.08)" : "var(--bg-elevated)"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}>
-              {item.label}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ─── Modal wrapper ────────────────────────────────────────────────────────────
 
 function Modal({ title, onClose, children, width = 420 }) {
-  return (
-    <div style={{ position: "fixed", inset: 0, background: "var(--lt-rgba-0-0-0-0-65, rgba(0,0,0,0.65))", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}
-      onClick={onClose}>
-      <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border)", borderRadius: 10, width: "100%", maxWidth: width, padding: 22, boxShadow: "0 20px 60px var(--lt-rgba-0-0-0-0-5, rgba(0,0,0,0.5))" }}
-        onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-center justify-between mb-4">
-          <p style={{ color: "var(--text-primary)", fontWeight: 700, fontSize: 14 }}>{title}</p>
-          <button onClick={onClose} style={{ color: "var(--text-tertiary)", cursor: "pointer", fontSize: 20, lineHeight: 1 }}>×</button>
-        </div>
-        {children}
-      </div>
-    </div>
-  );
+  return <KitModal title={title} onClose={onClose} width={width > 420 ? "max-w-lg" : "max-w-md"}>{children}</KitModal>;
 }
-
-// ─── Filter Chip ──────────────────────────────────────────────────────────────
 
 function FilterChip({ label, active, onClick }) {
   return (
-    <button onClick={onClick} style={{ padding: "4px 10px", borderRadius: 5, fontSize: 11, fontWeight: 600, cursor: "pointer", background: active ? "var(--accent)" : "var(--bg-elevated)", color: active ? "#fff" : "var(--text-secondary)", border: `1px solid ${active ? "var(--accent)" : "var(--border)"}`, transition: "all 150ms" }}>
+    <button type="button" onClick={onClick} aria-pressed={active}
+      className={`inline-flex h-9 cursor-pointer items-center whitespace-nowrap rounded-full border px-3.5 text-sm transition-colors duration-150 ${FOCUS} ${
+        active ? "border-[#4F46E5] bg-[#4F46E5] font-semibold text-white" : "border-[#E2E8F0] bg-white font-medium text-[#475569] hover:bg-[#F8FAFC]"}`}>
       {label}
     </button>
   );
+}
+
+function FormError({ children }) {
+  return <p className="rounded-lg border border-[#FECDD3] bg-[#FFF1F2] px-3 py-2 text-sm text-[#BE123C]">{children}</p>;
+}
+
+function ModalActions({ children }) {
+  return <div className="flex flex-col-reverse gap-2 border-t border-[#F1F5F9] pt-4 sm:flex-row sm:justify-end">{children}</div>;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -203,34 +133,42 @@ function InfoTab({ company, companyId }) {
   };
 
   return (
-    <form onSubmit={handleSave} className="space-y-4" style={{ maxWidth: 520 }}>
-      <FieldInput label={t("enterprise.settings.company.info.nameLabel")} value={form.name} onChange={set("name")} required />
-      <FieldInput label={t("enterprise.settings.company.info.websiteLabel")} value={form.website} onChange={set("website")} placeholder="https://…" />
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        {/* 18: Industry / Size are enum keys ("healthcare", "11_50"): choose them from translated options. */}
-        <FieldSelect label={t("enterprise.settings.company.info.industryLabel")} value={form.industry} onChange={(v) => setForm((f) => ({ ...f, industry: v }))}>
-          <option value="">—</option>
-          {INDUSTRIES.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-          {form.industry && !INDUSTRIES.some((o) => o.value === form.industry) && <option value={form.industry}>{form.industry}</option>}
-        </FieldSelect>
-        <FieldSelect label={t("enterprise.settings.company.info.sizeLabel")} value={form.company_size} onChange={(v) => setForm((f) => ({ ...f, company_size: v }))}>
-          <option value="">{t("enterprise.settings.company.info.sizePlaceholder")}</option>
-          {SIZES.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-          {form.company_size && !SIZES.some((o) => o.value === form.company_size) && <option value={form.company_size}>{form.company_size}</option>}
-        </FieldSelect>
-      </div>
-      <FieldTextarea label={t("enterprise.settings.company.info.descriptionLabel")} value={form.description} onChange={set("description")} rows={3} />
-      {error && <p style={{ color: "var(--lt-f87171, #f87171)", fontSize: 12 }}>{error}</p>}
-      {success && (
-        <div className="flex items-center gap-2">
-          <CheckCircleIcon style={{ width: 14, height: 14, color: "var(--lt-4ade80, #4ade80)" }} />
-          <p style={{ color: "var(--lt-4ade80, #4ade80)", fontSize: 12, fontWeight: 600 }}>{t("enterprise.settings.company.info.saved")}</p>
+    <Card>
+      <CardHeader icon={BuildingOfficeIcon} title={t("enterprise.settings.company.info.sectionTitle")} subtitle={t("enterprise.settings.company.info.sectionHint")} />
+      <form onSubmit={handleSave}>
+        <div className="grid grid-cols-1 gap-4 p-4 sm:p-6 md:grid-cols-2 md:gap-5">
+          <FieldInput label={t("enterprise.settings.company.info.nameLabel")} value={form.name} onChange={set("name")} required />
+          <FieldInput label={t("enterprise.settings.company.info.websiteLabel")} value={form.website} onChange={set("website")} placeholder="https://…" />
+          {/* 18: Industry / Size are enum keys ("healthcare", "11_50"): choose them from translated options. */}
+          <FieldSelect label={t("enterprise.settings.company.info.industryLabel")} value={form.industry} onChange={(v) => setForm((f) => ({ ...f, industry: v }))}>
+            <option value="">—</option>
+            {INDUSTRIES.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+            {form.industry && !INDUSTRIES.some((o) => o.value === form.industry) && <option value={form.industry}>{form.industry}</option>}
+          </FieldSelect>
+          <FieldSelect label={t("enterprise.settings.company.info.sizeLabel")} value={form.company_size} onChange={(v) => setForm((f) => ({ ...f, company_size: v }))}>
+            <option value="">{t("enterprise.settings.company.info.sizePlaceholder")}</option>
+            {SIZES.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+            {form.company_size && !SIZES.some((o) => o.value === form.company_size) && <option value={form.company_size}>{form.company_size}</option>}
+          </FieldSelect>
+          <div className="md:col-span-2">
+            <FieldTextarea label={t("enterprise.settings.company.info.descriptionLabel")} value={form.description} onChange={set("description")} rows={4} />
+          </div>
+          {error && <div className="md:col-span-2"><FormError>{error}</FormError></div>}
         </div>
-      )}
-      <button type="submit" disabled={saving} className="ank-btn-accent text-xs" style={{ opacity: saving ? 0.7 : 1 }}>
-        {saving ? t("enterprise.settings.company.info.saving") : t("enterprise.settings.company.info.save")}
-      </button>
-    </form>
+        <div className="flex flex-col gap-3 border-t border-[#F1F5F9] bg-[#F8FAFC] px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6 rounded-b-xl">
+          <div className="min-h-[20px]">
+            {success && (
+              <p className="inline-flex items-center gap-1.5 text-sm font-medium text-[#047857]">
+                <CheckCircleIcon className="h-4 w-4" /> {t("enterprise.settings.company.info.saved")}
+              </p>
+            )}
+          </div>
+          <button type="submit" disabled={saving} className={`${BTN_PRIMARY} w-full sm:w-auto`}>
+            {saving ? t("enterprise.settings.company.info.saving") : t("enterprise.settings.company.info.save")}
+          </button>
+        </div>
+      </form>
+    </Card>
   );
 }
 
@@ -240,6 +178,7 @@ function InfoTab({ company, companyId }) {
 
 function AddMemberModal({ companyId, availableRoles, onAdded, onClose }) {
   const { t } = useLanguage();
+  const roleLabel = useRoleLabel();
   const [form, setForm] = useState({ email: "", role: "employee", employee_stage: "onboarding" });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -261,24 +200,22 @@ function AddMemberModal({ companyId, availableRoles, onAdded, onClose }) {
 
   return (
     <Modal title={t("enterprise.settings.company.members.addModal.title")} onClose={onClose}>
-      <form onSubmit={handleSubmit} className="space-y-3">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <FieldInput label="Email" type="email" value={form.email} onChange={(e) => set("email")(e.target.value)} placeholder="juan@empresa.com" required />
-        <p style={{ color: "var(--text-tertiary)", fontSize: 11, marginTop: -6 }}>
-          {t("enterprise.settings.company.members.addModal.hint")}
-        </p>
+        <p className="-mt-1 text-xs text-[#64748B]">{t("enterprise.settings.company.members.addModal.hint")}</p>
         <FieldSelect label={t("enterprise.settings.company.members.addModal.roleLabel")} value={form.role} onChange={set("role")} required>
-          {availableRoles.map((r) => <option key={r} value={r} style={{ textTransform: "capitalize" }}>{r}</option>)}
+          {availableRoles.map((r) => <option key={r} value={r}>{roleLabel(r)}</option>)}
         </FieldSelect>
         <FieldSelect label={t("enterprise.settings.company.members.addModal.stageLabel")} value={form.employee_stage} onChange={set("employee_stage")} required>
           {STAGES.map((s) => <option key={s} value={s}>{STAGE_LABELS[s]}</option>)}
         </FieldSelect>
-        {error && <p style={{ color: "var(--lt-f87171, #f87171)", fontSize: 12 }}>{error}</p>}
-        <div className="flex justify-end gap-2 pt-1">
-          <button type="button" onClick={onClose} className="ank-btn-ghost text-xs">{t("enterprise.compliance.programs.cancel")}</button>
-          <button type="submit" disabled={saving} className="ank-btn-accent text-xs" style={{ opacity: saving ? 0.7 : 1 }}>
+        {error && <FormError>{error}</FormError>}
+        <ModalActions>
+          <button type="button" onClick={onClose} className={BTN_SECONDARY}>{t("enterprise.compliance.programs.cancel")}</button>
+          <button type="submit" disabled={saving} className={BTN_PRIMARY}>
             {saving ? t("enterprise.settings.company.members.adding") : <><UserPlusIcon className="h-3.5 w-3.5" /> {t("enterprise.settings.company.members.add")}</>}
           </button>
-        </div>
+        </ModalActions>
       </form>
     </Modal>
   );
@@ -286,6 +223,7 @@ function AddMemberModal({ companyId, availableRoles, onAdded, onClose }) {
 
 function ChangeRoleModal({ member, companyId, availableRoles, onChanged, onClose }) {
   const { t } = useLanguage();
+  const roleLabel = useRoleLabel();
   const [role, setRole] = useState(member.role === "owner" ? availableRoles[0] : member.role);
   const [saving, setSaving] = useState(false);
 
@@ -300,20 +238,20 @@ function ChangeRoleModal({ member, companyId, availableRoles, onChanged, onClose
 
   return (
     <Modal title={t("enterprise.settings.company.members.changeRoleModal.title")} onClose={onClose} width={360}>
-      <div className="space-y-3">
-        <p style={{ color: "var(--text-secondary)", fontSize: 12 }}>
-          {t("enterprise.settings.company.members.changeRoleModal.member")} <span style={{ color: "var(--text-primary)", fontWeight: 600 }}>{member.full_name || member.username || member.email}</span>
-          <br />{t("enterprise.settings.company.members.changeRoleModal.currentRole")} <RolePill role={member.role} />
-        </p>
+      <div className="space-y-4">
+        <div className="space-y-2 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-3 text-sm text-[#475569]">
+          <p>{t("enterprise.settings.company.members.changeRoleModal.member")} <span className="font-semibold text-[#0F172A]">{member.full_name || member.username || member.email}</span></p>
+          <p className="flex items-center gap-2">{t("enterprise.settings.company.members.changeRoleModal.currentRole")} <RolePill role={member.role} /></p>
+        </div>
         <FieldSelect label={t("enterprise.settings.company.members.changeRoleModal.newRole")} value={role} onChange={setRole}>
-          {availableRoles.map((r) => <option key={r} value={r} style={{ textTransform: "capitalize" }}>{r}</option>)}
+          {availableRoles.map((r) => <option key={r} value={r}>{roleLabel(r)}</option>)}
         </FieldSelect>
-        <div className="flex justify-end gap-2 pt-1">
-          <button onClick={onClose} className="ank-btn-ghost text-xs">{t("enterprise.compliance.programs.cancel")}</button>
-          <button onClick={handleSave} disabled={saving} className="ank-btn-accent text-xs">
+        <ModalActions>
+          <button onClick={onClose} className={BTN_SECONDARY}>{t("enterprise.compliance.programs.cancel")}</button>
+          <button onClick={handleSave} disabled={saving} className={BTN_PRIMARY}>
             {saving ? t("enterprise.settings.company.info.saving") : t("enterprise.settings.company.members.changeRoleModal.save")}
           </button>
-        </div>
+        </ModalActions>
       </div>
     </Modal>
   );
@@ -359,6 +297,12 @@ function MembersTab({ companyId }) {
     }
   };
 
+  const memberMenu = (m) => [
+    { label: t("enterprise.settings.company.members.menu.changeRole"), action: () => setModal({ type: "role", member: m }) },
+    ...(m.status === "active" ? [{ label: t("enterprise.settings.company.members.menu.resendWelcome"), action: () => handleResendWelcome(m) }] : []),
+    ...(m.status !== "removed" ? [{ label: t("enterprise.settings.company.members.menu.remove"), danger: true, action: () => handleRemove(m) }] : []),
+  ];
+
   const columns = [
     t("enterprise.settings.company.members.columns.name"),
     t("enterprise.settings.company.members.columns.email"),
@@ -378,81 +322,89 @@ function MembersTab({ companyId }) {
       )}
 
       {resendMsg && (
-        <div style={{
-          background: resendMsg.type === "ok" ? "rgba(74,222,128,0.1)" : "rgba(248,113,113,0.1)",
-          border: `1px solid ${resendMsg.type === "ok" ? "rgba(74,222,128,0.3)" : "rgba(248,113,113,0.3)"}`,
-          color: resendMsg.type === "ok" ? "var(--lt-4ade80, #4ade80)" : "var(--lt-f87171, #f87171)",
-          borderRadius: 7, padding: "8px 12px", fontSize: 12.5,
-        }}>
+        <p role="status" className={`rounded-lg border px-3.5 py-2.5 text-sm ${resendMsg.type === "ok" ? "border-[#A7F3D0] bg-[#ECFDF5] text-[#047857]" : "border-[#FECDD3] bg-[#FFF1F2] text-[#BE123C]"}`}>
           {resendMsg.text}
-        </div>
+        </p>
       )}
 
-      {/* Controls */}
-      <div className="flex items-center justify-between gap-3 flex-wrap">
-        <div className="flex items-center gap-1.5 flex-wrap">
+      <Card>
+        <CardHeader
+          icon={UserGroupIcon}
+          title={t("enterprise.settings.company.tabs.members")}
+          subtitle={!loading ? t("enterprise.settings.company.members.count", { count: members.length, plural: members.length !== 1 ? "s" : "" }) : undefined}
+          actions={canManage && (
+            <button type="button" onClick={() => setModal("add")} className={`${BTN_PRIMARY} w-full sm:w-auto`}>
+              <UserPlusIcon className="h-4 w-4" /> {t("enterprise.settings.company.members.addMember")}
+            </button>
+          )}
+        />
+        <div className="flex gap-2 overflow-x-auto border-b border-[#F1F5F9] px-4 py-3 sm:px-6">
           <FilterChip label={t("enterprise.settings.company.members.filters.active")} active={statusFilter === "active"} onClick={() => setStatusFilter("active")} />
           <FilterChip label={t("enterprise.settings.company.members.filters.removed")} active={statusFilter === "removed"} onClick={() => setStatusFilter("removed")} />
           <FilterChip label={t("enterprise.settings.company.members.filters.all")} active={statusFilter === "all"} onClick={() => setStatusFilter("all")} />
         </div>
-        {canManage && (
-          <button onClick={() => setModal("add")} className="ank-btn-accent text-xs">
-            <UserPlusIcon className="h-3.5 w-3.5" /> {t("enterprise.settings.company.members.addMember")}
-          </button>
-        )}
-      </div>
 
-      {/* Table */}
-      {loading ? (
-        <div className="space-y-2">
-          {[1, 2, 3].map((i) => <div key={i} style={{ height: 44, background: "var(--bg-elevated)", borderRadius: 6 }} className="animate-pulse" />)}
-        </div>
-      ) : members.length === 0 ? (
-        <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border)", borderRadius: 8, padding: "40px 24px", textAlign: "center" }}>
-          <p style={{ color: "var(--text-tertiary)", fontSize: 13 }}>{t("enterprise.settings.company.members.empty")}</p>
-        </div>
-      ) : (
-        <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border)", borderRadius: 8, overflow: "hidden" }}>
-          <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead>
-              <tr style={{ borderBottom: "1px solid var(--border)" }}>
-                {columns.map((h, i) => (
-                  <th key={i} style={{ textAlign: "left", padding: "10px 14px", fontSize: 10, fontWeight: 700, color: "var(--text-tertiary)", letterSpacing: "0.06em", textTransform: "uppercase", background: "var(--bg-elevated)" }}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {members.map((m, i) => (
-                <tr key={m.id} style={{ borderBottom: i < members.length - 1 ? "1px solid var(--border)" : "none" }}
-                  onMouseEnter={(e) => { e.currentTarget.style.background = "var(--bg-elevated)"; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}>
-                  <td style={{ padding: "10px 14px", fontSize: 13, fontWeight: 600, color: "var(--text-primary)" }}>
-                    {m.full_name || m.username || "—"}
-                  </td>
-                  <td style={{ padding: "10px 14px", fontSize: 12, color: "var(--text-secondary)" }}>{m.email || "—"}</td>
-                  <td style={{ padding: "10px 14px" }}><RolePill role={m.role} /></td>
-                  <td style={{ padding: "10px 14px", fontSize: 11, color: "var(--text-tertiary)" }}>
-                    {STAGE_LABELS[m.employee_stage] || "—"}
-                  </td>
-                  <td style={{ padding: "10px 14px" }}><StatusPill status={m.status} /></td>
-                  <td style={{ padding: "10px 14px" }}>
-                    {canManage && m.role !== "owner" && (
-                      <DotMenu items={[
-                        { label: t("enterprise.settings.company.members.menu.changeRole"), action: () => setModal({ type: "role", member: m }) },
-                        ...(m.status === "active" ? [{ label: t("enterprise.settings.company.members.menu.resendWelcome"), action: () => handleResendWelcome(m) }] : []),
-                        ...(m.status !== "removed" ? [{ label: t("enterprise.settings.company.members.menu.remove"), danger: true, action: () => handleRemove(m) }] : []),
-                      ]} />
-                    )}
-                  </td>
-                </tr>
+        {loading ? (
+          <SkeletonRows rows={3} />
+        ) : members.length === 0 ? (
+          <EmptyBlock icon={UsersIcon} title={t("enterprise.settings.company.members.empty")} />
+        ) : (
+          <>
+            {/* Phones: one card per member */}
+            <ul className="divide-y divide-[#F1F5F9] md:hidden">
+              {members.map((m) => (
+                <li key={m.id} className="flex items-start gap-3 px-4 py-4">
+                  <Avatar name={m.full_name || m.username || m.email} tone={ROLE_TONE[m.role] || "indigo"} />
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-semibold text-[#0F172A]">{m.full_name || m.username || "—"}</p>
+                    <p className="break-all text-xs text-[#64748B]">{m.email || "—"}</p>
+                    <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                      <RolePill role={m.role} />
+                      <StatusPill status={m.status} />
+                      {STAGE_LABELS[m.employee_stage] && <Badge tone="slate">{STAGE_LABELS[m.employee_stage]}</Badge>}
+                    </div>
+                  </div>
+                  {canManage && m.role !== "owner" && <DotMenu items={memberMenu(m)} />}
+                </li>
               ))}
-            </tbody>
-          </table>
-          </div>
-        </div>
-      )}
-      {!loading && <p style={{ color: "var(--text-tertiary)", fontSize: 11 }}>{t("enterprise.settings.company.members.count", { count: members.length, plural: members.length !== 1 ? "s" : "" })}</p>}
+            </ul>
+
+            {/* md and up: table */}
+            <div className="hidden overflow-x-auto md:block">
+              <table className="w-full text-sm">
+                <thead className="bg-[#F8FAFC]">
+                  <tr>
+                    {columns.map((h, i) => (
+                      <th key={i} scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wide text-[#64748B]">
+                        {h || <span className="sr-only">{t("enterprise.invitations.columns.actions")}</span>}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#F1F5F9]">
+                  {members.map((m) => (
+                    <tr key={m.id} className="transition-colors duration-150 hover:bg-[#F8FAFC]">
+                      <td className="px-6 py-3.5">
+                        <div className="flex items-center gap-3">
+                          <Avatar name={m.full_name || m.username || m.email} tone={ROLE_TONE[m.role] || "indigo"} size="sm" />
+                          <span className="font-medium text-[#0F172A]">{m.full_name || m.username || "—"}</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-3.5 text-[#64748B]">{m.email || "—"}</td>
+                      <td className="px-6 py-3.5"><RolePill role={m.role} /></td>
+                      <td className="px-6 py-3.5 text-[#64748B]">{STAGE_LABELS[m.employee_stage] || "—"}</td>
+                      <td className="px-6 py-3.5"><StatusPill status={m.status} /></td>
+                      <td className="px-6 py-3.5 text-right">
+                        {canManage && m.role !== "owner" && <div className="flex justify-end"><DotMenu items={memberMenu(m)} /></div>}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
+      </Card>
     </div>
   );
 }
@@ -486,7 +438,7 @@ function BUModal({ companyId, bu, members, onSaved, onClose }) {
 
   return (
     <Modal title={editing ? t("enterprise.settings.company.units.editModal.title") : t("enterprise.settings.company.units.editModal.newTitle")} onClose={onClose}>
-      <form onSubmit={handleSubmit} className="space-y-3">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <FieldInput label={t("enterprise.settings.company.units.editModal.nameLabel")} value={form.name} onChange={(e) => set("name")(e.target.value)} required />
           <FieldInput label={t("enterprise.settings.company.units.editModal.codeLabel")} value={form.code} onChange={(e) => set("code")(e.target.value.toUpperCase())} placeholder="COM" required />
@@ -498,13 +450,13 @@ function BUModal({ companyId, bu, members, onSaved, onClose }) {
             <option key={m.user} value={m.user}>{m.full_name || m.username} ({m.role})</option>
           ))}
         </FieldSelect>
-        {error && <p style={{ color: "var(--lt-f87171, #f87171)", fontSize: 12 }}>{error}</p>}
-        <div className="flex justify-end gap-2 pt-1">
-          <button type="button" onClick={onClose} className="ank-btn-ghost text-xs">{t("enterprise.compliance.programs.cancel")}</button>
-          <button type="submit" disabled={saving} className="ank-btn-accent text-xs">
+        {error && <FormError>{error}</FormError>}
+        <ModalActions>
+          <button type="button" onClick={onClose} className={BTN_SECONDARY}>{t("enterprise.compliance.programs.cancel")}</button>
+          <button type="submit" disabled={saving} className={BTN_PRIMARY}>
             {saving ? t("enterprise.settings.company.info.saving") : editing ? t("enterprise.settings.company.info.save") : t("enterprise.settings.company.units.create")}
           </button>
-        </div>
+        </ModalActions>
       </form>
     </Modal>
   );
@@ -540,57 +492,56 @@ function BusinessUnitsTab({ companyId }) {
       {modal && (
         <BUModal companyId={companyId} bu={modal === "create" ? null : modal} members={members} onSaved={load} onClose={() => setModal(null)} />
       )}
-      <div className="flex justify-between items-center">
-        <p style={{ color: "var(--text-tertiary)", fontSize: 11 }}>{t("enterprise.settings.company.units.count", { count: units.length, plural: units.length !== 1 ? (language === "es" ? "es" : "s") : "" })}</p>
-        {canManage && (
-          <button onClick={() => setModal("create")} className="ank-btn-accent text-xs">
-            <PlusIcon className="h-3.5 w-3.5" /> {t("enterprise.settings.company.units.newUnit")}
-          </button>
-        )}
-      </div>
-
-      {loading ? (
-        <div className="space-y-2">
-          {[1, 2].map((i) => <div key={i} style={{ height: 56, background: "var(--bg-elevated)", borderRadius: 6 }} className="animate-pulse" />)}
-        </div>
-      ) : units.length === 0 ? (
-        <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border)", borderRadius: 8, padding: "36px 24px", textAlign: "center" }}>
-          <BuildingOfficeIcon style={{ width: 24, height: 24, color: "var(--text-tertiary)", margin: "0 auto 8px" }} />
-          <p style={{ color: "var(--text-tertiary)", fontSize: 13 }}>{t("enterprise.settings.company.units.empty")}</p>
-          {canManage && (
-            <button onClick={() => setModal("create")} className="ank-btn-accent text-xs mt-3">
-              <PlusIcon className="h-3.5 w-3.5" /> {t("enterprise.settings.company.units.newUnit")}
+      <Card>
+        <CardHeader
+          icon={Squares2X2Icon}
+          title={t("enterprise.settings.company.tabs.units")}
+          subtitle={!loading ? t("enterprise.settings.company.units.count", { count: units.length, plural: units.length !== 1 ? (language === "es" ? "es" : "s") : "" }) : undefined}
+          actions={canManage && units.length > 0 && (
+            <button type="button" onClick={() => setModal("create")} className={`${BTN_PRIMARY} w-full sm:w-auto`}>
+              <PlusIcon className="h-4 w-4" /> {t("enterprise.settings.company.units.newUnit")}
             </button>
           )}
-        </div>
-      ) : (
-        <div className="space-y-2">
-          {units.map((bu) => (
-            <div key={bu.id}
-              style={{ background: "var(--bg-surface)", border: "1px solid var(--border)", borderRadius: 7, padding: "12px 16px" }}
-              className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-3 min-w-0">
-                <span style={{ background: "var(--bg-elevated)", color: "var(--accent)", fontSize: 10, fontWeight: 800, padding: "3px 8px", borderRadius: 4, flexShrink: 0, letterSpacing: "0.05em" }}>
-                  {bu.code}
-                </span>
-                <div className="min-w-0">
-                  <p style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)" }}>{bu.name}</p>
-                  <p style={{ fontSize: 11, color: "var(--text-tertiary)", marginTop: 1 }}>
-                    {t("enterprise.settings.company.units.teamCount", { count: bu.team_count ?? 0, plural: bu.team_count !== 1 ? "s" : "" })}
-                    {bu.manager_username ? ` · ${t("enterprise.settings.company.units.managerSuffix", { name: bu.manager_username })}` : ""}
-                  </p>
+        />
+        {loading ? (
+          <SkeletonRows rows={2} height="h-16" />
+        ) : units.length === 0 ? (
+          <EmptyBlock
+            icon={BuildingOfficeIcon}
+            title={t("enterprise.settings.company.units.empty")}
+            action={canManage && (
+              <button type="button" onClick={() => setModal("create")} className={BTN_PRIMARY}>
+                <PlusIcon className="h-4 w-4" /> {t("enterprise.settings.company.units.newUnit")}
+              </button>
+            )}
+          />
+        ) : (
+          <ul className="divide-y divide-[#F1F5F9]">
+            {units.map((bu) => (
+              <li key={bu.id} className="flex items-center justify-between gap-3 px-4 py-3.5 sm:px-6">
+                <div className="flex min-w-0 items-center gap-3">
+                  <span className={`grid h-10 min-w-[2.75rem] shrink-0 place-items-center rounded-lg px-2 text-xs font-bold tracking-wide ${TONE.indigo.icon}`}>
+                    {bu.code}
+                  </span>
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold text-[#0F172A]">{bu.name}</p>
+                    <p className="truncate text-xs text-[#64748B]">
+                      {t("enterprise.settings.company.units.teamCount", { count: bu.team_count ?? 0, plural: bu.team_count !== 1 ? "s" : "" })}
+                      {bu.manager_username ? ` · ${t("enterprise.settings.company.units.managerSuffix", { name: bu.manager_username })}` : ""}
+                    </p>
+                  </div>
                 </div>
-              </div>
-              {canManage && (
-                <DotMenu items={[
-                  { label: t("enterprise.settings.company.units.menu.edit"), action: () => setModal(bu) },
-                  { label: t("enterprise.settings.company.units.menu.delete"), danger: true, action: () => handleDelete(bu) },
-                ]} />
-              )}
-            </div>
-          ))}
-        </div>
-      )}
+                {canManage && (
+                  <DotMenu items={[
+                    { label: t("enterprise.settings.company.units.menu.edit"), action: () => setModal(bu) },
+                    { label: t("enterprise.settings.company.units.menu.delete"), danger: true, action: () => handleDelete(bu) },
+                  ]} />
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </Card>
     </div>
   );
 }
@@ -624,7 +575,7 @@ function TeamModal({ companyId, team, members, units, onSaved, onClose }) {
 
   return (
     <Modal title={editing ? t("enterprise.settings.company.teams.editModal.title") : t("enterprise.settings.company.teams.editModal.newTitle")} onClose={onClose}>
-      <form onSubmit={handleSubmit} className="space-y-3">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <FieldInput label={t("enterprise.settings.company.units.editModal.nameLabel")} value={form.name} onChange={(e) => set("name")(e.target.value)} required />
         <FieldSelect label={t("enterprise.settings.company.teams.editModal.buLabel")} value={form.business_unit} onChange={set("business_unit")}>
           <option value="">{t("enterprise.settings.company.teams.editModal.noUnit")}</option>
@@ -637,13 +588,13 @@ function TeamModal({ companyId, team, members, units, onSaved, onClose }) {
           ))}
         </FieldSelect>
         <FieldTextarea label={t("enterprise.settings.company.info.descriptionLabel")} value={form.description} onChange={(e) => set("description")(e.target.value)} />
-        {error && <p style={{ color: "var(--lt-f87171, #f87171)", fontSize: 12 }}>{error}</p>}
-        <div className="flex justify-end gap-2 pt-1">
-          <button type="button" onClick={onClose} className="ank-btn-ghost text-xs">{t("enterprise.compliance.programs.cancel")}</button>
-          <button type="submit" disabled={saving} className="ank-btn-accent text-xs">
+        {error && <FormError>{error}</FormError>}
+        <ModalActions>
+          <button type="button" onClick={onClose} className={BTN_SECONDARY}>{t("enterprise.compliance.programs.cancel")}</button>
+          <button type="submit" disabled={saving} className={BTN_PRIMARY}>
             {saving ? t("enterprise.settings.company.info.saving") : editing ? t("enterprise.settings.company.members.changeRoleModal.save") : t("enterprise.settings.company.teams.createTeam")}
           </button>
-        </div>
+        </ModalActions>
       </form>
     </Modal>
   );
@@ -676,45 +627,40 @@ function AddTeamMemberModal({ team, companyMembers, currentMemberIds, onAdded, o
 
   return (
     <Modal title={t("enterprise.settings.company.teams.addMemberModal.title", { name: team.name })} onClose={onClose}>
-      <div className="space-y-3">
-        <input placeholder={t("enterprise.settings.company.teams.addMemberModal.searchPlaceholder")} value={search} onChange={(e) => setSearch(e.target.value)}
-          style={{ width: "100%", background: "var(--bg-elevated)", border: "1px solid var(--border)", borderRadius: 6, padding: "8px 11px", color: "var(--text-primary)", fontSize: 12, outline: "none" }}
-          onFocus={(e) => { e.target.style.borderColor = "var(--accent)"; }}
-          onBlur={(e) => { e.target.style.borderColor = "var(--border)"; }} />
-        <div style={{ maxHeight: 200, overflowY: "auto" }} className="space-y-1">
+      <div className="space-y-4">
+        <TextInput placeholder={t("enterprise.settings.company.teams.addMemberModal.searchPlaceholder")} value={search} onChange={(e) => setSearch(e.target.value)} />
+        <div className="max-h-64 space-y-1.5 overflow-y-auto">
           {available.length === 0 ? (
-            <p style={{ color: "var(--text-tertiary)", fontSize: 12, textAlign: "center", padding: "12px 0" }}>
-              {t("enterprise.settings.company.teams.addMemberModal.noneAvailable")}
-            </p>
-          ) : available.map((m) => (
-            <button key={m.user} type="button" onClick={() => setSelectedUser(selectedUser?.user === m.user ? null : m)}
-              style={{ width: "100%", textAlign: "left", background: selectedUser?.user === m.user ? "var(--bg-accent)" : "var(--bg-elevated)", border: `1px solid ${selectedUser?.user === m.user ? "var(--accent)" : "var(--border)"}`, borderRadius: 5, padding: "8px 11px", cursor: "pointer", transition: "all 150ms" }}>
-              <div className="flex items-center gap-2">
-                <div style={{ width: 26, height: 26, borderRadius: "50%", background: "var(--accent-muted)", color: "var(--accent)", fontSize: 10, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                  {(m.full_name || m.username || "?").charAt(0).toUpperCase()}
-                </div>
-                <div>
-                  <p style={{ fontSize: 12.5, fontWeight: 500, color: "var(--text-primary)" }}>{m.full_name || m.username}</p>
-                  <p style={{ fontSize: 10, color: "var(--text-tertiary)" }}>{m.email}</p>
-                </div>
+            <p className="py-4 text-center text-sm text-[#64748B]">{t("enterprise.settings.company.teams.addMemberModal.noneAvailable")}</p>
+          ) : available.map((m) => {
+            const selected = selectedUser?.user === m.user;
+            return (
+              <button key={m.user} type="button" onClick={() => setSelectedUser(selected ? null : m)} aria-pressed={selected}
+                className={`flex w-full cursor-pointer items-center gap-3 rounded-lg border px-3 py-2.5 text-left transition-colors duration-150 ${FOCUS} ${
+                  selected ? "border-[#6366F1] bg-[#EEF2FF]" : "border-[#E2E8F0] bg-white hover:bg-[#F8FAFC]"}`}>
+                <Avatar name={m.full_name || m.username} tone={ROLE_TONE[m.role] || "indigo"} size="sm" />
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-sm font-medium text-[#0F172A]">{m.full_name || m.username}</span>
+                  <span className="block truncate text-xs text-[#64748B]">{m.email}</span>
+                </span>
                 <RolePill role={m.role} />
-              </div>
-            </button>
-          ))}
+              </button>
+            );
+          })}
         </div>
         {selectedUser && (
           <FieldSelect label={t("enterprise.settings.company.teams.addMemberModal.teamRole")} value={role} onChange={setRole}>
-            <option value="member">Member</option>
-            <option value="manager">Manager</option>
+            <option value="member">{t("enterprise.settings.company.teams.memberRole")}</option>
+            <option value="manager">{t("enterprise.roles.manager")}</option>
           </FieldSelect>
         )}
-        {error && <p style={{ color: "var(--lt-f87171, #f87171)", fontSize: 12 }}>{error}</p>}
-        <div className="flex justify-end gap-2 pt-1">
-          <button onClick={onClose} className="ank-btn-ghost text-xs">{t("enterprise.compliance.programs.cancel")}</button>
-          <button onClick={handleAdd} disabled={!selectedUser || saving} className="ank-btn-accent text-xs" style={{ opacity: !selectedUser || saving ? 0.6 : 1 }}>
+        {error && <FormError>{error}</FormError>}
+        <ModalActions>
+          <button onClick={onClose} className={BTN_SECONDARY}>{t("enterprise.compliance.programs.cancel")}</button>
+          <button onClick={handleAdd} disabled={!selectedUser || saving} className={BTN_PRIMARY}>
             {saving ? t("enterprise.settings.company.members.adding") : t("enterprise.settings.company.members.add")}
           </button>
-        </div>
+        </ModalActions>
       </div>
     </Modal>
   );
@@ -741,7 +687,7 @@ function TeamMembersPanel({ team, companyMembers, onClose }) {
   };
 
   return (
-    <div style={{ borderTop: "1px solid var(--border)", background: "var(--bg-elevated)", padding: "14px 16px" }}>
+    <div className="border-t border-[#F1F5F9] bg-[#F8FAFC] px-4 py-4 sm:px-6">
       {showAdd && (
         <AddTeamMemberModal
           team={team}
@@ -750,43 +696,36 @@ function TeamMembersPanel({ team, companyMembers, onClose }) {
           onAdded={() => { setShowAdd(false); load(); }}
           onClose={() => setShowAdd(false)} />
       )}
-      <div className="flex items-center justify-between mb-3">
-        <p style={{ color: "var(--text-tertiary)", fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <p className="text-xs font-semibold uppercase tracking-wide text-[#64748B]">
           {t("enterprise.settings.company.teams.membersHeading", { count: members.length })}
         </p>
-        <button onClick={() => setShowAdd(true)} className="ank-btn-ghost text-xs">
-          <PlusIcon className="h-3 w-3" /> {t("enterprise.settings.company.members.add")}
+        <button type="button" onClick={() => setShowAdd(true)} className={BTN_SECONDARY}>
+          <PlusIcon className="h-4 w-4" /> {t("enterprise.settings.company.members.add")}
         </button>
       </div>
       {loading ? (
-        <div className="space-y-1.5">
-          {[1, 2].map((i) => <div key={i} style={{ height: 34, background: "var(--bg-surface)", borderRadius: 5 }} className="animate-pulse" />)}
+        <div className="space-y-2">
+          {[1, 2].map((i) => <div key={i} className="h-12 animate-pulse rounded-lg bg-white" />)}
         </div>
       ) : members.length === 0 ? (
-        <p style={{ color: "var(--text-tertiary)", fontSize: 12, textAlign: "center", padding: "10px 0" }}>{t("enterprise.settings.company.teams.noMembersYet")}</p>
+        <p className="py-3 text-center text-sm text-[#64748B]">{t("enterprise.settings.company.teams.noMembersYet")}</p>
       ) : (
-        <div className="space-y-1.5">
+        <ul className="space-y-2">
           {members.map((m) => (
-            <div key={m.id} style={{ background: "var(--bg-surface)", border: "1px solid var(--border)", borderRadius: 5, padding: "7px 10px" }}
-              className="flex items-center justify-between gap-2">
-              <div className="flex items-center gap-2 min-w-0">
-                <div style={{ width: 22, height: 22, borderRadius: "50%", background: "var(--accent-muted)", color: "var(--accent)", fontSize: 9, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                  {(m.full_name || m.username || "?").charAt(0).toUpperCase()}
-                </div>
-                <p style={{ fontSize: 12, fontWeight: 500, color: "var(--text-primary)" }}>{m.full_name || m.username}</p>
-                <span style={{ fontSize: 9, fontWeight: 700, padding: "1px 5px", borderRadius: 3, textTransform: "capitalize", background: m.role === "manager" ? "rgba(59,130,246,0.12)" : "var(--bg-elevated)", color: m.role === "manager" ? "var(--lt-60a5fa, #60a5fa)" : "var(--text-tertiary)" }}>
-                  {m.role}
-                </span>
+            <li key={m.id} className="flex items-center justify-between gap-3 rounded-lg border border-[#E2E8F0] bg-white px-3 py-2">
+              <div className="flex min-w-0 items-center gap-2.5">
+                <Avatar name={m.full_name || m.username} tone={m.role === "manager" ? "sky" : "indigo"} size="sm" />
+                <p className="truncate text-sm font-medium text-[#0F172A]">{m.full_name || m.username}</p>
+                <Badge tone={m.role === "manager" ? "sky" : "slate"}>{m.role === "manager" ? t("enterprise.roles.manager") : t("enterprise.settings.company.teams.memberRole")}</Badge>
               </div>
-              <button onClick={() => handleRemove(m.user)}
-                style={{ color: "var(--text-tertiary)", padding: 3, borderRadius: 4, flexShrink: 0, cursor: "pointer", transition: "all 150ms" }}
-                onMouseEnter={(e) => { e.currentTarget.style.color = "var(--lt-f87171, #f87171)"; e.currentTarget.style.background = "rgba(239,68,68,0.1)"; }}
-                onMouseLeave={(e) => { e.currentTarget.style.color = "var(--text-tertiary)"; e.currentTarget.style.background = "transparent"; }}>
-                <XMarkIcon style={{ width: 12, height: 12 }} />
+              <button type="button" onClick={() => handleRemove(m.user)} aria-label={t("enterprise.settings.company.members.menu.remove")}
+                className={`grid h-9 w-9 shrink-0 cursor-pointer place-items-center rounded-lg text-[#94A3B8] transition-colors hover:bg-[#FFF1F2] hover:text-[#E11D48] ${FOCUS}`}>
+                <XMarkIcon className="h-4 w-4" />
               </button>
-            </div>
+            </li>
           ))}
-        </div>
+        </ul>
       )}
     </div>
   );
@@ -830,75 +769,80 @@ function TeamsTab({ companyId }) {
           members={companyMembers} units={units} onSaved={load} onClose={() => setModal(null)} />
       )}
 
-      {/* Controls */}
-      <div className="flex items-center justify-between gap-3 flex-wrap">
-        <div className="flex items-center gap-1.5 flex-wrap">
-          <FilterChip label={t("enterprise.settings.company.members.filters.all")} active={buFilter === ""} onClick={() => setBuFilter("")} />
-          {units.map((u) => (
-            <FilterChip key={u.id} label={u.name} active={buFilter === String(u.id)} onClick={() => setBuFilter(String(u.id))} />
-          ))}
-        </div>
-        {canManage && (
-          <button onClick={() => setModal("create")} className="ank-btn-accent text-xs">
-            <PlusIcon className="h-3.5 w-3.5" /> {t("enterprise.settings.company.teams.newTeam")}
-          </button>
-        )}
-      </div>
-
-      {loading ? (
-        <div className="space-y-2">
-          {[1, 2, 3].map((i) => <div key={i} style={{ height: 60, background: "var(--bg-elevated)", borderRadius: 6 }} className="animate-pulse" />)}
-        </div>
-      ) : filtered.length === 0 ? (
-        <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border)", borderRadius: 8, padding: "36px 24px", textAlign: "center" }}>
-          <UsersIcon style={{ width: 24, height: 24, color: "var(--text-tertiary)", margin: "0 auto 8px" }} />
-          <p style={{ color: "var(--text-tertiary)", fontSize: 13 }}>{t("enterprise.settings.company.teams.empty")}</p>
-          {canManage && (
-            <button onClick={() => setModal("create")} className="ank-btn-accent text-xs mt-3">
-              <PlusIcon className="h-3.5 w-3.5" /> {t("enterprise.settings.company.teams.newTeam")}
+      <Card>
+        <CardHeader
+          icon={UsersIcon}
+          title={t("enterprise.settings.company.tabs.teams")}
+          subtitle={!loading ? t("enterprise.settings.company.teams.count", { count: filtered.length, plural: filtered.length !== 1 ? "s" : "" }) : undefined}
+          actions={canManage && (
+            <button type="button" onClick={() => setModal("create")} className={`${BTN_PRIMARY} w-full sm:w-auto`}>
+              <PlusIcon className="h-4 w-4" /> {t("enterprise.settings.company.teams.newTeam")}
             </button>
           )}
-        </div>
-      ) : (
-        <div className="space-y-2">
-          {filtered.map((team) => (
-            <div key={team.id} style={{ background: "var(--bg-surface)", border: "1px solid var(--border)", borderRadius: 7, overflow: "hidden" }}>
-              <div style={{ padding: "12px 16px" }} className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3 min-w-0">
-                  <div style={{ background: "rgba(59,130,246,0.1)", borderRadius: 6, padding: 7, flexShrink: 0 }}>
-                    <UsersIcon style={{ width: 14, height: 14, color: "var(--lt-60a5fa, #60a5fa)" }} />
+        />
+        {units.length > 0 && (
+          <div className="flex gap-2 overflow-x-auto border-b border-[#F1F5F9] px-4 py-3 sm:px-6">
+            <FilterChip label={t("enterprise.settings.company.members.filters.all")} active={buFilter === ""} onClick={() => setBuFilter("")} />
+            {units.map((u) => (
+              <FilterChip key={u.id} label={u.name} active={buFilter === String(u.id)} onClick={() => setBuFilter(String(u.id))} />
+            ))}
+          </div>
+        )}
+
+        {loading ? (
+          <SkeletonRows rows={3} height="h-16" />
+        ) : filtered.length === 0 ? (
+          <EmptyBlock
+            icon={UsersIcon}
+            title={t("enterprise.settings.company.teams.empty")}
+            action={canManage && (
+              <button type="button" onClick={() => setModal("create")} className={BTN_PRIMARY}>
+                <PlusIcon className="h-4 w-4" /> {t("enterprise.settings.company.teams.newTeam")}
+              </button>
+            )}
+          />
+        ) : (
+          <ul className="divide-y divide-[#F1F5F9]">
+            {filtered.map((team) => {
+              const open = expanded === team.id;
+              return (
+                <li key={team.id}>
+                  <div className="flex items-center justify-between gap-3 px-4 py-3.5 sm:px-6">
+                    <div className="flex min-w-0 items-center gap-3">
+                      <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-lg ${TONE.sky.icon}`}><UsersIcon className="h-5 w-5" /></span>
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-semibold text-[#0F172A]">{team.name}</p>
+                        <p className="text-xs text-[#64748B]">
+                          {t("enterprise.settings.company.teams.memberCount", { count: team.member_count ?? 0, plural: team.member_count !== 1 ? "s" : "" })}
+                          {team.business_unit_name ? ` · ${t("enterprise.settings.company.teams.buSuffix", { name: team.business_unit_name })}` : ""}
+                          {team.manager_username ? ` · ${t("enterprise.settings.company.units.managerSuffix", { name: team.manager_username })}` : ""}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex shrink-0 items-center gap-1">
+                      <button type="button" onClick={() => setExpanded(open ? null : team.id)} aria-expanded={open}
+                        aria-label={open ? t("enterprise.settings.company.teams.hide") : t("enterprise.settings.company.teams.members")}
+                        className={`inline-flex h-10 cursor-pointer items-center gap-1.5 rounded-lg border px-3 text-sm font-medium transition-colors duration-150 sm:h-9 ${FOCUS} ${
+                          open ? "border-[#C7D2FE] bg-[#EEF2FF] text-[#4338CA]" : "border-[#E2E8F0] bg-white text-[#475569] hover:bg-[#F8FAFC]"}`}>
+                        <span className="hidden sm:inline">{open ? t("enterprise.settings.company.teams.hide") : t("enterprise.settings.company.teams.members")}</span>
+                        <UsersIcon className="h-4 w-4 sm:hidden" />
+                        <ChevronDownIcon className={`h-4 w-4 transition-transform duration-150 ${open ? "rotate-180" : ""}`} />
+                      </button>
+                      {canManage && (
+                        <DotMenu items={[
+                          { label: t("enterprise.settings.company.units.menu.edit"), action: () => setModal(team) },
+                          { label: t("enterprise.settings.company.units.menu.delete"), danger: true, action: () => handleDelete(team) },
+                        ]} />
+                      )}
+                    </div>
                   </div>
-                  <div className="min-w-0">
-                    <p style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)" }}>{team.name}</p>
-                    <p style={{ fontSize: 11, color: "var(--text-tertiary)", marginTop: 1 }}>
-                      {t("enterprise.settings.company.teams.memberCount", { count: team.member_count ?? 0, plural: team.member_count !== 1 ? "s" : "" })}
-                      {team.business_unit_name ? ` · ${t("enterprise.settings.company.teams.buSuffix", { name: team.business_unit_name })}` : ""}
-                      {team.manager_username ? ` · ${t("enterprise.settings.company.units.managerSuffix", { name: team.manager_username })}` : ""}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <button
-                    onClick={() => setExpanded(expanded === team.id ? null : team.id)}
-                    style={{ fontSize: 11, color: expanded === team.id ? "var(--accent)" : "var(--text-secondary)", padding: "4px 8px", borderRadius: 5, border: `1px solid ${expanded === team.id ? "var(--accent)" : "var(--border)"}`, cursor: "pointer", transition: "all 150ms" }}>
-                    {expanded === team.id ? t("enterprise.settings.company.teams.hide") : t("enterprise.settings.company.teams.members")}
-                  </button>
-                  {canManage && (
-                    <DotMenu items={[
-                      { label: t("enterprise.settings.company.units.menu.edit"), action: () => setModal(team) },
-                      { label: t("enterprise.settings.company.units.menu.delete"), danger: true, action: () => handleDelete(team) },
-                    ]} />
-                  )}
-                </div>
-              </div>
-              {expanded === team.id && (
-                <TeamMembersPanel team={team} companyMembers={companyMembers} onClose={() => setExpanded(null)} />
-              )}
-            </div>
-          ))}
-        </div>
-      )}
-      {!loading && <p style={{ color: "var(--text-tertiary)", fontSize: 11 }}>{t("enterprise.settings.company.teams.count", { count: filtered.length, plural: filtered.length !== 1 ? "s" : "" })}</p>}
+                  {open && <TeamMembersPanel team={team} companyMembers={companyMembers} onClose={() => setExpanded(null)} />}
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </Card>
     </div>
   );
 }
@@ -920,9 +864,7 @@ export function CompanySettings() {
 
   if (!activeCompanyId) {
     return (
-      <div style={{ textAlign: "center", padding: "60px 24px" }}>
-        <p style={{ color: "var(--text-secondary)", fontWeight: 600 }}>{t("enterprise.settings.company.noCompanySelected")}</p>
-      </div>
+      <Card className="mx-auto max-w-lg"><EmptyBlock icon={BuildingOfficeIcon} title={t("enterprise.settings.company.noCompanySelected")} /></Card>
     );
   }
 
@@ -937,31 +879,22 @@ export function CompanySettings() {
     ...(canViewMembers ? [{ id: "members", label: t("enterprise.settings.company.tabs.members") }] : []),
   ];
 
+  const tabIcons = { info: InformationCircleIcon, units: Squares2X2Icon, teams: UsersIcon, members: UserGroupIcon };
+
   return (
-    <div className="w-full space-y-5">
-      {/* Header */}
-      <div>
-        <h1 style={{ color: "var(--text-primary)" }} className="text-xl font-bold">{t("enterprise.settings.company.title")}</h1>
-        <p style={{ color: "var(--text-secondary)" }} className="text-sm mt-0.5">
-          {company?.name || activeCompany?.company_name || t("enterprise.settings.company.yourCompany")} · ID: {activeCompanyId}
-        </p>
-      </div>
+    <div className="mx-auto w-full max-w-6xl space-y-5 sm:space-y-6 md:py-2">
+      <PageHeader
+        title={t("enterprise.settings.company.title")}
+        subtitle={`${company?.name || activeCompany?.company_name || t("enterprise.settings.company.yourCompany")} · ID: ${activeCompanyId}`}
+      />
 
-      {/* Tab bar */}
-      <div style={{ borderBottom: "1px solid var(--border)", display: "flex", gap: 0 }}>
-        {tabs.map(({ id, label }) => (
-          <button key={id} onClick={() => setActiveTab(id)} style={{
-            padding: "9px 16px", borderBottom: `2px solid ${activeTab === id ? "var(--accent)" : "transparent"}`,
-            color: activeTab === id ? "var(--text-primary)" : "var(--text-tertiary)",
-            fontWeight: activeTab === id ? 600 : 400, fontSize: 13, cursor: "pointer",
-            background: "transparent", transition: "color 150ms, border-color 150ms", whiteSpace: "nowrap",
-          }}>
-            {label}
-          </button>
-        ))}
-      </div>
+      <Segmented
+        ariaLabel={t("enterprise.settings.company.title")}
+        value={activeTab}
+        onChange={setActiveTab}
+        items={tabs.map(({ id, label }) => ({ value: id, label, icon: tabIcons[id] }))}
+      />
 
-      {/* Content */}
       <div>
         {activeTab === "info"    && <InfoTab company={company} companyId={activeCompanyId} />}
         {activeTab === "members" && canViewMembers && <MembersTab companyId={activeCompanyId} />}

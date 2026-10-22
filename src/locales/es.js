@@ -1882,6 +1882,19 @@ export const es = {
                 trendTitle: "Retención en el Tiempo",
                 openGaps: "Brechas de Conocimiento Abiertas",
                 viewGaps: "Ver Brechas",
+                subtitle: "Cuánto recuerdas de lo que has estudiado y dónde reforzarlo.",
+                status: {
+                    good: "Bien",
+                    moderate: "Moderado",
+                    atRisk: "En riesgo"
+                },
+                hints: {
+                    retentionScore: "Cuánto recuerdas de lo que estudiaste",
+                    lowRisk: "Cuanto más alto, menor riesgo de olvido",
+                    confidence: "Qué tan fiable es esta estimación"
+                },
+                gapsHint: "Temas para repasar y subir tu retención.",
+                noGapsHint: "No tienes brechas abiertas ahora mismo.",
                 gauges: {
                     retentionScore: "Puntaje de Retención",
                     lowRisk: "Bajo Riesgo",
@@ -2584,7 +2597,9 @@ export const es = {
                     saveError: "No se pudieron guardar los cambios.",
                     saved: "Cambios guardados.",
                     saving: "Guardando…",
-                    save: "Guardar cambios"
+                    save: "Guardar cambios",
+                    sectionTitle: "Información de la empresa",
+                    sectionHint: "Datos básicos de tu organización."
                 },
                 members: {
                     addError: "Error al agregar usuario.",
@@ -2654,6 +2669,7 @@ export const es = {
                     addMemberError: "Error al agregar miembro.",
                     membersHeading: "Miembros ({count})",
                     noMembersYet: "Sin miembros aún.",
+                    memberRole: "Miembro",
                     confirmDelete: "¿Eliminar el equipo \"{name}\"?",
                     newTeam: "Nuevo Equipo",
                     empty: "Sin equipos aún.",
@@ -2846,6 +2862,26 @@ export const es = {
                 title: "Puntaje de Salud de la Empresa",
                 empty: "No hay datos de salud disponibles",
                 currentIndicator: "← actual",
+                subtitle: "Tu organización de un vistazo: compliance, retención, certificaciones y brechas críticas.",
+                healthScore: "Puntuación de salud",
+                breakdownTitle: "Qué compone la puntuación",
+                breakdownHint: "Cada área suma a la puntuación según su peso.",
+                weight: "Peso {n}%",
+                components: {
+                    compliance: "Compliance",
+                    retention: "Retención",
+                    certifications: "Certificaciones",
+                    noCriticalGaps: "Sin brechas críticas"
+                },
+                tierNames: {
+                    excellent: "Excelente",
+                    good: "Buena",
+                    needsAttention: "Requiere atención",
+                    atRisk: "En riesgo"
+                },
+                scaleTitle: "Escala de puntuación",
+                scaleHint: "Dónde está tu empresa hoy.",
+                current: "Actual",
                 tiers: {
                     excellent: "90–100: Excelente",
                     good: "70–89: Bueno",
@@ -2901,6 +2937,7 @@ export const es = {
         },
         invitations: {
             loadError: "No se pudieron cargar las invitaciones.",
+            emptyHint: "Invita a personas a tu empresa y sigue cada invitación desde aquí.",
             columns: {
                 actions: "Acciones"
             },

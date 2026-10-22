@@ -1881,6 +1881,19 @@ export const en = {
                 trendTitle: "Retention Over Time",
                 openGaps: "Open Knowledge Gaps",
                 viewGaps: "View Gaps",
+                subtitle: "How well you remember what you have studied, and where to reinforce it.",
+                status: {
+                    good: "Good",
+                    moderate: "Moderate",
+                    atRisk: "At risk"
+                },
+                hints: {
+                    retentionScore: "How much of what you studied you still remember",
+                    lowRisk: "The higher, the lower your risk of forgetting",
+                    confidence: "How reliable this estimate is"
+                },
+                gapsHint: "Topics to review to raise your retention.",
+                noGapsHint: "You have no open gaps right now.",
                 gauges: {
                     retentionScore: "Retention Score",
                     lowRisk: "Low Risk",
@@ -2583,7 +2596,9 @@ export const en = {
                     saveError: "Could not save changes.",
                     saved: "Changes saved.",
                     saving: "Saving…",
-                    save: "Save changes"
+                    save: "Save changes",
+                    sectionTitle: "Company information",
+                    sectionHint: "Basic details of your organization."
                 },
                 members: {
                     addError: "Error adding user.",
@@ -2653,6 +2668,7 @@ export const en = {
                     addMemberError: "Error adding member.",
                     membersHeading: "Members ({count})",
                     noMembersYet: "No members yet.",
+                    memberRole: "Member",
                     confirmDelete: "Delete team \"{name}\"?",
                     newTeam: "New Team",
                     empty: "No teams yet.",
@@ -2845,6 +2861,26 @@ export const en = {
                 title: "Company Health Score",
                 empty: "No health data available",
                 currentIndicator: "← current",
+                subtitle: "Your organization at a glance: compliance, retention, certifications and critical gaps.",
+                healthScore: "Health score",
+                breakdownTitle: "What makes up the score",
+                breakdownHint: "Each area adds to the score according to its weight.",
+                weight: "{n}% weight",
+                components: {
+                    compliance: "Compliance",
+                    retention: "Retention",
+                    certifications: "Certifications",
+                    noCriticalGaps: "No critical gaps"
+                },
+                tierNames: {
+                    excellent: "Excellent",
+                    good: "Good",
+                    needsAttention: "Needs attention",
+                    atRisk: "At risk"
+                },
+                scaleTitle: "Score scale",
+                scaleHint: "Where your company stands today.",
+                current: "Current",
                 tiers: {
                     excellent: "90–100: Excellent",
                     good: "70–89: Good",
@@ -2900,6 +2936,7 @@ export const en = {
         },
         invitations: {
             loadError: "Could not load invitations.",
+            emptyHint: "Invite people to your company and follow each invitation from here.",
             columns: {
                 actions: "Actions"
             },
