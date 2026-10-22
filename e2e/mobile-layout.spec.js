@@ -113,5 +113,28 @@ for (const vp of VIEWPORTS) {
       await page.getByRole("button", { name: "Overdue" }).scrollIntoViewIfNeeded();
       await expectNoHorizontalOverflow(page);
     });
+
+    test("M-04 knowledge graph: full-width canvas, filters and detail in sheets", async ({ page }) => {
+      await setupApp(page, withCompany);
+      await page.goto("/enterprise/knowledge/graph");
+      const svg = page.getByTestId("knowledge-graph");
+      await expect(svg).toBeVisible();
+      const box = await svg.boundingBox();
+      expect(box.width).toBeGreaterThan(vp.width - 48);
+      expect(box.height).toBeGreaterThan(300);
+      await expect(svg.locator("> g")).toHaveAttribute("transform", /scale\(1\)/); // fitted
+      await expectTappable(page.getByTestId("graph-filters"));
+      await page.getByTestId("graph-filters").click();
+      const sheet = page.getByRole("dialog");
+      await expect(sheet.getByLabel("Concept")).toBeVisible();
+      await sheet.getByLabel("Concept").uncheck();
+      await expect(svg.locator("line")).toHaveCount(1);
+      await sheet.getByTestId("zoom-in").click();
+      await expect(svg.locator("> g")).toHaveAttribute("transform", /scale\(1\.25\)/);
+      await sheet.getByRole("button", { name: "Close" }).click();
+      await page.locator('[data-node-title="EPP"] circle').click();
+      await expect(page.getByRole("dialog").getByText("casco, guantes")).toBeVisible();
+      await expectNoHorizontalOverflow(page);
+    });
   });
 }

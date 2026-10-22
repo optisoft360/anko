@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { ArrowPathIcon, LinkIcon, FunnelIcon } from "@heroicons/react/24/outline";
+import { Modal as Sheet } from "../../components/ui/kit";
 import { knowledgeApi } from "../../api/enterpriseApi";
 import { useEnterprise } from "../../context/enterprise-context";
 import { useLanguage } from "../../../context/language-context";
@@ -58,6 +59,8 @@ export const importanceOf = (n) => {
   const v = Number(n.importance_score ?? 50);
   return Math.max(0, Math.min(1, v > 1 ? v / 100 : v));
 };
+
+const MOBILE_QUERY = "(max-width: 719.98px)";
 
 /* Simple force-directed layout using Fruchterman-Reingold approximation */
 function computeLayout(nodes, edges, W, H) {
@@ -145,6 +148,18 @@ export function KnowledgeGraph() {
   const svgRef = useRef(null);
   const lastPt = useRef(null);
   const W = 1100, H = 700;
+  // Phones (below md, the bottom-tab-bar breakpoint): full-width canvas, filters and
+  // node detail in bottom sheets, touch pan / pinch zoom (M-04). Desktop unchanged.
+  const [isMobile, setIsMobile] = useState(() => typeof window !== "undefined" && window.matchMedia(MOBILE_QUERY).matches);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const touch = useRef(null);
+  useEffect(() => {
+    const mq = window.matchMedia(MOBILE_QUERY);
+    const onChange = () => setIsMobile(mq.matches);
+    mq.addEventListener?.("change", onChange);
+    return () => mq.removeEventListener?.("change", onChange);
+  }, []);
+  const fit = () => { setPan({ x: 0, y: 0 }); setZoom(1); };
 
   const loadGraph = useCallback(() => {
     setLoading(true);
@@ -163,7 +178,11 @@ export function KnowledgeGraph() {
         setPositions(computeLayout(g.nodes || [], g.edges || g.relationships || [], W, H));
       })
       .catch((err) => { setGraph(null); setError(apiErrorMessage(err, t("enterprise.knowledge.graph.loadError"))); })
-      .finally(() => setLoading(false));
+      .finally(() => {
+        setLoading(false);
+        // Phones open with the whole graph in view.
+        if (window.matchMedia(MOBILE_QUERY).matches) { setPan({ x: 0, y: 0 }); setZoom(1); }
+      });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeCompanyId, filters.source]);
 
@@ -218,27 +237,37 @@ export function KnowledgeGraph() {
   };
   const onMouseUp = () => { dragging.current = false; };
 
+  // Touch: one finger pans, two fingers pinch-zoom (no gesture library in this page).
+  const toViewBox = () => {
+    const rect = svgRef.current?.getBoundingClientRect();
+    return rect && rect.width ? W / rect.width : 1;
+  };
+  const dist = (a, b) => Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+  const onTouchStart = (e) => {
+    const [a, b] = e.touches;
+    touch.current = b
+      ? { mode: "pinch", d: dist(a, b), zoom }
+      : { mode: "pan", x: a.clientX, y: a.clientY };
+  };
+  const onTouchMove = (e) => {
+    const t0 = touch.current;
+    if (!t0) return;
+    const [a, b] = e.touches;
+    if (t0.mode === "pinch" && b) {
+      setZoom(Math.max(0.2, Math.min(4, t0.zoom * (dist(a, b) / t0.d))));
+    } else if (t0.mode === "pan" && a) {
+      const f = toViewBox();
+      setPan((p) => ({ x: p.x + (a.clientX - t0.x) * f, y: p.y + (a.clientY - t0.y) * f }));
+      touch.current = { ...t0, x: a.clientX, y: a.clientY };
+    }
+  };
+  const onTouchEnd = (e) => { touch.current = e.touches.length ? { mode: "pan", x: e.touches[0].clientX, y: e.touches[0].clientY } : null; };
+
   const selectedRelations = selected
     ? visibleEdges.filter((e) => edgeEnds(e).includes(selected.id))
     : [];
 
-  return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <div>
-          <h1 style={{ color: "var(--text-primary)", fontSize: 20, fontWeight: 800 }}>{t("enterprise.knowledge.graph.title")}</h1>
-          <p style={{ color: "var(--text-tertiary)", fontSize: 12, marginTop: 2 }}>
-            {t("enterprise.knowledge.graph.summary", { nodes: visibleNodes.length, edges: visibleEdges.length })}
-          </p>
-        </div>
-        <button onClick={refresh} disabled={loading || rebuilding} className="ank-btn-ghost text-xs" style={{ opacity: loading || rebuilding ? 0.6 : 1 }}>
-          <ArrowPathIcon className={`h-3.5 w-3.5 ${loading || rebuilding ? "animate-spin" : ""}`} /> {t("enterprise.knowledge.graph.refresh")}
-        </button>
-      </div>
-
-      <div className="flex gap-4 flex-wrap lg:flex-nowrap">
-        {/* Filters panel */}
-        <div style={{ width: 208, flexShrink: 0 }} className="space-y-4">
+  const filtersCard = (
           <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border)", borderRadius: 12, padding: 16 }} className="space-y-3">
             <div className="flex items-center gap-2">
               <FunnelIcon style={{ width: 14, height: 14, color: "var(--text-tertiary)" }} />
@@ -278,14 +307,14 @@ export function KnowledgeGraph() {
                 style={{ flex: 1, padding: "5px 0", background: "var(--bg-elevated)", border: "1px solid var(--border)", borderRadius: 8, color: "var(--text-secondary)", fontWeight: 700, fontSize: 13, cursor: "pointer" }}>+</button>
               <button data-testid="zoom-out" onClick={() => setZoom((z) => Math.max(0.2, z - 0.25))}
                 style={{ flex: 1, padding: "5px 0", background: "var(--bg-elevated)", border: "1px solid var(--border)", borderRadius: 8, color: "var(--text-secondary)", fontWeight: 700, fontSize: 13, cursor: "pointer" }}>−</button>
-              <button onClick={() => { setPan({ x: 0, y: 0 }); setZoom(1); }}
+              <button onClick={fit}
                 style={{ flex: 1, padding: "5px 0", background: "var(--bg-elevated)", border: "1px solid var(--border)", borderRadius: 8, color: "var(--text-tertiary)", fontWeight: 700, fontSize: 11, cursor: "pointer" }}>{t("enterprise.knowledge.graph.fit")}</button>
             </div>
           </div>
+  );
 
-          {/* Selected node detail */}
-          {selected && (
-            <div style={{ background: "var(--bg-surface)", border: "1px solid rgba(99,102,241,0.3)", borderRadius: 12, padding: 16 }} className="space-y-3">
+  const detailCard = selected && (
+          <div style={{ background: "var(--bg-surface)", border: "1px solid rgba(99,102,241,0.3)", borderRadius: 12, padding: 16 }} className="space-y-3">
               <div className="flex items-center justify-between">
                 <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 9px", borderRadius: 20, background: NODE_COLORS[selected.node_type] + "22", color: NODE_COLORS[selected.node_type] }}>
                   {NODE_TYPE_LABELS[selected.node_type] || selected.node_type}
@@ -336,7 +365,42 @@ export function KnowledgeGraph() {
                 </div>
               )}
             </div>
-          )}
+  );
+
+  return (
+    <div className="space-y-4">
+      {isMobile && filtersOpen && (
+        <Sheet title={t("enterprise.knowledge.graph.filters")} onClose={() => setFiltersOpen(false)}>
+          <div className="[&>div]:!border-0 [&>div]:!p-0">{filtersCard}</div>
+        </Sheet>
+      )}
+      {isMobile && selected && (
+        <Sheet title={selected.title} onClose={() => setSelected(null)}>
+          <div className="[&>div]:!border-0 [&>div]:!p-0">{detailCard}</div>
+        </Sheet>
+      )}
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div>
+          <h1 style={{ color: "var(--text-primary)", fontSize: 20, fontWeight: 800 }}>{t("enterprise.knowledge.graph.title")}</h1>
+          <p style={{ color: "var(--text-tertiary)", fontSize: 12, marginTop: 2 }}>
+            {t("enterprise.knowledge.graph.summary", { nodes: visibleNodes.length, edges: visibleEdges.length })}
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+        <button type="button" onClick={() => setFiltersOpen(true)} className="ank-btn-ghost text-xs min-h-[44px] md:hidden" data-testid="graph-filters">
+          <FunnelIcon className="h-4 w-4" /> {t("enterprise.knowledge.graph.filters")}
+        </button>
+        <button onClick={refresh} disabled={loading || rebuilding} className="ank-btn-ghost text-xs min-h-[44px] md:min-h-0" style={{ opacity: loading || rebuilding ? 0.6 : 1 }}>
+          <ArrowPathIcon className={`h-3.5 w-3.5 ${loading || rebuilding ? "animate-spin" : ""}`} /> {t("enterprise.knowledge.graph.refresh")}
+        </button>
+        </div>
+      </div>
+
+      <div className="flex gap-4 flex-wrap lg:flex-nowrap">
+        {/* Filters panel (md and up; phones open it as a bottom sheet) */}
+        <div style={{ width: 208, flexShrink: 0 }} className="hidden space-y-4 md:block">
+          {filtersCard}
+          {selected && detailCard}
         </div>
 
         {/* Graph canvas */}
@@ -367,7 +431,11 @@ export function KnowledgeGraph() {
               ref={svgRef}
               data-testid="knowledge-graph"
               viewBox={`0 0 ${W} ${H}`}
-              style={{ width: "100%", height: 520, background: "var(--bg-app)", borderRadius: 12, border: "1px solid var(--border)", cursor: dragging.current ? "grabbing" : "grab" }}
+              className="h-[calc(100dvh-240px)] min-h-[320px] touch-none md:h-[520px] md:touch-auto"
+              style={{ width: "100%", background: "var(--bg-app)", borderRadius: 12, border: "1px solid var(--border)", cursor: dragging.current ? "grabbing" : "grab" }}
+              onTouchStart={onTouchStart}
+              onTouchMove={onTouchMove}
+              onTouchEnd={onTouchEnd}
               onMouseDown={onMouseDown}
               onMouseMove={onMouseMove}
               onMouseUp={onMouseUp}
