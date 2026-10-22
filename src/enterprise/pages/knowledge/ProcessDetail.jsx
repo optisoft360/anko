@@ -962,15 +962,28 @@ function TagGroupSection({ tagGroup, content, isLast, onStudy, onLearn, onSimula
   return (
     <div style={{ display: "flex", minWidth: 0 }}>
       {/* Timeline */}
-      <div style={{ width: 22, display: "flex", flexDirection: "column", alignItems: "center", marginRight: 14, flexShrink: 0 }}>
+      <div className="hidden lg:flex" style={{ width: 22, flexDirection: "column", alignItems: "center", marginRight: 14, flexShrink: 0 }}>
         <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#6366F1", border: "2px solid var(--lt-0f172a, #0F172A)", flexShrink: 0, marginTop: 7 }} />
         {!isLast && <div style={{ width: 2, flex: 1, background: "var(--lt-rgba-255-255-255-0-08, rgba(255,255,255,0.08))", minHeight: 24, marginTop: 4 }} />}
       </div>
 
       {/* Content */}
       <div style={{ flex: 1, minWidth: 0, paddingBottom: isLast ? 8 : 20 }}>
-        {/* Header row */}
-        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: expanded ? 8 : 0, flexWrap: "nowrap" }}>
+        {/* Header row — phones / narrow tablets */}
+        <div className="mb-2 flex items-start gap-2 lg:hidden">
+          <button type="button" onClick={() => setExpanded((v) => !v)} aria-expanded={expanded} aria-label={tagGroup.name}
+            className="grid h-11 w-8 shrink-0 place-items-center text-[#64748B]">
+            {expanded ? <ChevronDownIcon className="h-4 w-4" /> : <ChevronRightIcon className="h-4 w-4" />}
+          </button>
+          <div className="min-w-0 flex-1 pt-2.5">
+            <p className="text-sm font-bold leading-snug text-[#0F172A] [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2] overflow-hidden">{tagGroup.name}</p>
+            <span className="mt-1 inline-flex rounded-full bg-[#F1F5F9] px-2 py-0.5 text-[10px] font-semibold text-[#64748B]">
+              {t("enterprise.knowledge.processDetail.tagGroup.counts", { decks: decks.length, batteries: batteries.length })}
+            </span>
+          </div>
+        </div>
+        {/* Header row — desktop */}
+        <div className="hidden lg:flex" style={{ alignItems: "center", gap: 8, marginBottom: expanded ? 8 : 0, flexWrap: "nowrap" }}>
           <button onClick={() => setExpanded((v) => !v)} style={{ color: "#64748B", cursor: "pointer", padding: 0, background: "none", border: "none", display: "flex", alignItems: "center", flexShrink: 0 }}>
             {expanded ? <ChevronDownIcon style={{ width: 13, height: 13 }} /> : <ChevronRightIcon style={{ width: 13, height: 13 }} />}
           </button>
@@ -994,7 +1007,7 @@ function TagGroupSection({ tagGroup, content, isLast, onStudy, onLearn, onSimula
         </div>
 
         {expanded && (
-          <div style={{ marginLeft: 6 }}>
+          <div className="lg:ml-1.5">
             {isLoading ? (
               <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 0" }}>
                 <div style={{ width: 14, height: 14, border: "2px solid rgba(99,102,241,0.25)", borderTopColor: "#6366F1", borderRadius: "50%" }} className="animate-spin" />
@@ -1185,6 +1198,67 @@ function ItemJobStrip({ job, accentColor }) {
   );
 }
 
+// Phones and narrow tablets (below lg): the deck/battery row as a card. Same actions
+// as the desktop row (Learn / Study / Simulate / + Add / delete); no drag handle.
+const MOBILE_BTN = {
+  outline: "border border-[#C7D2FE] bg-white text-[#4338CA] active:bg-[#EEF2FF]",
+  soft: "border border-[#C7D2FE] bg-[#EEF2FF] text-[#4338CA] active:bg-[#E0E7FF]",
+  add: "border border-[#BBF7D0] bg-[#F0FDF4] text-[#15803D] active:bg-[#DCFCE7]",
+};
+
+function MobileItemCard({ kind, label, badge, borderColor, actions, onDelete, deleteLabel, disabled, job, onDismissJob, progress }) {
+  const { t } = useLanguage();
+  const Icon = kind === "battery" ? BoltIcon : ViewColumnsIcon;
+  const isFailed = job && FAILED_STATUSES.has(job.status);
+  return (
+    <div className="mb-2 rounded-lg bg-white p-3 lg:hidden" style={{ border: `1px solid ${borderColor}` }} data-testid={`${kind}-card`}>
+      <div className="flex items-start gap-2.5">
+        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-md bg-[#EEF2FF] text-[#4F46E5]"><Icon className="h-4 w-4" /></span>
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-semibold leading-snug text-[#0F172A] [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2] overflow-hidden" title={label}>{label}</p>
+          {badge ? (
+            <span className="mt-1 inline-flex rounded-full bg-[#EEF2FF] px-2 py-0.5 text-[11px] font-semibold text-[#4338CA]">{badge}</span>
+          ) : (
+            <ArrowPathIcon className="mt-1 h-3.5 w-3.5 animate-spin text-[#6366F1]" />
+          )}
+        </div>
+        {onDelete && (
+          <button type="button" onClick={onDelete} disabled={disabled} aria-label={deleteLabel} title={deleteLabel}
+            className="grid h-11 w-11 shrink-0 place-items-center rounded-lg border border-[#FECDD3] bg-white text-[#E11D48] active:bg-[#FFF1F2] disabled:opacity-40">
+            <TrashIcon className="h-4 w-4" />
+          </button>
+        )}
+      </div>
+      {progress && (
+        <div className="mt-2.5 flex items-center gap-2">
+          <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-[#F1F5F9]">
+            <div className="h-full rounded-full" style={{ width: `${progress.value}%`, background: progress.color }} />
+          </div>
+          <span className="w-9 text-right text-xs font-semibold tabular-nums" style={{ color: progress.hasAttempt ? progress.color : "#94A3B8" }}>{progress.text}</span>
+        </div>
+      )}
+      {job && (
+        <div className="mt-2 flex items-center gap-2">
+          <div className="min-w-0 flex-1 [&>div]:!px-0 [&>div]:!pb-0"><ItemJobStrip job={job} accentColor="#818CF8" /></div>
+          {isFailed && onDismissJob && (
+            <button type="button" onClick={() => onDismissJob(job.id)} className="min-h-[44px] shrink-0 rounded-lg border border-[#FECDD3] px-3 text-xs font-semibold text-[#BE123C]">
+              {t("enterprise.knowledge.processDetail.dismiss")}
+            </button>
+          )}
+        </div>
+      )}
+      <div className="mt-3 flex flex-wrap gap-2">
+        {actions.map((a) => (
+          <button key={a.key} type="button" onClick={a.onClick} disabled={a.disabled}
+            className={`min-h-[44px] min-w-[44px] flex-1 basis-[30%] whitespace-nowrap rounded-lg px-3 text-sm font-semibold disabled:opacity-40 ${MOBILE_BTN[a.tone]}`}>
+            {a.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function DeckRowItem({ deck, index, onStudy, onLearn, dragHandleProps, onAddDeck, onDelete, job, onDismissJob }) {
   const { t } = useLanguage();
   const cardCount = deck.flashcards_count ?? deck.cardsCount ?? deck.card_count ?? 0;
@@ -1194,7 +1268,19 @@ function DeckRowItem({ deck, index, onStudy, onLearn, dragHandleProps, onAddDeck
   const isRunning = job && !isFailed && !isSuccess;
   const borderColor = isFailed ? "rgba(239,68,68,0.35)" : isSuccess ? "rgba(74,222,128,0.35)" : isRunning ? "rgba(99,102,241,0.35)" : "var(--lt-rgba-255-255-255-0-06, rgba(255,255,255,0.06))";
   return (
-    <div style={{ background: "var(--lt-rgba-255-255-255-0-025, rgba(255,255,255,0.025))", border: `1px solid ${borderColor}`, borderRadius: 8, marginBottom: 6, minWidth: 0, transition: "border-color 250ms" }}>
+    <>
+    <MobileItemCard
+      kind="deck" label={label} borderColor={borderColor} disabled={isRunning} job={job} onDismissJob={onDismissJob}
+      badge={isRunning ? null : t("enterprise.knowledge.processDetail.cardsCount", { n: cardCount })}
+      actions={[
+        { key: "learn", label: t("enterprise.knowledge.processDetail.learn"), onClick: () => onLearn?.(deck), tone: "outline", disabled: isRunning },
+        { key: "study", label: t("enterprise.knowledge.processDetail.study"), onClick: () => onStudy?.(deck), tone: "soft", disabled: isRunning },
+        { key: "add", label: `+ ${t("enterprise.knowledge.processDetail.addDeck")}`, onClick: () => onAddDeck?.(), tone: "add" },
+      ]}
+      onDelete={onDelete ? () => onDelete(deck) : null}
+      deleteLabel={t("enterprise.knowledge.processDetail.deleteDeckTitle")}
+    />
+    <div className="hidden lg:block" style={{ background: "var(--lt-rgba-255-255-255-0-025, rgba(255,255,255,0.025))", border: `1px solid ${borderColor}`, borderRadius: 8, marginBottom: 6, minWidth: 0, transition: "border-color 250ms" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", minWidth: 0 }}>
         {dragHandleProps && (
           <div {...dragHandleProps} style={{ cursor: "grab", color: "var(--lt-334155, #334155)", display: "flex", alignItems: "center", flexShrink: 0, touchAction: "none" }} title={t("enterprise.knowledge.processDetail.dragToReorder")}>
@@ -1265,6 +1351,7 @@ function DeckRowItem({ deck, index, onStudy, onLearn, dragHandleProps, onAddDeck
         </div>
       )}
     </div>
+    </>
   );
 }
 
@@ -1283,7 +1370,19 @@ function BatteryRowItem({ battery, index, onSimulate, onDelete, dragHandleProps,
   const borderColor = isFailed ? "rgba(239,68,68,0.35)" : isSuccess ? "rgba(74,222,128,0.35)" : isRunning ? "rgba(94,106,210,0.35)" : "var(--lt-rgba-255-255-255-0-06, rgba(255,255,255,0.06))";
 
   return (
-    <div style={{ background: "var(--lt-rgba-255-255-255-0-025, rgba(255,255,255,0.025))", border: `1px solid ${borderColor}`, borderRadius: 8, marginBottom: 6, minWidth: 0, transition: "border-color 250ms" }}>
+    <>
+    <MobileItemCard
+      kind="battery" label={label} borderColor={borderColor} disabled={isRunning} job={job} onDismissJob={onDismissJob}
+      badge={isRunning ? null : t("enterprise.knowledge.processDetail.questionsCount", { n: questionCount })}
+      progress={{ value: hasAttempt ? pctRounded : 0, text: hasAttempt ? `${pctRounded}%` : "—", color: pctColor, hasAttempt }}
+      actions={[
+        { key: "simulate", label: t("enterprise.knowledge.processDetail.simulate"), onClick: () => onSimulate?.(battery), tone: "soft", disabled: isRunning },
+        { key: "add", label: `+ ${t("enterprise.knowledge.processDetail.addBattery")}`, onClick: () => onAddBattery?.(), tone: "add" },
+      ]}
+      onDelete={onDelete ? () => onDelete(battery) : null}
+      deleteLabel={t("enterprise.knowledge.processDetail.deleteBatteryTitle")}
+    />
+    <div className="hidden lg:block" style={{ background: "var(--lt-rgba-255-255-255-0-025, rgba(255,255,255,0.025))", border: `1px solid ${borderColor}`, borderRadius: 8, marginBottom: 6, minWidth: 0, transition: "border-color 250ms" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", minWidth: 0 }}>
         {dragHandleProps && (
           <div {...dragHandleProps} style={{ cursor: "grab", color: "var(--lt-334155, #334155)", display: "flex", alignItems: "center", flexShrink: 0, touchAction: "none" }} title={t("enterprise.knowledge.processDetail.dragToReorder")}>
@@ -1355,6 +1454,7 @@ function BatteryRowItem({ battery, index, onSimulate, onDelete, dragHandleProps,
         </div>
       )}
     </div>
+    </>
   );
 }
 
@@ -1401,7 +1501,7 @@ function TopicTreeItem({
   return (
     <div style={{ display: "flex", minWidth: 0 }}>
       {/* Timeline */}
-      <div style={{ width: 22, display: "flex", flexDirection: "column", alignItems: "center", marginRight: 14, flexShrink: 0 }}>
+      <div className="hidden lg:flex" style={{ width: 22, flexDirection: "column", alignItems: "center", marginRight: 14, flexShrink: 0 }}>
         <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#4ade80", border: "2px solid var(--lt-0f172a, #0F172A)", flexShrink: 0, marginTop: 7 }} />
         {!isLast && (
           <div style={{ width: 2, flex: 1, background: "var(--lt-rgba-255-255-255-0-08, rgba(255,255,255,0.08))", minHeight: 24, marginTop: 4 }} />
@@ -1410,8 +1510,28 @@ function TopicTreeItem({
 
       {/* Content */}
       <div style={{ flex: 1, minWidth: 0, paddingBottom: isLast ? 8 : 20 }}>
-        {/* Topic header */}
-        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: expanded ? 8 : 0, flexWrap: "nowrap" }}>
+        {/* Topic header — phones / narrow tablets */}
+        <div className="mb-2 flex items-start gap-2 lg:hidden">
+          <button type="button" onClick={() => setExpanded((v) => !v)} aria-expanded={expanded}
+            className="grid h-11 w-8 shrink-0 place-items-center text-[#64748B]" aria-label={topic.title || t("enterprise.knowledge.processDetail.topicLabel", { n: index + 1 })}>
+            {expanded ? <ChevronDownIcon className="h-4 w-4" /> : <ChevronRightIcon className="h-4 w-4" />}
+          </button>
+          <div className="min-w-0 flex-1 pt-2.5">
+            <p className="text-sm font-bold leading-snug text-[#0F172A] [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2] overflow-hidden">
+              {topic.title || t("enterprise.knowledge.processDetail.topicLabel", { n: index + 1 })}
+            </p>
+            <p className="mt-1 flex min-w-0 items-center gap-1.5 text-xs text-[#64748B]">
+              <span className="shrink-0 rounded-full bg-[#F1F5F9] px-2 py-0.5 text-[10px] font-semibold">{t("enterprise.knowledge.processDetail.tagsCount", { n: tagCount })}</span>
+              <span className="truncate">{description}</span>
+            </p>
+          </div>
+          <button type="button" onClick={deleteTopic} aria-label={t("enterprise.knowledge.processDetail.deleteDialog.titleTopic")}
+            className="grid h-11 w-11 shrink-0 place-items-center rounded-lg border border-[#FECDD3] bg-white text-[#E11D48] active:bg-[#FFF1F2]">
+            <TrashIcon className="h-4 w-4" />
+          </button>
+        </div>
+        {/* Topic header — desktop */}
+        <div className="hidden lg:flex" style={{ alignItems: "center", gap: 8, marginBottom: expanded ? 8 : 0, flexWrap: "nowrap" }}>
           <button
             onClick={() => setExpanded((v) => !v)}
             style={{ color: "#64748B", cursor: "pointer", padding: 0, background: "none", border: "none", display: "flex", alignItems: "center", flexShrink: 0 }}
@@ -1446,7 +1566,7 @@ function TopicTreeItem({
 
         {/* Deck + Battery rows */}
         {expanded && (
-          <div style={{ marginLeft: 6 }}>
+          <div className="lg:ml-1.5">
             {decks.length > 0 && (
               <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDeckDragEnd}>
                 <SortableContext items={decks.map((d) => d.id)} strategy={verticalListSortingStrategy}>
@@ -1478,8 +1598,8 @@ function TopicTreeItem({
             {decks.length === 0 && batteries.length === 0 && pendingDeckJobs.length === 0 && pendingBatteryJobs.length === 0 && (
               <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", padding: "4px 8px" }}>
                 <p style={{ color: "var(--lt-334155, #334155)", fontSize: 12, fontStyle: "italic", margin: 0 }}>{t("enterprise.knowledge.processDetail.noContentGenerated")}</p>
-                {onAddDeck && <button type="button" onClick={addDeck} style={{ padding: "4px 8px", borderRadius: 6, background: "rgba(74,222,128,0.07)", border: "1px solid rgba(74,222,128,0.18)", color: "var(--lt-4ade80, #4ade80)", fontSize: 11, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}>+ {t("enterprise.knowledge.processDetail.addDeck")}</button>}
-                {onAddBattery && <button type="button" onClick={addBattery} style={{ padding: "4px 8px", borderRadius: 6, background: "rgba(74,222,128,0.07)", border: "1px solid rgba(74,222,128,0.18)", color: "var(--lt-4ade80, #4ade80)", fontSize: 11, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}>+ {t("enterprise.knowledge.processDetail.addBattery")}</button>}
+                {onAddDeck && <button type="button" onClick={addDeck} className="min-h-[44px] lg:min-h-0" style={{ padding: "4px 8px", borderRadius: 6, background: "rgba(74,222,128,0.07)", border: "1px solid rgba(74,222,128,0.18)", color: "var(--lt-4ade80, #4ade80)", fontSize: 11, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}>+ {t("enterprise.knowledge.processDetail.addDeck")}</button>}
+                {onAddBattery && <button type="button" onClick={addBattery} className="min-h-[44px] lg:min-h-0" style={{ padding: "4px 8px", borderRadius: 6, background: "rgba(74,222,128,0.07)", border: "1px solid rgba(74,222,128,0.18)", color: "var(--lt-4ade80, #4ade80)", fontSize: 11, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}>+ {t("enterprise.knowledge.processDetail.addBattery")}</button>}
               </div>
             )}
           </div>
@@ -1526,7 +1646,8 @@ function KnowledgeStructurePanel({
   const completionColor = processCompletion >= 80 ? "#4ade80" : processCompletion >= 50 ? "#f59e0b" : "#818CF8";
 
   return (
-    <div style={{ background: "var(--lt-0f172a, #0F172A)", border: "1px solid var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))", borderRadius: 12, overflow: "hidden" }}>
+    <div className="order-first lg:order-none lg:overflow-hidden" data-testid="knowledge-structure"
+      style={{ background: "var(--lt-0f172a, #0F172A)", border: "1px solid var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))", borderRadius: 12 }}>
       {/* Header with stats */}
       <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))" }}>
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
@@ -1536,7 +1657,7 @@ function KnowledgeStructurePanel({
               {t("enterprise.knowledge.processDetail.structurePanel.summary", { topics: summary?.topics ?? topics.length, decks: summary?.decks ?? decks.length, batteries: summary?.batteries ?? batteries.length })}
             </p>
           </div>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 6, alignItems: "center" }}>
+          <div className="grid w-full grid-cols-3 gap-1.5 lg:flex lg:w-auto lg:flex-wrap lg:items-center">
             {[
               { count: summary?.topics ?? topics.length, label: t("enterprise.knowledge.processDetail.structurePanel.stats.topics") },
               { count: summary?.decks ?? decks.length, label: t("enterprise.knowledge.processDetail.structurePanel.stats.decks") },
@@ -1544,12 +1665,12 @@ function KnowledgeStructurePanel({
               { count: totalQuestions, label: t("enterprise.knowledge.processDetail.structurePanel.stats.questions") },
               { count: totalCards, label: t("enterprise.knowledge.processDetail.structurePanel.stats.cards") },
             ].map(({ count, label }) => (
-              <div key={label} style={{ display: "flex", alignItems: "center", gap: 4, padding: "3px 8px", background: "var(--lt-rgba-255-255-255-0-05, rgba(255,255,255,0.05))", border: "1px solid var(--lt-rgba-255-255-255-0-08, rgba(255,255,255,0.08))", borderRadius: 6 }}>
+              <div key={label} className="justify-center lg:justify-start" style={{ display: "flex", alignItems: "center", gap: 4, padding: "3px 8px", background: "var(--lt-rgba-255-255-255-0-05, rgba(255,255,255,0.05))", border: "1px solid var(--lt-rgba-255-255-255-0-08, rgba(255,255,255,0.08))", borderRadius: 6 }}>
                 <span style={{ fontSize: 12, fontWeight: 700, color: "var(--lt-94a3b8, #94A3B8)" }}>{count}</span>
                 <span style={{ fontSize: 10, color: "var(--lt-475569, #475569)" }}>{label}</span>
               </div>
             ))}
-            <button onClick={() => onAddTopic?.()} style={{ display: "flex", alignItems: "center", gap: 4, padding: "4px 10px", background: "rgba(74,222,128,0.08)", border: "1px solid rgba(74,222,128,0.22)", borderRadius: 6, color: "var(--lt-4ade80, #4ade80)", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
+            <button onClick={() => onAddTopic?.()} className="min-h-[44px] justify-center lg:min-h-0 lg:justify-start" style={{ display: "flex", alignItems: "center", gap: 4, padding: "4px 10px", background: "rgba(74,222,128,0.08)", border: "1px solid rgba(74,222,128,0.22)", borderRadius: 6, color: "var(--lt-4ade80, #4ade80)", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
               <PlusIcon style={{ width: 11, height: 11 }} /> {t("enterprise.knowledge.processDetail.structurePanel.addTopic")}
             </button>
           </div>
@@ -1557,7 +1678,7 @@ function KnowledgeStructurePanel({
 
         {/* Proceso completion bar */}
         {batteries.length > 0 && (
-          <div style={{ marginTop: 14, display: "flex", alignItems: "center", gap: 10 }}>
+          <div className="flex-wrap lg:flex-nowrap" style={{ marginTop: 14, display: "flex", alignItems: "center", gap: 10 }}>
             <span style={{ fontSize: 11, fontWeight: 600, color: "#64748B", flexShrink: 0 }}>{t("enterprise.knowledge.processDetail.structurePanel.completion")}</span>
             <div style={{ flex: 1, height: 6, background: "var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))", borderRadius: 3, overflow: "hidden" }}>
               <div style={{ height: "100%", width: `${processCompletion}%`, background: processCompletion > 0 ? `linear-gradient(90deg, ${completionColor}99, ${completionColor})` : "transparent", borderRadius: 3, transition: "width 600ms ease" }} />
@@ -1594,7 +1715,7 @@ function KnowledgeStructurePanel({
           </button>
         </div>
       ) : (
-        <div style={{ padding: "20px" }}>
+        <div className="p-3 lg:p-5">
           {/* ── NEW: TagGroup system ── */}
           {useTagGroupSystem && (
             <>
@@ -3051,7 +3172,9 @@ export function ProcessDetail() {
       )}
 
       {/* Two-column layout: Documentos | Estructura de conocimiento */}
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 340px) 1fr", gap: 16, marginTop: 16, alignItems: "start" }}>
+      {/* Below lg the content area is too narrow for two columns (the 1fr column collapsed
+          to ~0px next to the 340px one): one column there, Knowledge Structure first. */}
+      <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(0,340px)_1fr]" style={{ marginTop: 16 }}>
         <DocumentsPanel docs={docs} onAdd={(dropped) => { setDroppedFiles(dropped || []); setShowAddDoc(true); }} />
         <KnowledgeStructurePanel
           topics={results.topics}
