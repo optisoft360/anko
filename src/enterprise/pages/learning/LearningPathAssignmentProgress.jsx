@@ -188,20 +188,27 @@ function ReadOnlyDeckRow({ deck, onLearn, onStudy }) {
         {studyBtn}
       </div>
 
-      {/* Mobile — badge above a short generic title/description (the real deck title can be very long
-          and used to blow up the card height); single primary action pinned right */}
-      <div className="flex sm:hidden items-center gap-3" style={{ background: "var(--bg-app)", border: "1px solid var(--border)", borderRadius: 14, marginBottom: 10, padding: "14px" }}>
-        {mobileIcon}
-        <div className="flex-1 min-w-0">
-          {badge}
-          <p style={{ fontSize: 14.5, fontWeight: 700, color: "var(--text-primary)", marginTop: 6 }}>{t("enterprise.learning.progress.deckMobileTitle")}</p>
-          <p style={{ fontSize: 11.5, color: "var(--text-tertiary)", marginTop: 2 }}>{t("enterprise.learning.progress.deckMobileDesc")}</p>
+      {/* Mobile — real deck title (2 lines max) and the same actions as desktop (Learn + Study) */}
+      <div className="sm:hidden" data-testid="assignment-deck-card" style={{ background: "var(--bg-app)", border: "1px solid var(--border)", borderRadius: 14, marginBottom: 10, padding: "14px" }}>
+        <div className="flex items-start gap-3">
+          {mobileIcon}
+          <div className="flex-1 min-w-0">
+            {badge}
+            <p className="[display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2] overflow-hidden" style={{ fontSize: 14.5, fontWeight: 700, color: "var(--text-primary)", marginTop: 6, lineHeight: 1.35 }} title={deck.title}>
+              {deck.title || t("enterprise.learning.progress.deckMobileTitle")}
+            </p>
+          </div>
         </div>
-        <button onClick={() => onLearn?.(deck)}
-          className="flex items-center gap-1 flex-shrink-0"
-          style={{ padding: "9px 12px 9px 14px", borderRadius: 10, background: "rgba(99,102,241,0.16)", border: "1px solid rgba(99,102,241,0.3)", color: "var(--lt-818cf8, #818CF8)", fontSize: 12.5, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}>
-          {t("enterprise.learning.progress.learnBtn")} <ChevronRightIcon style={{ width: 13, height: 13 }} />
-        </button>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <button onClick={() => onLearn?.(deck)}
+            className="min-h-[44px] flex-1 basis-[40%] rounded-[10px] border border-[#C7D2FE] bg-white px-3 text-sm font-bold text-[#4338CA] active:bg-[#EEF2FF]">
+            {t("enterprise.learning.progress.learnBtn")}
+          </button>
+          <button onClick={() => onStudy?.(deck)}
+            className="min-h-[44px] flex-1 basis-[40%] rounded-[10px] border border-[#C7D2FE] bg-[#EEF2FF] px-3 text-sm font-bold text-[#4338CA] active:bg-[#E0E7FF]">
+            {t("enterprise.learning.progress.studyBtn")}
+          </button>
+        </div>
       </div>
     </>
   );
@@ -271,20 +278,21 @@ function ReadOnlyBatteryRow({ battery, onSimulate }) {
         {simulateBtn}
       </div>
 
-      {/* Mobile — badge above a short generic title/description (the real name can be very long and
-          used to blow up the card height); progress only shows once there's a real attempt */}
-      <div className="flex sm:hidden items-center gap-3" style={{ background: "var(--bg-app)", border: "1px solid var(--border)", borderRadius: 14, marginBottom: 10, padding: "14px" }}>
-        {mobileIcon}
-        <div className="flex-1 min-w-0">
-          {badge}
-          <p style={{ fontSize: 14.5, fontWeight: 700, color: "var(--text-primary)", marginTop: 6 }}>{t("enterprise.learning.progress.batteryMobileTitle")}</p>
-          <p style={{ fontSize: 11.5, color: "var(--text-tertiary)", marginTop: 2 }}>{t("enterprise.learning.progress.batteryMobileDesc")}</p>
-          {mobileProgressMini}
+      {/* Mobile — real battery name (2 lines max); progress once there's a real attempt; Simulate */}
+      <div className="sm:hidden" data-testid="assignment-battery-card" style={{ background: "var(--bg-app)", border: "1px solid var(--border)", borderRadius: 14, marginBottom: 10, padding: "14px" }}>
+        <div className="flex items-start gap-3">
+          {mobileIcon}
+          <div className="flex-1 min-w-0">
+            {badge}
+            <p className="[display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2] overflow-hidden" style={{ fontSize: 14.5, fontWeight: 700, color: "var(--text-primary)", marginTop: 6, lineHeight: 1.35 }} title={battery.name || battery.title}>
+              {battery.name || battery.title || t("enterprise.learning.progress.batteryMobileTitle")}
+            </p>
+            {mobileProgressMini}
+          </div>
         </div>
         <button onClick={() => onSimulate?.(battery)}
-          className="flex items-center gap-1 flex-shrink-0"
-          style={{ padding: "9px 12px 9px 14px", borderRadius: 10, background: "rgba(94,106,210,0.18)", border: "1px solid rgba(94,106,210,0.32)", color: "var(--lt-818cf8, #818CF8)", fontSize: 12.5, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}>
-          {t("enterprise.learning.progress.simulateBtn")} <ChevronRightIcon style={{ width: 13, height: 13 }} />
+          className="mt-3 inline-flex min-h-[44px] w-full items-center justify-center gap-1 rounded-[10px] border border-[#C7D2FE] bg-[#EEF2FF] px-3 text-sm font-bold text-[#4338CA] active:bg-[#E0E7FF]">
+          {t("enterprise.learning.progress.simulateBtn")} <ChevronRightIcon style={{ width: 14, height: 14 }} />
         </button>
       </div>
     </>
@@ -317,9 +325,12 @@ function ReadOnlyTopicSection({ topic, index, decks, batteries, isLast, onStudy,
           <button onClick={() => setExpanded((v) => !v)} style={{ color: "#64748B", cursor: "pointer", padding: 0, background: "none", border: "none", display: "flex", alignItems: "center", flexShrink: 0 }}>
             {expanded ? <ChevronRightIcon style={{ width: 13, height: 13, transform: "rotate(90deg)" }} /> : <ChevronRightIcon style={{ width: 13, height: 13 }} />}
           </button>
-          <span style={{ fontWeight: 700, color: "var(--lt-f1f5f9, #F1F5F9)", fontSize: 13, flexShrink: 0 }}>{t("enterprise.learning.progress.topicLabel", { n: index + 1 })}</span>
+          <span className="hidden sm:inline" style={{ fontWeight: 700, color: "var(--lt-f1f5f9, #F1F5F9)", fontSize: 13, flexShrink: 0 }}>{t("enterprise.learning.progress.topicLabel", { n: index + 1 })}</span>
+          <span className="sm:hidden min-w-0 flex-1 [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2] overflow-hidden" style={{ fontWeight: 700, color: "var(--text-primary)", fontSize: 13.5, lineHeight: 1.35 }}>
+            {topic.title || t("enterprise.learning.progress.topicLabel", { n: index + 1 })}
+          </span>
           <span style={{ padding: "1px 7px", borderRadius: 20, background: "var(--lt-rgba-255-255-255-0-06, rgba(255,255,255,0.06))", border: "1px solid var(--lt-rgba-255-255-255-0-09, rgba(255,255,255,0.09))", color: "#64748B", fontSize: 10, fontWeight: 600, flexShrink: 0 }}>{t("enterprise.learning.progress.tagsCount", { n: tagCount })}</span>
-          <span style={{ fontSize: 11, color: "#64748B", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1, minWidth: 0 }}>{description}</span>
+          <span className="hidden sm:inline" style={{ fontSize: 11, color: "#64748B", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1, minWidth: 0 }}>{description}</span>
         </div>
         {expanded && (
           <div className="sm:ml-1.5">

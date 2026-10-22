@@ -63,5 +63,19 @@ for (const vp of VIEWPORTS) {
         await expect(page.getByPlaceholder("E.g. Heart Anatomy")).toBeVisible();
       });
     }
+
+    test("M-02 assignment: Learn, Study and Simulate with the real names", async ({ page }) => {
+      await setupApp(page, withCompany);
+      await page.goto("/enterprise/learning/assignments/90");
+      await expect(page.getByText("Equipos de protección individual obligatorios").locator("visible=true").first()).toBeVisible();
+      const deck = page.getByTestId("assignment-deck-card").first();
+      await expect(deck.getByText("Equipos de protección individual: casco, guantes y gafas de seguridad")).toBeVisible();
+      await expectTappable(deck.getByRole("button", { name: "Learn" }));
+      await expectTappable(deck.getByRole("button", { name: "Study" }));
+      const battery = page.getByTestId("assignment-battery-card").first();
+      await expect(battery.getByText("Evaluación EPP")).toBeVisible();
+      await expectTappable(battery.getByRole("button", { name: /Simulate/ }));
+      await expectNoHorizontalOverflow(page);
+    });
   });
 }
