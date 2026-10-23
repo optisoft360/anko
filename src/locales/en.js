@@ -2137,6 +2137,8 @@ export const en = {
                     all: "All"
                 },
                 empty: {
+                    noMatchTitle: "No processes match these filters",
+                    clearFilters: "Clear filters",
                     title: "No processes yet",
                     message: "Create your first Learning Process. You can upload documents and the system converts them into structured content."
                 },

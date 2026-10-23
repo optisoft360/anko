@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import {
   PlusIcon, BookOpenIcon, AcademicCapIcon,
   ClockIcon, TrashIcon, ArrowPathIcon, ExclamationTriangleIcon,
+  FunnelIcon,
 } from "@heroicons/react/24/outline";
 import { knowledgeApi } from "../../api/enterpriseApi";
 import { useEnterprise } from "../../context/enterprise-context";
@@ -80,6 +81,23 @@ function EmptyProcesos({ onNew }) {
       </p>
       <button onClick={onNew} className="ank-btn-accent text-xs mt-5">
         <PlusIcon className="h-3.5 w-3.5" /> {t("enterprise.knowledge.sources.newProcess")}
+      </button>
+    </div>
+  );
+}
+
+// Filters active but nothing matches: not the same as having no processes (M-05.2).
+function NoMatchingProcesos({ onClear }) {
+  const { t } = useLanguage();
+  return (
+    <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border)", borderRadius: 8 }}
+      className="flex flex-col items-center py-16 px-8 text-center" data-testid="processes-no-match">
+      <div style={{ background: "var(--bg-elevated)", borderRadius: 10, padding: 14, marginBottom: 14 }}>
+        <FunnelIcon style={{ width: 28, height: 28, color: "var(--text-tertiary)" }} />
+      </div>
+      <p style={{ color: "var(--text-primary)", fontWeight: 600, fontSize: 14 }}>{t("enterprise.knowledge.sources.empty.noMatchTitle")}</p>
+      <button onClick={onClear} className="ank-btn-ghost text-xs mt-5 min-h-[44px] md:min-h-0">
+        {t("enterprise.knowledge.sources.empty.clearFilters")}
       </button>
     </div>
   );
@@ -324,6 +342,8 @@ export function KnowledgeSources() {
               className="animate-pulse" />
           ))}
         </div>
+      ) : filtered.length === 0 && (typeFilter || diffFilter) ? (
+        <NoMatchingProcesos onClear={() => { setTypeFilter(""); setDiffFilter(""); }} />
       ) : filtered.length === 0 ? (
         <EmptyProcesos onNew={() => navigate("/enterprise/knowledge/new")} />
       ) : (

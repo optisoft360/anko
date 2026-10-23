@@ -76,26 +76,45 @@ export function Avatar({ name, tone = "indigo", size = "md" }) {
   );
 }
 
-/** Segmented tabs; scrolls sideways on narrow screens. */
+/** Segmented tabs; scrolls sideways on narrow screens, with a fade where more tabs hide. */
 export function Segmented({ items, value, onChange, ariaLabel }) {
+  const ref = useRef(null);
+  const [edges, setEdges] = useState({ left: false, right: false });
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return undefined;
+    const update = () => setEdges({
+      left: el.scrollLeft > 2,
+      right: el.scrollLeft + el.clientWidth < el.scrollWidth - 2,
+    });
+    update();
+    el.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    return () => { el.removeEventListener("scroll", update); window.removeEventListener("resize", update); };
+  }, [items.length]);
   return (
-    <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
-      <div role="tablist" aria-label={ariaLabel} className="inline-flex min-w-max gap-1 rounded-lg border border-[#E2E8F0] bg-white p-1 shadow-[0_1px_2px_0_rgb(15_23_42/0.04)]">
-        {items.map((it) => {
-          const active = it.value === value;
-          return (
-            <button key={it.value} type="button" role="tab" aria-selected={active} onClick={() => onChange(it.value)}
-              className={`inline-flex h-9 cursor-pointer items-center gap-2 whitespace-nowrap rounded-md px-3 text-sm transition-colors duration-150 ${FOCUS} ${
-                active ? "bg-[#EEF2FF] font-semibold text-[#4338CA]" : "font-medium text-[#475569] hover:bg-[#F8FAFC] hover:text-[#0F172A]"}`}>
-              {it.icon && <it.icon className="h-4 w-4" />}
-              {it.label}
-              {it.count != null && it.count > 0 && (
-                <span className={`rounded-full px-1.5 text-[11px] font-semibold tabular-nums ${active ? "bg-[#C7D2FE] text-[#3730A3]" : "bg-[#F1F5F9] text-[#64748B]"}`}>{it.count}</span>
-              )}
-            </button>
-          );
-        })}
+    <div className="relative -mx-4 sm:mx-0">
+      <div ref={ref} className="overflow-x-auto px-4 sm:px-0" data-testid="segmented-scroller">
+        <div role="tablist" aria-label={ariaLabel} className="inline-flex min-w-max gap-1 rounded-lg border border-[#E2E8F0] bg-white p-1 shadow-[0_1px_2px_0_rgb(15_23_42/0.04)]">
+          {items.map((it) => {
+            const active = it.value === value;
+            return (
+              <button key={it.value} type="button" role="tab" aria-selected={active} onClick={() => onChange(it.value)}
+                className={`inline-flex h-10 cursor-pointer items-center gap-2 whitespace-nowrap rounded-md px-2.5 text-sm transition-colors duration-150 sm:h-9 sm:px-3 ${FOCUS} ${
+                  active ? "bg-[#EEF2FF] font-semibold text-[#4338CA]" : "font-medium text-[#475569] hover:bg-[#F8FAFC] hover:text-[#0F172A]"}`}>
+                {it.icon && <it.icon className="hidden h-4 w-4 sm:block" />}
+                {it.label}
+                {it.count != null && it.count > 0 && (
+                  <span className={`rounded-full px-1.5 text-[11px] font-semibold tabular-nums ${active ? "bg-[#C7D2FE] text-[#3730A3]" : "bg-[#F1F5F9] text-[#64748B]"}`}>{it.count}</span>
+                )}
+              </button>
+            );
+          })}
+        </div>
       </div>
+      {/* Swipe hint on phones: fade on the side that still has tabs. */}
+      {edges.left && <span aria-hidden="true" className="pointer-events-none absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-[#F5F7FB] to-transparent sm:hidden" />}
+      {edges.right && <span aria-hidden="true" data-testid="segmented-more" className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-[#F5F7FB] to-transparent sm:hidden" />}
     </div>
   );
 }

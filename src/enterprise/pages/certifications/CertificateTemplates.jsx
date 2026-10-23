@@ -156,7 +156,7 @@ export function CertificateTemplates() {
         <EmptyState icon={AcademicCapIcon} title={t("enterprise.certifications.templates.empty.title")} message={t("enterprise.certifications.templates.empty.message")} action={t("enterprise.certifications.templates.newTemplate")} onAction={() => navigate("/enterprise/certifications/templates/new")} />
       ) : (
         <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border)", borderRadius: 12, overflow: "hidden" }}>
-          <div style={{ overflowX: "auto" }}>
+          <div className="ank-table-scroll ank-sticky-last" style={{ overflowX: "auto" }}>
             <table className="w-full" style={{ fontSize: 13, borderCollapse: "collapse" }}>
               <thead style={{ background: "var(--bg-elevated)", borderBottom: "1px solid var(--border)" }}>
                 <tr>

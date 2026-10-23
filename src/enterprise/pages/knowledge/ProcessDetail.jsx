@@ -384,7 +384,7 @@ export function AddDocModal({ ksId, companyId, onClose, onAdded, initialFiles = 
   const allDone = results.length > 0 && !uploading;
 
   return (
-    <div style={{ position: "fixed", inset: 0, zIndex: 50, background: "var(--lt-rgba-0-0-0-0-7, rgba(0,0,0,0.7))", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+    <div className="z-[10050] md:z-50" style={{ position: "fixed", inset: 0, background: "var(--lt-rgba-0-0-0-0-7, rgba(0,0,0,0.7))", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
       <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border)", borderRadius: 10, padding: "24px", width: "100%", maxWidth: 420 }}>
         <div className="flex items-center justify-between mb-5">
           <h2 style={{ color: "var(--text-primary)", fontWeight: 700, fontSize: 14 }}>{t("enterprise.knowledge.processDetail.addDocModal.title")}</h2>

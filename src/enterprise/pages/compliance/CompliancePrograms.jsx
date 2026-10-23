@@ -306,7 +306,7 @@ export function CompliancePrograms() {
           action={canEdit ? t("enterprise.compliance.programs.newProgram") : undefined} onAction={canEdit ? () => setShowCreate(true) : undefined} />
       ) : (
         <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border)", borderRadius: 12, overflow: "hidden" }}>
-          <div style={{ overflowX: "auto" }}>
+          <div className={`ank-table-scroll ${canEdit ? "ank-sticky-last" : ""}`} style={{ overflowX: "auto" }}>
             <table className="w-full" style={{ fontSize: 13, borderCollapse: "collapse" }}>
               <thead style={{ background: "var(--bg-elevated)", borderBottom: "1px solid var(--border)" }}>
                 <tr>

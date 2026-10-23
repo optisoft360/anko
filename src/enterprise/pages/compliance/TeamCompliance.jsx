@@ -79,7 +79,7 @@ export function TeamCompliance() {
         <EmptyState title={t(`${K}noMembers`)} />
       ) : (
         <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border)", borderRadius: 12, overflow: "hidden" }}>
-          <div style={{ overflowX: "auto" }}>
+          <div className="ank-table-scroll ank-sticky-first" style={{ overflowX: "auto" }}>
             <table className="w-full" style={{ fontSize: 13, borderCollapse: "collapse" }}>
               <thead style={{ background: "var(--bg-elevated)", borderBottom: "1px solid var(--border)" }}>
                 <tr>

@@ -2138,6 +2138,8 @@ export const es = {
                     all: "Todos"
                 },
                 empty: {
+                    noMatchTitle: "Ningún proceso coincide con estos filtros",
+                    clearFilters: "Quitar filtros",
                     title: "Aún no hay procesos",
                     message: "Crea tu primer Proceso de aprendizaje. Puedes subir documentos y el sistema los convierte en contenido estructurado."
                 },

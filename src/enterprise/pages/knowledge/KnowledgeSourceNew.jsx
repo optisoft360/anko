@@ -15,6 +15,7 @@ import { applyUploadValidation, UPLOAD_ALLOWED_FILE_TYPES, MAX_UPLOAD_BYTES, upl
 import { API_BASE } from "@/services/api";
 import { mapApiErrors } from "@/utils/apiError";
 import { intInRange, noWheel } from "@/utils/numberInput";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 // 17: bounds shared with the API (KnowledgeSourceCreateSerializer).
 const NUMBER_FIELDS = {
@@ -376,6 +377,7 @@ function Step2({ form, onChange, onBack, onNext, saving, error, fieldErrors = {}
 // ─── Step 3: Subir documentos con Uppy ───────────────────────────────────────
 
 function Step3({ ksId, companyId, onFinish }) {
+  const isMobile = useIsMobile();
   const { t } = useLanguage();
   const [uploadedDocs, setUploadedDocs] = useState([]);
   const uppyRef = useRef(null);
@@ -436,12 +438,12 @@ function Step3({ ksId, companyId, onFinish }) {
         <Dashboard
           uppy={uppy}
           width="100%"
-          height={360}
+          height={isMobile ? 240 : 360}
           inline
           proudlyDisplayPoweredByUppy={false}
           showProgressDetails
           note={uploadHelpText(t)}
-          theme="dark"
+          theme={isMobile ? "light" : "dark"}
         />
       </div>
 

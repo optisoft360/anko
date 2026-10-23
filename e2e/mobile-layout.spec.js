@@ -136,5 +136,74 @@ for (const vp of VIEWPORTS) {
       await expect(page.getByRole("dialog").getByText("casco, guantes")).toBeVisible();
       await expectNoHorizontalOverflow(page);
     });
+
+    test("M-05.1 learning path: Edit / Assign below the title", async ({ page }) => {
+      await setupApp(page, withCompany);
+      await page.goto("/enterprise/learning/paths/7");
+      const title = page.getByRole("heading", { name: /Ruta de incorporación/ });
+      await expect(title).toBeVisible();
+      const tb = await title.boundingBox();
+      expect(tb.width).toBeGreaterThan(150);
+      for (const name of [/^Edit$/, /^Assign$/]) {
+        const btn = page.getByRole("button", { name });
+        await expectTappable(btn);
+        expect((await btn.boundingBox()).y).toBeGreaterThan(tb.y + tb.height);
+      }
+      await expectNoHorizontalOverflow(page);
+    });
+
+    test("M-05.2 processes: filters without results say so and can be cleared", async ({ page }) => {
+      await setupApp(page, {
+        ...withCompany,
+        "GET /enterprise/knowledge-sources/$": (req, url) => (url.searchParams.get("process_type") === "study_material" ? [] : withCompany["GET /enterprise/knowledge-sources/$"]()),
+      });
+      await page.goto("/enterprise/knowledge");
+      await page.getByRole("button", { name: "Study Material" }).click();
+      await expect(page.getByText("No processes match these filters")).toBeVisible();
+      await expect(page.getByText("No processes yet")).toHaveCount(0);
+      await expectTappable(page.getByRole("button", { name: "Clear filters" }));
+      await page.getByRole("button", { name: "Clear filters" }).click();
+      await expect(page.getByText("QA-TEST Manual de calidad ISO 9001")).toBeVisible();
+    });
+
+    test("M-05.3 new process upload area is light and short", async ({ page }) => {
+      await setupApp(page, {
+        ...withCompany,
+        "POST /enterprise/knowledge-sources/$": () => ({ id: 9, title: "QA-TEST nuevo" }),
+      });
+      await page.goto("/enterprise/knowledge/new");
+      await page.getByPlaceholder(/General Onboarding/).fill("QA-TEST nuevo");
+      await page.getByRole("button", { name: "Next" }).click();
+      await page.getByRole("button", { name: /Create Process/i }).click();
+      const dash = page.locator(".uppy-Dashboard");
+      await expect(dash).toBeVisible();
+      await expect(dash).toHaveAttribute("data-uppy-theme", "light");
+      expect((await page.locator(".uppy-Dashboard-inner").boundingBox()).height).toBeLessThanOrEqual(260);
+    });
+
+    test("M-05.4 scrolling tables keep their key column visible", async ({ page }) => {
+      await setupApp(page, withCompany);
+      await page.goto("/enterprise/certifications/templates");
+      const lastCell = page.locator("tbody tr").first().locator("td").last();
+      await expect(lastCell).toHaveCSS("position", "sticky");
+      const box = await lastCell.boundingBox();
+      expect(box.x + box.width).toBeLessThanOrEqual(vp.width);
+      await page.goto("/enterprise/compliance/team");
+      await page.getByRole("combobox").first().selectOption({ index: 1 }).catch(() => {});
+      await expectNoHorizontalOverflow(page);
+    });
+
+    test("M-05.5 settings tabs: Members reachable, swipe hint when they overflow", async ({ page }) => {
+      await setupApp(page, withCompany);
+      await page.goto("/enterprise/settings");
+      const members = page.getByRole("tab", { name: "Members" });
+      await expect(members).toBeAttached();
+      const scroller = page.getByTestId("segmented-scroller");
+      const overflows = await scroller.evaluate((el) => el.scrollWidth > el.clientWidth + 2);
+      if (overflows) await expect(page.getByTestId("segmented-more")).toBeVisible();
+      await members.click();
+      await expect(page.getByRole("button", { name: /Add member/ })).toBeVisible();
+      await expectNoHorizontalOverflow(page);
+    });
   });
 }

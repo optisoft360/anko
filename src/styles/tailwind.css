@@ -416,3 +416,32 @@ html.theme-light input::placeholder, html.theme-light textarea::placeholder { co
 @media (prefers-reduced-motion: reduce) {
   html.theme-light * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
 }
+
+/* ─── Phones only (below md): horizontally scrolling tables (M-05.4) ───
+   .ank-table-scroll  shadow at the edges while there is more to scroll
+   .ank-sticky-first  first column (name) stays visible
+   .ank-sticky-last   last column (actions) stays visible */
+@media (max-width: 719.98px) {
+  .ank-table-scroll {
+    background:
+      linear-gradient(to right, var(--bg-surface) 30%, rgba(255,255,255,0)) left center / 32px 100% no-repeat local,
+      linear-gradient(to left, var(--bg-surface) 30%, rgba(255,255,255,0)) right center / 32px 100% no-repeat local,
+      radial-gradient(farthest-side at 0 50%, rgba(15,23,42,0.16), rgba(15,23,42,0)) left center / 12px 100% no-repeat scroll,
+      radial-gradient(farthest-side at 100% 50%, rgba(15,23,42,0.16), rgba(15,23,42,0)) right center / 12px 100% no-repeat scroll;
+    -webkit-overflow-scrolling: touch;
+  }
+  .ank-sticky-first th:first-child,
+  .ank-sticky-first td:first-child {
+    position: sticky; left: 0; z-index: 1;
+    background: var(--bg-surface);
+    box-shadow: 6px 0 8px -6px rgba(15,23,42,0.18);
+  }
+  .ank-sticky-last th:last-child,
+  .ank-sticky-last td:last-child {
+    position: sticky; right: 0; z-index: 1;
+    background: var(--bg-surface);
+    box-shadow: -6px 0 8px -6px rgba(15,23,42,0.18);
+  }
+  .ank-sticky-first thead th:first-child,
+  .ank-sticky-last thead th:last-child { background: var(--bg-elevated); }
+}

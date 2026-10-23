@@ -546,13 +546,13 @@ export function LearningPathDetail() {
       </button>
 
       {/* Header card */}
-      <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border)", borderRadius: 8, padding: "20px 24px" }}>
+      <div className="p-4 md:px-6 md:py-5" style={{ background: "var(--bg-surface)", border: "1px solid var(--border)", borderRadius: 8 }}>
         {editing ? (
           <EditHeaderForm path={path}
             onSaved={(updated) => { setPath(updated); setEditing(false); }}
             onCancel={() => setEditing(false)} />
         ) : (
-          <div className="flex items-start justify-between gap-4">
+          <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <div className="flex items-start gap-3 min-w-0">
               <div style={{ width: 42, height: 42, borderRadius: 8, background: "var(--accent)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 18, flexShrink: 0 }}>
                 {path.name.charAt(0).toUpperCase()}
@@ -585,7 +585,7 @@ export function LearningPathDetail() {
                 </div>
               </div>
             </div>
-            <div className="flex items-center gap-2 flex-shrink-0">
+            <div className="flex flex-wrap items-center gap-2 flex-shrink-0 [&>button]:min-h-[44px] [&>button]:flex-1 [&>button]:justify-center md:flex-nowrap md:[&>button]:min-h-0 md:[&>button]:flex-none">
               <button onClick={() => setEditing(true)} className="ank-btn-ghost text-xs">
                 <PencilIcon className="h-3.5 w-3.5" /> {t("enterprise.learning.pathDetail.edit")}
               </button>
