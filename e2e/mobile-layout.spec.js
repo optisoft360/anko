@@ -2,6 +2,17 @@ import { expect, test } from "@playwright/test";
 import { setupApp } from "./helpers";
 import { withCompany } from "./fixtures/app-data";
 
+const noCompany = {
+  "GET /auth/me/context/$": () => ({ has_company: false, companies: [] }),
+  "GET /rbac/me/allowed-routes/$": () => ({ allowed_routes: [], is_admin: false, roles: ["client"] }),
+  "GET /auth/me/$": () => ({ id: 2, username: "new.user", first_name: "Nuevo", email: "new@test.com", is_staff: false }),
+  "GET /enterprise/companies/$": () => [],
+};
+const ownerNotStaff = {
+  ...withCompany,
+  "GET /rbac/me/allowed-routes/$": () => ({ allowed_routes: ["enterprise.ent-dashboard", "enterprise.ent-knowledge"], is_admin: false, roles: ["client"] }),
+};
+
 // Mobile layout fixes (M-01 … M-08), run on an iPhone and an Android viewport.
 
 const VIEWPORTS = [
@@ -205,5 +216,85 @@ for (const vp of VIEWPORTS) {
       await expect(page.getByRole("button", { name: /Add member/ })).toBeVisible();
       await expectNoHorizontalOverflow(page);
     });
+
+    test("M-07 no company: home only, no hamburger, drawer or bottom bar", async ({ page }) => {
+      await setupApp(page, noCompany);
+      await page.addInitScript(() => localStorage.removeItem("enterprise_company_id"));
+      await page.goto("/dashboard/home");
+      await expect(page.getByRole("heading", { name: "Nuevo" })).toBeVisible();
+      await expect(page.getByRole("button", { name: "Open menu" })).toBeHidden();
+      await expect(page.locator("nav.fixed.bottom-0")).toHaveCount(0);
+      await expect(page.locator("aside").filter({ hasText: "Knowledge Sources" })).toBeHidden();
+      await expectNoHorizontalOverflow(page);
+    });
+
+    test("M-07 with company: hamburger, drawer and bottom bar unchanged", async ({ page }) => {
+      await setupApp(page, ownerNotStaff);
+      await page.goto("/enterprise/dashboard");
+      await expectTappable(page.getByRole("button", { name: "Open menu" }));
+      await expect(page.locator("nav.fixed.bottom-0")).toBeVisible();
+      await page.getByRole("button", { name: "Open menu" }).click();
+      await expect(page.locator("aside").getByText("Knowledge Sources")).toBeVisible();
+    });
+
+    test("M-08 owner: New Process visible, not covered and opens the wizard (dashboard + processes)", async ({ page }) => {
+      await setupApp(page, ownerNotStaff);
+      for (const path of ["/enterprise/dashboard", "/enterprise/knowledge"]) {
+        await page.goto(path);
+        const btn = page.getByRole("button", { name: "New Process" }).first();
+        await expectTappable(btn);
+        await btn.click();
+        await expect(page.getByPlaceholder(/General Onboarding/)).toBeVisible();
+      }
+    });
+
+    test("M-08 personal Create Project is hidden for everyone", async ({ page }) => {
+      for (const routes of [ownerNotStaff, noCompany]) {
+        await setupApp(page, routes);
+        await page.goto("/dashboard/projects");
+        await page.waitForLoadState("networkidle");
+        await expect(page.getByRole("button", { name: /Create Project|New Project|Crear Proyecto|Nuevo Proyecto/ })).toHaveCount(0);
+        await expect(page.getByText(/^New Project$/)).toHaveCount(0);
+      }
+    });
   });
 }
+
+test.describe("desktop 1440x900", () => {
+  test.use({ viewport: { width: 1440, height: 900 } });
+
+  test("M-08 owner: New Process visible, not covered and opens the wizard", async ({ page }) => {
+    await setupApp(page, ownerNotStaff);
+    for (const path of ["/enterprise/dashboard", "/enterprise/knowledge"]) {
+      await page.goto(path);
+      const btn = page.getByRole("button", { name: "New Process" }).first();
+      await expect(btn).toBeVisible();
+      const onTop = await btn.evaluate((el) => {
+        const r = el.getBoundingClientRect();
+        const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+        return !!hit && (hit === el || el.contains(hit));
+      });
+      expect(onTop).toBe(true);
+      await btn.click();
+      await expect(page.getByPlaceholder(/General Onboarding/)).toBeVisible();
+    }
+  });
+
+  test("M-07 no company on desktop: navigation as today (flag off)", async ({ page }) => {
+    await setupApp(page, noCompany);
+    await page.addInitScript(() => localStorage.removeItem("enterprise_company_id"));
+    await page.goto("/dashboard/home");
+    await expect(page.getByRole("button", { name: "Open menu" })).toBeVisible();
+    await expect(page.locator("aside").getByText("Knowledge Sources")).toBeVisible();
+  });
+
+  test("M-08 personal Create Project is hidden for everyone", async ({ page }) => {
+    for (const routes of [ownerNotStaff, noCompany]) {
+      await setupApp(page, routes);
+      await page.goto("/dashboard/projects");
+      await page.waitForLoadState("networkidle");
+      await expect(page.getByRole("button", { name: /Create Project|New Project|Crear Proyecto|Nuevo Proyecto/ })).toHaveCount(0);
+      await expect(page.getByText(/^New Project$/)).toHaveCount(0);
+    }
+  });
+});

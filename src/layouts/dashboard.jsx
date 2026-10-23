@@ -15,6 +15,7 @@ import { useEnterprise } from "@/enterprise/context/enterprise-context";
 import { EnterpriseSidenav } from "@/widgets/layout/enterprise-sidenav";
 import { useLightTheme } from "@/hooks/useLightTheme";
 import { ChatFab } from "@/widgets/layout/chat-fab";
+import { useHideNavWithoutCompany } from "@/config/navigation";
 
 export function Dashboard() {
   const [controller, dispatch] = useMaterialTailwindController();
@@ -22,6 +23,8 @@ export function Dashboard() {
   const { isAdmin } = useAuth();
   const { activeCompany, role } = useEnterprise();
   useLightTheme();
+  // M-07: no company → home only, without side menu or bottom tab bar (phones).
+  const hideNav = useHideNavWithoutCompany();
 
   // "admin-area" is platform-wide (Users, Roles, Companies, ...) — gated purely
   // by isAdmin (is_staff/is_superuser/global "admin" role), same rule as in
@@ -33,14 +36,18 @@ export function Dashboard() {
 
   return (
     <div className="min-h-screen" style={{ background: "var(--bg-app)" }}>
-      <EnterpriseSidenav routes={filteredRoutes} company={activeCompany} role={role} />
+      {hideNav.desktop ? null : hideNav.mobile ? (
+        <div className="hidden md:block"><EnterpriseSidenav routes={filteredRoutes} company={activeCompany} role={role} /></div>
+      ) : (
+        <EnterpriseSidenav routes={filteredRoutes} company={activeCompany} role={role} />
+      )}
 
       <div
-        className="min-h-screen flex flex-col transition-all duration-200 md:ml-[var(--sidebar-w)]"
+        className={`min-h-screen flex flex-col transition-all duration-200 ${hideNav.desktop ? "" : "md:ml-[var(--sidebar-w)]"}`}
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       >
         <div className="sticky top-0 z-30 bg-white/95 backdrop-blur md:static md:bg-transparent md:backdrop-blur-none">
-          <DashboardNavbar />
+          <DashboardNavbar hideMenu={hideNav} />
         </div>
 
         <ChatPanel />
@@ -74,7 +81,7 @@ export function Dashboard() {
 
       </div>
 
-      <MobileTabBar />
+      {!hideNav.mobile && <MobileTabBar />}
     </div>
   );
 }

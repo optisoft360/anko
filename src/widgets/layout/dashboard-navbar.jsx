@@ -45,7 +45,7 @@ const getLevelStyle = (level) => {
   return                          { Icon: InformationCircleIcon,   ring: "ring-indigo-100",  cls: "text-indigo-500",  dot: "bg-indigo-500"  };
 };
 
-export function DashboardNavbar() {
+export function DashboardNavbar({ hideMenu = { mobile: false, desktop: false } } = {}) {
   const [controller, dispatch] = useMaterialTailwindController();
   const { fixedNavbar, openSidenav } = controller;
   const { pathname } = useLocation();
@@ -159,7 +159,7 @@ export function DashboardNavbar() {
           <div className="capitalize flex min-w-0 items-center gap-1 md:gap-4">
             <IconButton
               variant="text"
-              className="grid text-zinc-600"
+              className={`${hideMenu.desktop ? "hidden" : hideMenu.mobile ? "hidden md:grid" : "grid"} text-zinc-600 !h-11 !w-11 !max-h-[44px] !max-w-[44px] md:!h-10 md:!w-10 md:!max-h-[40px] md:!max-w-[40px]`}
               aria-label={language === "es" ? "Abrir menú" : "Open menu"}
               onClick={() => setOpenSidenav(dispatch, !openSidenav)}
             >

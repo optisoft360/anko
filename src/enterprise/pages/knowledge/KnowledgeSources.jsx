@@ -312,7 +312,7 @@ export function KnowledgeSources() {
             {t("enterprise.knowledge.sources.subtitle")}
           </p>
         </div>
-        <button onClick={() => navigate("/enterprise/knowledge/new")} className="ank-btn-accent text-xs">
+        <button onClick={() => navigate("/enterprise/knowledge/new")} className="ank-btn-accent text-xs min-h-[44px] md:min-h-0">
           <PlusIcon className="h-3.5 w-3.5" /> {t("enterprise.knowledge.sources.newProcess")}
         </button>
       </div>
