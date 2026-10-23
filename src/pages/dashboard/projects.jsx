@@ -22,6 +22,11 @@ import {
 } from "@heroicons/react/24/outline";
 import { ProjectCard } from "@/widgets/cards/project-card";
 import { CreateProjectDialog } from "@/widgets/dialogs/create-project-dialog";
+
+// Creating personal projects is disabled for everyone (product decision, 2026-10-22).
+// Set to true to bring back every "Create Project" entry point; the dialog and the
+// create logic below are kept untouched.
+const ALLOW_PERSONAL_PROJECT_CREATION = false;
 import { EditProjectDialog } from "@/widgets/dialogs/edit-project-dialog";
 import { ConfirmDialog } from "@/widgets/dialogs/confirm-dialog";
 import projectService from "@/services/projectService";
@@ -387,11 +392,13 @@ export function Projects() {
                             <input type="text" placeholder={language === "es" ? "Buscar proyectos…" : "Search projects…"} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
                                 style={{ width: 260, padding: "11px 14px 11px 38px", background: "#fff", border: "1.5px solid #e2e8f0", borderRadius: 13, fontFamily: "inherit", fontSize: 14, color: "#0f172a", outline: "none", boxShadow: "0 2px 8px rgba(0,0,0,.04)" }} />
                         </div>
-                        <button onClick={() => setCreateDialogOpen(true)}
+                        {ALLOW_PERSONAL_PROJECT_CREATION && (
+<button onClick={() => setCreateDialogOpen(true)}
                             style={{ display: "flex", alignItems: "center", gap: 8, padding: "12px 24px", borderRadius: 13, background: "linear-gradient(135deg, #3949AB 0%, #6366f1 100%)", color: "#fff", fontFamily: "'Syne', sans-serif", fontSize: 14, fontWeight: 700, border: "none", cursor: "pointer", boxShadow: "0 6px 20px rgba(57,73,171,0.18)", whiteSpace: "nowrap" }}>
                             <svg viewBox="0 0 24 24" style={{ width: 15, height: 15, stroke: "#fff", strokeWidth: 2.5, fill: "none" }}><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                             {language === "es" ? "Crear Proyecto" : "Create Project"}
                         </button>
+)}
                     </div>
                 </div>
 
@@ -458,13 +465,15 @@ export function Projects() {
                             <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: "1.3px", color: "#94a3b8", textTransform: "uppercase", margin: 0 }}>
                                 {language === "es" ? "Recientes" : "Recent"}
                             </p>
-                            <button
+                            {ALLOW_PERSONAL_PROJECT_CREATION && (
+<button
                                 onClick={() => setCreateDialogOpen(true)}
                                 className="shrink-0 font-semibold text-white transition-all active:scale-95"
                                 style={{ background: "var(--ank-purple)", fontSize: "9px", padding: "5px 10px", borderRadius: "8px", border: "none", cursor: "pointer", whiteSpace: "nowrap" }}
                             >
                                 + {language === "es" ? "Nuevo Proyecto" : "New Project"}
                             </button>
+)}
                         </div>
                         {paginatedMobile.map((project, index) => {
                             const isFeatured = projPage === 1 && index === 0;
@@ -596,7 +605,7 @@ export function Projects() {
                         <p style={{ fontSize: 13, color: "#94a3b8", marginBottom: 20 }}>
                             {searchQuery ? t("projects.no_projects_desc") : t("projects.no_projects_cta")}
                         </p>
-                        {!searchQuery && (
+                        {ALLOW_PERSONAL_PROJECT_CREATION && !searchQuery && (
                             <button
                                 onClick={() => setCreateDialogOpen(true)}
                                 style={{
@@ -722,7 +731,8 @@ export function Projects() {
                             );
                         })}
                         {/* Create card */}
-                        <div onClick={() => setCreateDialogOpen(true)}
+                        {ALLOW_PERSONAL_PROJECT_CREATION && (
+<div onClick={() => setCreateDialogOpen(true)}
                             style={{ background: "rgba(255,255,255,.6)", borderRadius: 22, border: "1.5px dashed rgba(57,73,171,0.18)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, cursor: "pointer", minHeight: 260, transition: "all .25s" }}
                             onMouseEnter={e => { e.currentTarget.style.borderColor = "#3949AB"; e.currentTarget.style.background = "#fff"; e.currentTarget.style.transform = "translateY(-5px)"; e.currentTarget.style.boxShadow = "0 16px 40px rgba(57,73,171,0.18)"; }}
                             onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(57,73,171,0.18)"; e.currentTarget.style.background = "rgba(255,255,255,.6)"; e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = ""; }}>
@@ -732,6 +742,7 @@ export function Projects() {
                             <div style={{ fontFamily: "'Syne', sans-serif", fontSize: 16, fontWeight: 800, color: "#3949AB" }}>{language === "es" ? "Nuevo Proyecto" : "New Project"}</div>
                             <div style={{ fontSize: 13, color: "#94a3b8", textAlign: "center", maxWidth: 150, lineHeight: 1.6 }}>{language === "es" ? "Empieza a organizar tu contenido" : "Start organizing your study content"}</div>
                         </div>
+)}
                     </div>
                     <AppPagination
                         page={projPage}
@@ -746,7 +757,7 @@ export function Projects() {
                         <svg viewBox="0 0 24 24" style={{ width: 56, height: 56, stroke: "#cbd5e1", strokeWidth: 1.5, fill: "none", margin: "0 auto 16px", display: "block" }}><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
                         <p style={{ fontSize: 16, fontWeight: 600, color: "#0f172a", marginBottom: 8 }}>{t("projects.no_projects")}</p>
                         <p style={{ fontSize: 14, color: "#94a3b8", marginBottom: 20 }}>{searchQuery ? t("projects.no_projects_desc") : t("projects.no_projects_cta")}</p>
-                        {!searchQuery && (
+                        {ALLOW_PERSONAL_PROJECT_CREATION && !searchQuery && (
                             <button onClick={() => setCreateDialogOpen(true)} style={{ background: "#3949AB", color: "#fff", border: "none", borderRadius: 12, padding: "11px 24px", fontSize: 14, fontWeight: 600, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 7 }}>
                                 <svg viewBox="0 0 24 24" style={{ width: 15, height: 15, stroke: "#fff", strokeWidth: 2.5, fill: "none" }}><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                                 {t("projects.btn_create")}
