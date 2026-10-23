@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { ArrowPathIcon, LinkIcon, FunnelIcon } from "@heroicons/react/24/outline";
 import { Modal as Sheet } from "../../components/ui/kit";
+import { useIsMobile, mediaMatches, MOBILE_QUERY } from "@/hooks/useIsMobile";
 import { knowledgeApi } from "../../api/enterpriseApi";
 import { useEnterprise } from "../../context/enterprise-context";
 import { useLanguage } from "../../../context/language-context";
@@ -59,8 +60,6 @@ export const importanceOf = (n) => {
   const v = Number(n.importance_score ?? 50);
   return Math.max(0, Math.min(1, v > 1 ? v / 100 : v));
 };
-
-const MOBILE_QUERY = "(max-width: 719.98px)";
 
 /* Simple force-directed layout using Fruchterman-Reingold approximation */
 function computeLayout(nodes, edges, W, H) {
@@ -150,15 +149,9 @@ export function KnowledgeGraph() {
   const W = 1100, H = 700;
   // Phones (below md, the bottom-tab-bar breakpoint): full-width canvas, filters and
   // node detail in bottom sheets, touch pan / pinch zoom (M-04). Desktop unchanged.
-  const [isMobile, setIsMobile] = useState(() => typeof window !== "undefined" && window.matchMedia(MOBILE_QUERY).matches);
+  const isMobile = useIsMobile();
   const [filtersOpen, setFiltersOpen] = useState(false);
   const touch = useRef(null);
-  useEffect(() => {
-    const mq = window.matchMedia(MOBILE_QUERY);
-    const onChange = () => setIsMobile(mq.matches);
-    mq.addEventListener?.("change", onChange);
-    return () => mq.removeEventListener?.("change", onChange);
-  }, []);
   const fit = () => { setPan({ x: 0, y: 0 }); setZoom(1); };
 
   const loadGraph = useCallback(() => {
@@ -181,7 +174,7 @@ export function KnowledgeGraph() {
       .finally(() => {
         setLoading(false);
         // Phones open with the whole graph in view.
-        if (window.matchMedia(MOBILE_QUERY).matches) { setPan({ x: 0, y: 0 }); setZoom(1); }
+        if (mediaMatches(MOBILE_QUERY)) { setPan({ x: 0, y: 0 }); setZoom(1); }
       });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeCompanyId, filters.source]);

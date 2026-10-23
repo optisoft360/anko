@@ -16,6 +16,7 @@ export function ChatFab() {
   const lastY = useRef(0);
 
   useEffect(() => {
+    if (typeof window.matchMedia !== "function") return undefined;
     const mq = window.matchMedia(MOBILE_QUERY);
     lastY.current = window.scrollY;
     const onScroll = () => {

@@ -20,6 +20,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { CheckCircleIcon as CheckCircleSolid } from "@heroicons/react/24/solid";
 import { knowledgeApi } from "../../api/enterpriseApi";
 import { useEnterprise } from "../../context/enterprise-context";
+import { useMediaQuery, BELOW_LG_QUERY } from "@/hooks/useIsMobile";
 import { useLanguage } from "../../../context/language-context";
 import { API_BASE } from "@/services/api";
 import { ExamSimulatorDialog } from "@/widgets/dialogs/index";
@@ -938,6 +939,7 @@ function SortableBatteryRow({ battery, index, onSimulate, onDelete, canReorder, 
 
 function TagGroupSection({ tagGroup, content, isLast, onStudy, onLearn, onSimulate, onDeleteBattery, onDeleteDeck, canReorder, onDecksReorder, onBatteriesReorder, onAddDeck, onAddBattery }) {
   const { t } = useLanguage();
+  const narrow = useMediaQuery(BELOW_LG_QUERY);
   const [expanded, setExpanded] = useState(true);
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
@@ -962,15 +964,18 @@ function TagGroupSection({ tagGroup, content, isLast, onStudy, onLearn, onSimula
   return (
     <div style={{ display: "flex", minWidth: 0 }}>
       {/* Timeline */}
-      <div className="hidden lg:flex" style={{ width: 22, flexDirection: "column", alignItems: "center", marginRight: 14, flexShrink: 0 }}>
+      {!narrow && (
+      <div style={{ width: 22, display: "flex", flexDirection: "column", alignItems: "center", marginRight: 14, flexShrink: 0 }}>
         <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#6366F1", border: "2px solid var(--lt-0f172a, #0F172A)", flexShrink: 0, marginTop: 7 }} />
         {!isLast && <div style={{ width: 2, flex: 1, background: "var(--lt-rgba-255-255-255-0-08, rgba(255,255,255,0.08))", minHeight: 24, marginTop: 4 }} />}
       </div>
+      )}
 
       {/* Content */}
       <div style={{ flex: 1, minWidth: 0, paddingBottom: isLast ? 8 : 20 }}>
         {/* Header row — phones / narrow tablets */}
-        <div className="mb-2 flex items-start gap-2 lg:hidden">
+        {narrow && (
+        <div className="mb-2 flex items-start gap-2">
           <button type="button" onClick={() => setExpanded((v) => !v)} aria-expanded={expanded} aria-label={tagGroup.name}
             className="grid h-11 w-8 shrink-0 place-items-center text-[#64748B]">
             {expanded ? <ChevronDownIcon className="h-4 w-4" /> : <ChevronRightIcon className="h-4 w-4" />}
@@ -982,8 +987,10 @@ function TagGroupSection({ tagGroup, content, isLast, onStudy, onLearn, onSimula
             </span>
           </div>
         </div>
+        )}
         {/* Header row — desktop */}
-        <div className="hidden lg:flex" style={{ alignItems: "center", gap: 8, marginBottom: expanded ? 8 : 0, flexWrap: "nowrap" }}>
+        {!narrow && (
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: expanded ? 8 : 0, flexWrap: "nowrap" }}>
           <button onClick={() => setExpanded((v) => !v)} style={{ color: "#64748B", cursor: "pointer", padding: 0, background: "none", border: "none", display: "flex", alignItems: "center", flexShrink: 0 }}>
             {expanded ? <ChevronDownIcon style={{ width: 13, height: 13 }} /> : <ChevronRightIcon style={{ width: 13, height: 13 }} />}
           </button>
@@ -1005,6 +1012,7 @@ function TagGroupSection({ tagGroup, content, isLast, onStudy, onLearn, onSimula
             </span>
           )}
         </div>
+        )}
 
         {expanded && (
           <div className="lg:ml-1.5">
@@ -1267,9 +1275,9 @@ function DeckRowItem({ deck, index, onStudy, onLearn, dragHandleProps, onAddDeck
   const isSuccess = job && SUCCESS_STATUSES.has(job.status);
   const isRunning = job && !isFailed && !isSuccess;
   const borderColor = isFailed ? "rgba(239,68,68,0.35)" : isSuccess ? "rgba(74,222,128,0.35)" : isRunning ? "rgba(99,102,241,0.35)" : "var(--lt-rgba-255-255-255-0-06, rgba(255,255,255,0.06))";
-  return (
-    <>
-    <MobileItemCard
+  const narrow = useMediaQuery(BELOW_LG_QUERY);
+  if (narrow) return (
+<MobileItemCard
       kind="deck" label={label} borderColor={borderColor} disabled={isRunning} job={job} onDismissJob={onDismissJob}
       badge={isRunning ? null : t("enterprise.knowledge.processDetail.cardsCount", { n: cardCount })}
       actions={[
@@ -1280,7 +1288,10 @@ function DeckRowItem({ deck, index, onStudy, onLearn, dragHandleProps, onAddDeck
       onDelete={onDelete ? () => onDelete(deck) : null}
       deleteLabel={t("enterprise.knowledge.processDetail.deleteDeckTitle")}
     />
-    <div className="hidden lg:block" style={{ background: "var(--lt-rgba-255-255-255-0-025, rgba(255,255,255,0.025))", border: `1px solid ${borderColor}`, borderRadius: 8, marginBottom: 6, minWidth: 0, transition: "border-color 250ms" }}>
+  );
+
+  return (
+    <div style={{ background: "var(--lt-rgba-255-255-255-0-025, rgba(255,255,255,0.025))", border: `1px solid ${borderColor}`, borderRadius: 8, marginBottom: 6, minWidth: 0, transition: "border-color 250ms" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", minWidth: 0 }}>
         {dragHandleProps && (
           <div {...dragHandleProps} style={{ cursor: "grab", color: "var(--lt-334155, #334155)", display: "flex", alignItems: "center", flexShrink: 0, touchAction: "none" }} title={t("enterprise.knowledge.processDetail.dragToReorder")}>
@@ -1351,7 +1362,6 @@ function DeckRowItem({ deck, index, onStudy, onLearn, dragHandleProps, onAddDeck
         </div>
       )}
     </div>
-    </>
   );
 }
 
@@ -1369,9 +1379,9 @@ function BatteryRowItem({ battery, index, onSimulate, onDelete, dragHandleProps,
   const isRunning = job && !isFailed && !isSuccess;
   const borderColor = isFailed ? "rgba(239,68,68,0.35)" : isSuccess ? "rgba(74,222,128,0.35)" : isRunning ? "rgba(94,106,210,0.35)" : "var(--lt-rgba-255-255-255-0-06, rgba(255,255,255,0.06))";
 
-  return (
-    <>
-    <MobileItemCard
+  const narrow = useMediaQuery(BELOW_LG_QUERY);
+  if (narrow) return (
+<MobileItemCard
       kind="battery" label={label} borderColor={borderColor} disabled={isRunning} job={job} onDismissJob={onDismissJob}
       badge={isRunning ? null : t("enterprise.knowledge.processDetail.questionsCount", { n: questionCount })}
       progress={{ value: hasAttempt ? pctRounded : 0, text: hasAttempt ? `${pctRounded}%` : "—", color: pctColor, hasAttempt }}
@@ -1382,7 +1392,10 @@ function BatteryRowItem({ battery, index, onSimulate, onDelete, dragHandleProps,
       onDelete={onDelete ? () => onDelete(battery) : null}
       deleteLabel={t("enterprise.knowledge.processDetail.deleteBatteryTitle")}
     />
-    <div className="hidden lg:block" style={{ background: "var(--lt-rgba-255-255-255-0-025, rgba(255,255,255,0.025))", border: `1px solid ${borderColor}`, borderRadius: 8, marginBottom: 6, minWidth: 0, transition: "border-color 250ms" }}>
+  );
+
+  return (
+    <div style={{ background: "var(--lt-rgba-255-255-255-0-025, rgba(255,255,255,0.025))", border: `1px solid ${borderColor}`, borderRadius: 8, marginBottom: 6, minWidth: 0, transition: "border-color 250ms" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", minWidth: 0 }}>
         {dragHandleProps && (
           <div {...dragHandleProps} style={{ cursor: "grab", color: "var(--lt-334155, #334155)", display: "flex", alignItems: "center", flexShrink: 0, touchAction: "none" }} title={t("enterprise.knowledge.processDetail.dragToReorder")}>
@@ -1454,7 +1467,6 @@ function BatteryRowItem({ battery, index, onSimulate, onDelete, dragHandleProps,
         </div>
       )}
     </div>
-    </>
   );
 }
 
@@ -1463,6 +1475,7 @@ function TopicTreeItem({
   canReorder, onDecksReorder, onBatteriesReorder, onAddDeck, onAddBattery, onDeleteTopic, itemJobs, onDismissItemJob,
 }) {
   const { t } = useLanguage();
+  const narrow = useMediaQuery(BELOW_LG_QUERY);
   const [expanded, setExpanded] = useState(true);
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
   const tagCount = topic.tags?.length || 0;
@@ -1501,17 +1514,20 @@ function TopicTreeItem({
   return (
     <div style={{ display: "flex", minWidth: 0 }}>
       {/* Timeline */}
-      <div className="hidden lg:flex" style={{ width: 22, flexDirection: "column", alignItems: "center", marginRight: 14, flexShrink: 0 }}>
+      {!narrow && (
+      <div style={{ width: 22, display: "flex", flexDirection: "column", alignItems: "center", marginRight: 14, flexShrink: 0 }}>
         <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#4ade80", border: "2px solid var(--lt-0f172a, #0F172A)", flexShrink: 0, marginTop: 7 }} />
         {!isLast && (
           <div style={{ width: 2, flex: 1, background: "var(--lt-rgba-255-255-255-0-08, rgba(255,255,255,0.08))", minHeight: 24, marginTop: 4 }} />
         )}
       </div>
+      )}
 
       {/* Content */}
       <div style={{ flex: 1, minWidth: 0, paddingBottom: isLast ? 8 : 20 }}>
         {/* Topic header — phones / narrow tablets */}
-        <div className="mb-2 flex items-start gap-2 lg:hidden">
+        {narrow && (
+        <div className="mb-2 flex items-start gap-2">
           <button type="button" onClick={() => setExpanded((v) => !v)} aria-expanded={expanded}
             className="grid h-11 w-8 shrink-0 place-items-center text-[#64748B]" aria-label={topic.title || t("enterprise.knowledge.processDetail.topicLabel", { n: index + 1 })}>
             {expanded ? <ChevronDownIcon className="h-4 w-4" /> : <ChevronRightIcon className="h-4 w-4" />}
@@ -1530,8 +1546,10 @@ function TopicTreeItem({
             <TrashIcon className="h-4 w-4" />
           </button>
         </div>
+        )}
         {/* Topic header — desktop */}
-        <div className="hidden lg:flex" style={{ alignItems: "center", gap: 8, marginBottom: expanded ? 8 : 0, flexWrap: "nowrap" }}>
+        {!narrow && (
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: expanded ? 8 : 0, flexWrap: "nowrap" }}>
           <button
             onClick={() => setExpanded((v) => !v)}
             style={{ color: "#64748B", cursor: "pointer", padding: 0, background: "none", border: "none", display: "flex", alignItems: "center", flexShrink: 0 }}
@@ -1563,6 +1581,7 @@ function TopicTreeItem({
             <TrashIcon style={{ width: 12, height: 12 }} />
           </button>
         </div>
+        )}
 
         {/* Deck + Battery rows */}
         {expanded && (
