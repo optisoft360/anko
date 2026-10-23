@@ -10,7 +10,7 @@ import {
   ArrowPathIcon, XMarkIcon, CheckCircleIcon,
   ExclamationTriangleIcon, ClockIcon, PlayIcon, ArrowDownTrayIcon, TrashIcon,
   BookOpenIcon, MagnifyingGlassIcon, FunnelIcon, ChevronDownIcon, ChevronRightIcon,
-  EllipsisVerticalIcon, ArrowUpTrayIcon, Bars3Icon,
+  EllipsisVerticalIcon, ArrowUpTrayIcon, Bars3Icon, EyeIcon,
 } from "@heroicons/react/24/outline";
 import { useAuth } from "@/context/auth-context";
 import { collectionApi } from "../../api/enterpriseApi";
@@ -21,6 +21,7 @@ import { CheckCircleIcon as CheckCircleSolid } from "@heroicons/react/24/solid";
 import { knowledgeApi } from "../../api/enterpriseApi";
 import { useEnterprise } from "../../context/enterprise-context";
 import { useMediaQuery, BELOW_LG_QUERY } from "@/hooks/useIsMobile";
+import { DocumentViewDialog } from "../learning/LearningPathAssignmentProgress";
 import { useLanguage } from "../../../context/language-context";
 import { API_BASE } from "@/services/api";
 import { ExamSimulatorDialog } from "@/widgets/dialogs/index";
@@ -235,12 +236,14 @@ function AutoGenBanner({ runState, collapsed, onToggle, onDismiss, onStop, summa
         )}
 
         {/* Toggle */}
+        {!isSuccess && (
         <button onClick={onToggle}
           style={{ color: "var(--text-tertiary)", cursor: "pointer", padding: "2px 6px", borderRadius: 4, fontSize: 11, fontWeight: 600, background: "var(--lt-rgba-255-255-255-0-06, rgba(255,255,255,0.06))", border: "1px solid var(--lt-rgba-255-255-255-0-1, rgba(255,255,255,0.1))", flexShrink: 0 }}
           onMouseEnter={(e) => (e.currentTarget.style.color = "var(--text-primary)")}
           onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-tertiary)")}>
           {collapsed ? t("enterprise.knowledge.processDetail.banner.view") : t("enterprise.knowledge.processDetail.banner.hide")}
         </button>
+        )}
 
         {/* Dismiss */}
         {isTerminal && (
@@ -1069,9 +1072,10 @@ function TagGroupSection({ tagGroup, content, isLast, onStudy, onLearn, onSimula
 
 // ─── Documents Panel ──────────────────────────────────────────────────────────
 
-function DocumentsPanel({ docs, onAdd }) {
+function DocumentsPanel({ docs, onAdd, onView }) {
   const { t } = useLanguage();
   const [search, setSearch] = useState("");
+  const [menuDocId, setMenuDocId] = useState(null);
   const filtered = search
     ? docs.filter((d) => d.filename?.toLowerCase().includes(search.toLowerCase()))
     : docs;
@@ -1141,9 +1145,29 @@ function DocumentsPanel({ docs, onAdd }) {
                 <span style={{ fontSize: 9, fontWeight: 700, padding: "2px 6px", borderRadius: 4, background: doc.status === "ready" ? "rgba(74,222,128,0.15)" : "var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))", color: doc.status === "ready" ? "#4ade80" : "#8B8B9C" }}>
                   {doc.status}
                 </span>
-                <button style={{ color: "var(--lt-475569, #475569)", cursor: "pointer", background: "none", border: "none", padding: 2, display: "flex" }}>
-                  <EllipsisVerticalIcon style={{ width: 14, height: 14 }} />
-                </button>
+                <div style={{ position: "relative" }}>
+                  <button type="button" aria-label={t("enterprise.knowledge.processDetail.documentsPanel.actions")} aria-expanded={menuDocId === doc.id}
+                    onClick={() => setMenuDocId(menuDocId === doc.id ? null : doc.id)}
+                    className="min-h-[44px] min-w-[44px] justify-center lg:min-h-0 lg:min-w-0"
+                    style={{ color: "var(--lt-475569, #475569)", cursor: "pointer", background: "none", border: "none", padding: 2, display: "flex", alignItems: "center" }}>
+                    <EllipsisVerticalIcon style={{ width: 14, height: 14 }} />
+                  </button>
+                  {menuDocId === doc.id && (
+                    <>
+                      <div style={{ position: "fixed", inset: 0, zIndex: 40 }} onClick={() => setMenuDocId(null)} />
+                      <div role="menu" style={{ position: "absolute", right: 0, top: "100%", zIndex: 41, minWidth: 160, background: "var(--bg-surface)", border: "1px solid var(--border)", borderRadius: 8, boxShadow: "0 10px 30px rgba(15,23,42,0.12)", overflow: "hidden" }}>
+                        <button type="button" role="menuitem" onClick={() => { setMenuDocId(null); onView?.(doc); }}
+                          className="min-h-[44px] w-full lg:min-h-0"
+                          style={{ display: "flex", alignItems: "center", gap: 8, padding: "9px 14px", fontSize: 12.5, fontWeight: 600, color: "var(--text-primary)", background: "none", border: "none", cursor: "pointer", textAlign: "left" }}
+                          onMouseEnter={(e) => { e.currentTarget.style.background = "var(--bg-elevated)"; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.background = "none"; }}>
+                          <EyeIcon style={{ width: 14, height: 14, color: "var(--text-tertiary)" }} />
+                          {t("enterprise.knowledge.processDetail.documentsPanel.view")}
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
           );
@@ -2561,6 +2585,16 @@ export function ProcessDetail() {
   const [tagGroupContent, setTagGroupContent] = useState({});
   const [tagGroupsLoading, setTagGroupsLoading] = useState(false);
   const [bannerVisible, setBannerVisible] = useState(false);
+  const [viewingDoc, setViewingDoc] = useState(null);
+  // The "Ready" notice stays 3 seconds, then goes away and is not shown again for that run.
+  useEffect(() => {
+    if (!bannerVisible || !SUCCESS_STATUSES.has(genState.status)) return undefined;
+    const timer = setTimeout(() => {
+      setBannerVisible(false);
+      if (genState.runId) localStorage.setItem(`ks_run_seen_${id}`, String(genState.runId));
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, [bannerVisible, genState.status, genState.runId, id]);
   const [bannerCollapsed, setBannerCollapsed] = useState(false);
   const [simulationBattery, setSimulationBattery] = useState(null);
   const [studyDeck, setStudyDeck] = useState(null);
@@ -2941,6 +2975,18 @@ export function ProcessDetail() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ks?.id]);
 
+  // "View" in a document's menu: its extracted sections, from the process endpoint
+  // (process documents have no project, so the personal-project viewer can't serve them).
+  const handleViewDoc = async (doc) => {
+    try {
+      const data = await knowledgeApi.getDocumentsWithSections(id);
+      const full = (data.documents || []).find((d) => d.id === doc.id);
+      setViewingDoc(full || { ...doc, sections: [] });
+    } catch {
+      setViewingDoc({ ...doc, sections: [] });
+    }
+  };
+
   const applyRunData = (data, runId) => {
     const terminal = TERMINAL_STATUSES.has(data.status);
     setGenState({
@@ -2974,6 +3020,8 @@ export function ProcessDetail() {
         return;
       }
       const terminal = applyRunData(data, runId);
+      // A finished run whose "Ready" notice was already shown: don't show it again.
+      if (terminal && SUCCESS_STATUSES.has(data.status) && localStorage.getItem(`ks_run_seen_${id}`) === String(runId)) return;
       setBannerVisible(true);
       setBannerCollapsed(terminal); // collapse banner when already done
       if (!terminal) startPolling(runId);
@@ -3194,7 +3242,7 @@ export function ProcessDetail() {
       {/* Below lg the content area is too narrow for two columns (the 1fr column collapsed
           to ~0px next to the 340px one): one column there, Knowledge Structure first. */}
       <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(0,340px)_1fr]" style={{ marginTop: 16 }}>
-        <DocumentsPanel docs={docs} onAdd={(dropped) => { setDroppedFiles(dropped || []); setShowAddDoc(true); }} />
+        <DocumentsPanel docs={docs} onAdd={(dropped) => { setDroppedFiles(dropped || []); setShowAddDoc(true); }} onView={handleViewDoc} />
         <KnowledgeStructurePanel
           topics={results.topics}
           decks={results.decks}
@@ -3224,6 +3272,9 @@ export function ProcessDetail() {
           onDismissItemJob={removeItemJob}
         />
       </div>
+
+      {/* Document viewer (same one as the assignment view: the document's sections) */}
+      <DocumentViewDialog doc={viewingDoc} onClose={() => setViewingDoc(null)} className="!z-[10050] p-4 lg:p-0" />
 
       {/* Add Document Modal (still a modal — user explicitly triggered) */}
       {showAddDoc && (

@@ -97,11 +97,13 @@ function DocumentsMiniPanel({ documents, onView }) {
   );
 }
 
-function DocumentViewDialog({ doc, onClose }) {
+// Also used by the process page (ProcessDetail) for "View" in a document's menu;
+// `className` lets that page layer it above the phone bottom bar.
+export function DocumentViewDialog({ doc, onClose, className }) {
   const { t } = useLanguage();
   if (!doc) return null;
   return (
-    <div style={{ position: "fixed", inset: 0, zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", background: "var(--lt-rgba-0-0-0-0-6, rgba(0,0,0,0.6))" }} onClick={onClose}>
+    <div className={className} style={{ position: "fixed", inset: 0, zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", background: "var(--lt-rgba-0-0-0-0-6, rgba(0,0,0,0.6))" }} onClick={onClose}>
       <div style={{ width: "100%", maxWidth: 560, maxHeight: "80vh", display: "flex", flexDirection: "column", background: "var(--lt-0f172a, #0F172A)", border: "1px solid var(--lt-rgba-255-255-255-0-1, rgba(255,255,255,0.1))", borderRadius: 16, overflow: "hidden", boxShadow: "0 20px 60px var(--lt-rgba-0-0-0-0-7, rgba(0,0,0,0.7))" }} onClick={(e) => e.stopPropagation()}>
         <div style={{ height: 2, background: "linear-gradient(90deg, #6366F1, #818CF8, #A78BFA)", flexShrink: 0 }} />
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 18px", borderBottom: "1px solid var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))", flexShrink: 0 }}>

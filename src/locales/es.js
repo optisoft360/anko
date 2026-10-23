@@ -2297,6 +2297,8 @@ export const es = {
                     delete: "Eliminar"
                 },
                 documentsPanel: {
+                    view: "Ver",
+                    actions: "Acciones del documento",
                     title: "Documentos",
                     addDocument: "Agregar documento",
                     searchPlaceholder: "Buscar documentos...",
