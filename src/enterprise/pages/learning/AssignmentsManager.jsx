@@ -8,7 +8,7 @@ import {
   ExclamationCircleIcon, UserGroupIcon, UsersIcon,
   ArrowPathIcon, CheckIcon, XMarkIcon, RectangleStackIcon,
 } from "@heroicons/react/24/outline";
-import { learningApi, companyApi, teamsApi } from "../../api/enterpriseApi";
+import { learningApi, companyApi, teamsApi, knowledgeApi } from "../../api/enterpriseApi";
 import { useEnterprise } from "../../context/enterprise-context";
 import { useLanguage } from "../../../context/language-context";
 
@@ -63,6 +63,7 @@ function NewAssignmentModal({ companyId, onCreated, onClose }) {
   const [contentType, setContentType] = useState("path"); // "path" | "module"
   const [paths, setPaths] = useState([]);
   const [modules, setModules] = useState([]);
+  const [processes, setProcesses] = useState([]);
   const [members, setMembers] = useState([]);
   const [teams, setTeams] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -80,10 +81,30 @@ function NewAssignmentModal({ companyId, onCreated, onClose }) {
     Promise.all([
       learningApi.getPaths().then((d) => d.results || d || []),
       learningApi.getModules().then((d) => d.results || d || []),
+      knowledgeApi.list().then((d) => d.results || d || []),
       companyApi.getMembers(companyId, { status: "active" }).then((d) => d.results || d || []),
       teamsApi.list({ company_id: companyId }).then((d) => d.results || d || []),
-    ]).then(([p, mod, m, tms]) => { setPaths(p); setModules(mod); setMembers(m); setTeams(tms); }).catch(() => {}).finally(() => setLoading(false));
+    ]).then(([p, mod, ks, m, tms]) => { setPaths(p); setModules(mod); setProcesses(ks); setMembers(m); setTeams(tms); }).catch(() => {}).finally(() => setLoading(false));
   }, [companyId]);
+
+  // Assignments target a LearningModule, and a process (KnowledgeSource) only has one
+  // once it was placed somewhere. Reuse the standalone module linked to the process
+  // (or any linked one); otherwise create a standalone one, same as AddProcesoModal.
+  const resolveModuleFor = async (proc) => {
+    const linked = modules.filter((mod) => mod.knowledge_source === proc.id);
+    const existing = linked.find((mod) => !mod.learning_path) || linked[0];
+    if (existing) return existing;
+    const created = await learningApi.createModule({
+      company: companyId,
+      knowledge_source: proc.id,
+      name: proc.title,
+      description: proc.description || "",
+      process_type: proc.process_type || "course",
+      difficulty: proc.difficulty || "medium",
+    });
+    setModules((prev) => [...prev, created]);
+    return created;
+  };
 
   const submittingRef = useRef(false);
   const handleAssign = async () => {
@@ -100,11 +121,14 @@ function NewAssignmentModal({ companyId, onCreated, onClose }) {
           await learningApi.assignPathToTeam(selectedItem.id, { team_id: selectedTeam.id, ...duePay });
         else { setError(t("enterprise.learning.assignmentsManager.modal.selectTarget")); setSaving(false); return; }
       } else {
-        if (tab === "user" && selectedUser)
-          await learningApi.assignModuleToUser(selectedItem.id, { user_id: selectedUser.user, ...duePay });
-        else if (tab === "team" && selectedTeam)
-          await learningApi.assignModuleToTeam(selectedItem.id, { team_id: selectedTeam.id, ...duePay });
-        else { setError(t("enterprise.learning.assignmentsManager.modal.selectTarget")); setSaving(false); return; }
+        if (!(tab === "user" && selectedUser) && !(tab === "team" && selectedTeam)) {
+          setError(t("enterprise.learning.assignmentsManager.modal.selectTarget")); setSaving(false); return;
+        }
+        const mod = await resolveModuleFor(selectedItem);
+        if (tab === "user")
+          await learningApi.assignModuleToUser(mod.id, { user_id: selectedUser.user, ...duePay });
+        else
+          await learningApi.assignModuleToTeam(mod.id, { team_id: selectedTeam.id, ...duePay });
       }
       onCreated();
       onClose();
@@ -194,9 +218,11 @@ function NewAssignmentModal({ companyId, onCreated, onClose }) {
                   );
                 })
               ) : (
-                modules.length === 0 ? (
+                processes.length === 0 ? (
                   <p style={{ color: "var(--text-tertiary)", fontSize: 13, textAlign: "center", padding: "20px 0" }}>{t("enterprise.learning.assignmentsManager.modal.noProcesses")}</p>
-                ) : modules.map((mod) => {
+                ) : processes.map((proc) => {
+                  // selectedItem keeps `name` for the step-2 title; `id` is the process id.
+                  const mod = { ...proc, name: proc.title };
                   const sel = selectedItem?.id === mod.id && contentType === "module";
                   const typeColors = { document: "#60a5fa", topic: "#a855f7", deck: "#f59e0b", battery: "#f87171" };
                   const tc = typeColors[mod.process_type] || "var(--text-tertiary)";
