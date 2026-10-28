@@ -1342,6 +1342,7 @@ export const en = {
                 back: "Back",
                 myAssignments: "My Assignments",
                 assignment: "Assignment",
+                completedTag: "Completed",
                 by: "by {name}",
                 due: "Due: "
             },
@@ -1381,6 +1382,9 @@ export const en = {
                 noModulesFound: "No modules found for this assignment.",
                 completedTitle: "Learning Path completed!",
                 completedMessage: "You've finished all the processes in this assignment.",
+                processCompletedTitle: "Process completed!",
+                processCompletedMessage: "You've marked this process as complete.",
+                completeError: "Couldn't mark the process as complete. Try again.",
                 viewMyCertificate: "View my certificate"
             },
             paths: {

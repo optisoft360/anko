@@ -1343,6 +1343,7 @@ export const es = {
                 back: "Volver",
                 myAssignments: "Mis Tareas",
                 assignment: "Asignación",
+                completedTag: "Completado",
                 by: "por {name}",
                 due: "Límite: "
             },
@@ -1382,6 +1383,9 @@ export const es = {
                 noModulesFound: "No se encontraron módulos para esta asignación.",
                 completedTitle: "¡Learning Path completado!",
                 completedMessage: "Has terminado todos los procesos de esta asignación.",
+                processCompletedTitle: "¡Proceso completado!",
+                processCompletedMessage: "Marcaste este proceso como completado.",
+                completeError: "No se pudo marcar el proceso como completado. Inténtalo de nuevo.",
                 viewMyCertificate: "Ver mi certificado"
             },
             paths: {

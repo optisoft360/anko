@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useMemo } from "react";
+import React, { createContext, useContext, useEffect, useState, useCallback, useMemo } from "react";
 import { enumLabel, useKnowledgeEnumLabels } from "@/utils/enumLabel";
 import { bestAttemptPercent } from "@/utils/batteryProgress";
 import { useNavigate } from "react-router-dom";
@@ -10,9 +10,11 @@ import {
 } from "@heroicons/react/24/outline";
 import { learningApi, knowledgeApi } from "../../api/enterpriseApi";
 import { useLanguage } from "../../../context/language-context";
+import { apiErrorMessage } from "@/utils/apiError";
 import { ExamSimulatorDialog } from "@/widgets/dialogs/index";
-import { FlashcardViewDialog } from "@/widgets/dialogs/flashcard-view-dialog";
+import { FlashcardViewDialog, readStudyProgress } from "@/widgets/dialogs/flashcard-view-dialog";
 import { FlashcardLearnDialog } from "@/widgets/dialogs/flashcard-learn-dialog";
+import { useMediaQuery, BELOW_SM_QUERY } from "@/hooks/useIsMobile";
 
 // This component is the single place that renders "go complete this Learning
 // Path assignment" — the process node list (Learn/Study/Simular + "Mark
@@ -23,6 +25,20 @@ import { FlashcardLearnDialog } from "@/widgets/dialogs/flashcard-learn-dialog";
 // assignment too — see ComplianceService.auto_complete_on_path_completion).
 
 // ─── Shared helpers ───────────────────────────────────────────────────────────
+
+// Set by the "My Assignments" detail page only (`mobileOptimized`): phone fixes for that page and
+// its Study/Simulate modals. The Compliance page renders this component without it, unchanged.
+const PhoneOptimizedContext = createContext(false);
+
+/** Which of the two row layouts to render: both (default, as before) or only the one for this width. */
+function useRowLayouts() {
+  const optimized = useContext(PhoneOptimizedContext);
+  const narrow = useMediaQuery(BELOW_SM_QUERY);
+  return { optimized, desktop: !optimized || !narrow, phone: !optimized || narrow };
+}
+
+// 44x44 touch area around a small icon without making the icon bigger (phones, optimized page).
+const phoneTapArea = { minWidth: 44, minHeight: 44, justifyContent: "center" };
 
 function ProgressBar({ value, color = "var(--accent)" }) {
   const pct = Math.max(0, Math.min(100, value || 0));
@@ -37,11 +53,12 @@ function ProgressBar({ value, color = "var(--accent)" }) {
 
 function DocumentsMiniPanel({ documents, onView }) {
   const { t } = useLanguage();
+  const show = useRowLayouts();
   if (!documents || documents.length === 0) return null;
   return (
     <>
       {/* Tablet/desktop — original compact list, unchanged */}
-      <div className="hidden sm:block" style={{ background: "var(--bg-app)", border: "1px solid var(--border)", borderRadius: 8, overflow: "hidden", marginBottom: 16 }}>
+      {show.desktop && <div className="hidden sm:block" style={{ background: "var(--bg-app)", border: "1px solid var(--border)", borderRadius: 8, overflow: "hidden", marginBottom: 16 }}>
         <div style={{ padding: "10px 14px", borderBottom: "1px solid var(--border)" }}>
           <p style={{ fontSize: 10, fontWeight: 800, color: "var(--text-tertiary)", textTransform: "uppercase", letterSpacing: "0.07em" }}>
             {t("enterprise.learning.progress.documentsTitle", { count: documents.length })}
@@ -66,10 +83,10 @@ function DocumentsMiniPanel({ documents, onView }) {
             );
           })}
         </div>
-      </div>
+      </div>}
 
       {/* Mobile — label above, each document as its own roomy card */}
-      <div className="sm:hidden" style={{ marginBottom: 16 }}>
+      {show.phone && <div className="sm:hidden" style={{ marginBottom: 16 }}>
         <p style={{ fontSize: 10, fontWeight: 800, color: "var(--text-tertiary)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 10 }}>
           {t("enterprise.learning.progress.documentsTitle", { count: documents.length })}
         </p>
@@ -83,7 +100,8 @@ function DocumentsMiniPanel({ documents, onView }) {
                 <span style={{ color: "#fff", fontSize: 9, fontWeight: 800 }}>{ext.slice(0, 4)}</span>
               </div>
               <div className="flex-1 min-w-0">
-                <p style={{ fontSize: 13.5, fontWeight: 700, color: "var(--text-primary)" }} className="truncate">{doc.filename}</p>
+                <p style={{ fontSize: 13.5, fontWeight: 700, color: "var(--text-primary)" }} title={doc.filename}
+                  className={show.optimized ? "[display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:3] overflow-hidden [overflow-wrap:anywhere]" : "truncate"}>{doc.filename}</p>
                 <p style={{ fontSize: 11.5, color: "var(--text-tertiary)", marginTop: 2 }}>{t("enterprise.learning.progress.docSubtitle")}</p>
               </div>
               <div style={{ width: 36, height: 36, borderRadius: "50%", background: "var(--lt-rgba-255-255-255-0-06, rgba(255,255,255,0.06))", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
@@ -92,7 +110,7 @@ function DocumentsMiniPanel({ documents, onView }) {
             </button>
           );
         })}
-      </div>
+      </div>}
     </>
   );
 }
@@ -140,8 +158,9 @@ export function DocumentViewDialog({ doc, onClose, className }) {
 
 // ─── Read-only deck / battery rows (Learn/Study/Simular only) ─────────────────
 
-function ReadOnlyDeckRow({ deck, onLearn, onStudy }) {
-  const { t } = useLanguage();
+function ReadOnlyDeckRow({ deck, onLearn, onStudy, studyProgress }) {
+  const { t, language } = useLanguage();
+  const show = useRowLayouts();
   const cardCount = deck.flashcards_count ?? deck.cardsCount ?? deck.card_count ?? 0;
 
   const icon = (
@@ -179,7 +198,7 @@ function ReadOnlyDeckRow({ deck, onLearn, onStudy }) {
   return (
     <>
       {/* Tablet/desktop — original single-row layout, unchanged */}
-      <div className="hidden sm:flex sm:items-center sm:gap-2" style={{ background: "var(--lt-rgba-255-255-255-0-025, rgba(255,255,255,0.025))", border: "1px solid var(--lt-rgba-255-255-255-0-06, rgba(255,255,255,0.06))", borderRadius: 8, marginBottom: 6, padding: "8px 12px", minWidth: 0 }}>
+      {show.desktop && <div className="hidden sm:flex sm:items-center sm:gap-2" style={{ background: "var(--lt-rgba-255-255-255-0-025, rgba(255,255,255,0.025))", border: "1px solid var(--lt-rgba-255-255-255-0-06, rgba(255,255,255,0.06))", borderRadius: 8, marginBottom: 6, padding: "8px 12px", minWidth: 0 }}>
         {icon}
         <span style={{ fontSize: 12, fontWeight: 700, color: "var(--lt-f1f5f9, #F1F5F9)", flexShrink: 0, maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={deck.title}>{deck.title}</span>
         {badge}
@@ -188,10 +207,10 @@ function ReadOnlyDeckRow({ deck, onLearn, onStudy }) {
         </span>
         {learnBtn}
         {studyBtn}
-      </div>
+      </div>}
 
       {/* Mobile — real deck title (2 lines max) and the same actions as desktop (Learn + Study) */}
-      <div className="sm:hidden" data-testid="assignment-deck-card" style={{ background: "var(--bg-app)", border: "1px solid var(--border)", borderRadius: 14, marginBottom: 10, padding: "14px" }}>
+      {show.phone && <div className="sm:hidden" data-testid="assignment-deck-card" style={{ background: "var(--bg-app)", border: "1px solid var(--border)", borderRadius: 14, marginBottom: 10, padding: "14px" }}>
         <div className="flex items-start gap-3">
           {mobileIcon}
           <div className="flex-1 min-w-0">
@@ -199,6 +218,12 @@ function ReadOnlyDeckRow({ deck, onLearn, onStudy }) {
             <p className="[display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2] overflow-hidden" style={{ fontSize: 14.5, fontWeight: 700, color: "var(--text-primary)", marginTop: 6, lineHeight: 1.35 }} title={deck.title}>
               {deck.title || t("enterprise.learning.progress.deckMobileTitle")}
             </p>
+            {show.optimized && studyProgress && (
+              <p data-testid="study-progress" className="flex items-center gap-1.5 mt-1.5" style={{ fontSize: 11, fontWeight: 700, color: studyProgress.completed ? "#16a34a" : "var(--text-secondary)" }}>
+                {studyProgress.completed && <CheckCircleIcon style={{ width: 13, height: 13 }} />}
+                {studyProgress.reviewed}/{studyProgress.total} {language === "es" ? "repasadas" : "reviewed"}
+              </p>
+            )}
           </div>
         </div>
         <div className="mt-3 flex flex-wrap gap-2">
@@ -211,13 +236,14 @@ function ReadOnlyDeckRow({ deck, onLearn, onStudy }) {
             {t("enterprise.learning.progress.studyBtn")}
           </button>
         </div>
-      </div>
+      </div>}
     </>
   );
 }
 
 function ReadOnlyBatteryRow({ battery, onSimulate }) {
   const { t } = useLanguage();
+  const show = useRowLayouts();
   const questionCount = battery.question_count ?? 0;
   const pct = bestAttemptPercent(battery);  // 14: same rule as the process view
   const hasAttempt = pct !== null;
@@ -269,7 +295,7 @@ function ReadOnlyBatteryRow({ battery, onSimulate }) {
   return (
     <>
       {/* Tablet/desktop — original single-row layout, unchanged */}
-      <div className="hidden sm:flex sm:items-center sm:gap-2" style={{ background: "var(--lt-rgba-255-255-255-0-025, rgba(255,255,255,0.025))", border: "1px solid var(--lt-rgba-255-255-255-0-06, rgba(255,255,255,0.06))", borderRadius: 8, marginBottom: 6, padding: "8px 12px", minWidth: 0 }}>
+      {show.desktop && <div className="hidden sm:flex sm:items-center sm:gap-2" style={{ background: "var(--lt-rgba-255-255-255-0-025, rgba(255,255,255,0.025))", border: "1px solid var(--lt-rgba-255-255-255-0-06, rgba(255,255,255,0.06))", borderRadius: 8, marginBottom: 6, padding: "8px 12px", minWidth: 0 }}>
         {icon}
         <span style={{ fontSize: 12, fontWeight: 700, color: "var(--lt-f1f5f9, #F1F5F9)", flexShrink: 0, maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={battery.name || battery.title}>{battery.name || battery.title}</span>
         {badge}
@@ -278,10 +304,10 @@ function ReadOnlyBatteryRow({ battery, onSimulate }) {
         </span>
         {progressMini}
         {simulateBtn}
-      </div>
+      </div>}
 
       {/* Mobile — real battery name (2 lines max); progress once there's a real attempt; Simulate */}
-      <div className="sm:hidden" data-testid="assignment-battery-card" style={{ background: "var(--bg-app)", border: "1px solid var(--border)", borderRadius: 14, marginBottom: 10, padding: "14px" }}>
+      {show.phone && <div className="sm:hidden" data-testid="assignment-battery-card" style={{ background: "var(--bg-app)", border: "1px solid var(--border)", borderRadius: 14, marginBottom: 10, padding: "14px" }}>
         <div className="flex items-start gap-3">
           {mobileIcon}
           <div className="flex-1 min-w-0">
@@ -296,13 +322,14 @@ function ReadOnlyBatteryRow({ battery, onSimulate }) {
           className="mt-3 inline-flex min-h-[44px] w-full items-center justify-center gap-1 rounded-[10px] border border-[#C7D2FE] bg-[#EEF2FF] px-3 text-sm font-bold text-[#4338CA] active:bg-[#E0E7FF]">
           {t("enterprise.learning.progress.simulateBtn")} <ChevronRightIcon style={{ width: 14, height: 14 }} />
         </button>
-      </div>
+      </div>}
     </>
   );
 }
 
-function ReadOnlyTopicSection({ topic, index, decks, batteries, isLast, onStudy, onLearn, onSimulate }) {
-  const { t } = useLanguage();
+function ReadOnlyTopicSection({ topic, index, decks, batteries, isLast, onStudy, onLearn, onSimulate, studyProgress }) {
+  const { t, language } = useLanguage();
+  const show = useRowLayouts();
   const [expanded, setExpanded] = useState(true);
   const tagCount = topic.tags?.length || 0;
   const description = topic.tags?.slice(0, 5).join(", ") || "";
@@ -324,7 +351,9 @@ function ReadOnlyTopicSection({ topic, index, decks, batteries, isLast, onStudy,
       >
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: expanded ? 8 : 0 }}>
           <span className="inline-flex sm:hidden flex-shrink-0" style={{ width: 8, height: 8, borderRadius: "50%", background: "#4ade80" }} />
-          <button onClick={() => setExpanded((v) => !v)} style={{ color: "#64748B", cursor: "pointer", padding: 0, background: "none", border: "none", display: "flex", alignItems: "center", flexShrink: 0 }}>
+          <button onClick={() => setExpanded((v) => !v)} aria-expanded={expanded}
+            aria-label={`${expanded ? (language === "es" ? "Contraer" : "Collapse") : (language === "es" ? "Expandir" : "Expand")}: ${topic.title || t("enterprise.learning.progress.topicLabel", { n: index + 1 })}`}
+            style={{ color: "#64748B", cursor: "pointer", padding: 0, background: "none", border: "none", display: "flex", alignItems: "center", flexShrink: 0, ...(show.optimized && !show.desktop ? { ...phoneTapArea, margin: "-10px -8px" } : {}) }}>
             {expanded ? <ChevronRightIcon style={{ width: 13, height: 13, transform: "rotate(90deg)" }} /> : <ChevronRightIcon style={{ width: 13, height: 13 }} />}
           </button>
           <span className="hidden sm:inline" style={{ fontWeight: 700, color: "var(--lt-f1f5f9, #F1F5F9)", fontSize: 13, flexShrink: 0 }}>{t("enterprise.learning.progress.topicLabel", { n: index + 1 })}</span>
@@ -336,7 +365,7 @@ function ReadOnlyTopicSection({ topic, index, decks, batteries, isLast, onStudy,
         </div>
         {expanded && (
           <div className="sm:ml-1.5">
-            {decks.map((d) => <ReadOnlyDeckRow key={d.id} deck={d} onLearn={onLearn} onStudy={onStudy} />)}
+            {decks.map((d) => <ReadOnlyDeckRow key={d.id} deck={d} onLearn={onLearn} onStudy={onStudy} studyProgress={studyProgress?.[d.id]} />)}
             {batteries.map((b) => <ReadOnlyBatteryRow key={b.id} battery={b} onSimulate={onSimulate} />)}
             {decks.length === 0 && batteries.length === 0 && (
               <p style={{ fontSize: 11, color: "var(--lt-475569, #475569)", padding: "4px 0" }}>{t("enterprise.learning.progress.noTopicContent")}</p>
@@ -353,7 +382,8 @@ function ReadOnlyTopicSection({ topic, index, decks, batteries, isLast, onStudy,
 // same data ProcessDetail.jsx uses, but strictly read-only: no upload, no
 // auto-generate, no add/delete — just Learn/Study/Simular + document viewing.
 
-function ProcessKnowledgeView({ ksId, moduleId, assignmentId, alreadyCompleted, onComplete, onProgress }) {
+// `completeWholeAssignment`: single-process assignment (no Learning Path), completed as a whole.
+function ProcessKnowledgeView({ ksId, moduleId, assignmentId, alreadyCompleted, onComplete, onProgress, completeWholeAssignment = false }) {
   const { t } = useLanguage();
   const [loading, setLoading] = useState(true);
   const [documents, setDocuments] = useState([]);
@@ -365,6 +395,13 @@ function ProcessKnowledgeView({ ksId, moduleId, assignmentId, alreadyCompleted, 
   const [simulationBattery, setSimulationBattery] = useState(null);
   const [completing, setCompleting] = useState(false);
   const [doneNow, setDoneNow] = useState(false);
+  const [completeError, setCompleteError] = useState("");
+  const optimized = useContext(PhoneOptimizedContext);
+  // Study progress per deck (kept in this browser by the Study modal; no endpoint for it).
+  const [studyProgress, setStudyProgress] = useState({});
+  const handleStudyProgress = useCallback((deckId, value) => {
+    setStudyProgress((prev) => ({ ...prev, [deckId]: value }));
+  }, []);
 
   const loadContent = useCallback(({ silent } = {}) => {
     if (!ksId) { setLoading(false); return; }
@@ -392,6 +429,9 @@ function ProcessKnowledgeView({ ksId, moduleId, assignmentId, alreadyCompleted, 
         };
       });
       setContentByTopic(contentMap);
+      const saved = {};
+      (results.decks || []).forEach((d) => { const v = readStudyProgress(d.id); if (v) saved[d.id] = v; });
+      setStudyProgress(saved);
     }).finally(() => setLoading(false));
   }, [ksId]);
 
@@ -412,14 +452,22 @@ function ProcessKnowledgeView({ ksId, moduleId, assignmentId, alreadyCompleted, 
   }, [avgBatteryPercent, moduleId, onProgress]);
 
   const isDone = alreadyCompleted || doneNow;
+  // "Go to Simulate" at the end of Study: the battery of the same topic as the studied deck.
+  const studyDeckBattery = studyDeck
+    ? contentByTopic[String(studyDeck.tag_group_id)]?.batteries?.[0] || null
+    : null;
 
   const handleComplete = async () => {
     setCompleting(true);
+    setCompleteError("");
     try {
-      await learningApi.completeModule(assignmentId, { module_id: moduleId });
+      if (completeWholeAssignment) await learningApi.completeAssignment(assignmentId);
+      else await learningApi.completeModule(assignmentId, { module_id: moduleId });
       setDoneNow(true);
       onComplete?.(moduleId);
-    } catch {}
+    } catch (err) {
+      setCompleteError(apiErrorMessage(err, t("enterprise.learning.progress.completeError")));
+    }
     setCompleting(false);
   };
 
@@ -463,28 +511,34 @@ function ProcessKnowledgeView({ ksId, moduleId, assignmentId, alreadyCompleted, 
               onLearn={setLearnDeck}
               onStudy={setStudyDeck}
               onSimulate={setSimulationBattery}
+              studyProgress={studyProgress}
             />
           ))
         )}
       </div>
 
       {!isDone && (
-        <div style={{ borderTop: "1px solid var(--border)", padding: "12px 18px", background: "var(--bg-surface)", display: "flex", justifyContent: "flex-end" }}>
+        <div style={{ borderTop: "1px solid var(--border)", padding: "12px 18px", background: "var(--bg-surface)", display: "flex", justifyContent: "flex-end", flexWrap: completeError ? "wrap" : undefined, gap: completeError ? 8 : undefined }}>
+          {completeError && (
+            <p role="alert" data-testid="complete-error" style={{ flexBasis: "100%", fontSize: 12, color: "var(--lt-ef4444, #f87171)", textAlign: "right" }}>{completeError}</p>
+          )}
           <button onClick={handleComplete} disabled={completing} className="ank-btn-accent text-xs min-h-[44px] w-full justify-center sm:min-h-0 sm:w-auto" style={{ opacity: completing ? 0.7 : 1 }}>
             {completing ? <ArrowPathIcon className="h-3.5 w-3.5 animate-spin" /> : <><CheckCircleIcon className="h-3.5 w-3.5" /> {t("enterprise.learning.progress.markComplete")}</>}
           </button>
         </div>
       )}
       {isDone && (
-        <div style={{ borderTop: "1px solid var(--border)", padding: "10px 18px", background: "var(--bg-surface)", display: "flex", alignItems: "center", gap: 6, color: "var(--lt-4ade80, #4ade80)", fontSize: 11, fontWeight: 700 }}>
+        <div data-testid="process-completed" style={{ borderTop: "1px solid var(--border)", padding: "10px 18px", background: "var(--bg-surface)", display: "flex", alignItems: "center", gap: 6, color: "var(--lt-4ade80, #4ade80)", fontSize: 11, fontWeight: 700 }}>
           <CheckCircleIcon style={{ width: 13, height: 13 }} /> {t("enterprise.learning.progress.completedLabel")}
         </div>
       )}
 
       <DocumentViewDialog doc={viewingDoc} onClose={() => setViewingDoc(null)} />
-      <FlashcardViewDialog open={!!studyDeck} onClose={() => setStudyDeck(null)} deckId={studyDeck?.id} deckTitle={studyDeck?.title} />
+      <FlashcardViewDialog open={!!studyDeck} onClose={() => setStudyDeck(null)} deckId={studyDeck?.id} deckTitle={studyDeck?.title}
+        mobileOptimized={optimized} onProgress={handleStudyProgress}
+        onGoToSimulate={studyDeckBattery ? () => setSimulationBattery(studyDeckBattery) : undefined} />
       <FlashcardLearnDialog open={!!learnDeck} onClose={() => setLearnDeck(null)} deckId={learnDeck?.id} deckTitle={learnDeck?.title} />
-      <ExamSimulatorDialog open={!!simulationBattery} handler={() => setSimulationBattery(null)} battery={simulationBattery} onFinish={() => loadContent({ silent: true })} />
+      <ExamSimulatorDialog open={!!simulationBattery} handler={() => setSimulationBattery(null)} battery={simulationBattery} onFinish={() => loadContent({ silent: true })} mobileOptimized={optimized} />
     </div>
   );
 }
@@ -512,6 +566,7 @@ function NodeIcon({ status, size = 30, iconSize = 14 }) {
 function ProcessNode({ mod, index, status, isLast, isOpen, onClick, assignmentId, onModuleComplete, onModuleProgress, percent }) {
   const ENUMS = useKnowledgeEnumLabels();
   const { t } = useLanguage();
+  const show = useRowLayouts();
   const typeColor = { document: "#60a5fa", topic: "#a855f7", deck: "#f59e0b", battery: "#f87171", course: "#4ade80" }[mod.process_type] || "var(--text-tertiary)";
   const locked = status === "locked";
   const borderColor = status === "completed" ? "#4ade80" : status === "in_progress" ? "var(--accent)" : "var(--border)";
@@ -540,7 +595,7 @@ function ProcessNode({ mod, index, status, isLast, isOpen, onClick, assignmentId
 
         <div style={{ flex: 1, marginBottom: isLast ? 0 : 12, minWidth: 0 }}>
           {/* Tablet/desktop — original compact single-line layout, unchanged */}
-          <div onClick={() => !locked && onClick()}
+          {show.desktop && <div onClick={() => !locked && onClick()}
             className="hidden sm:block"
             style={{ background: isOpen ? "var(--bg-elevated)" : "var(--bg-surface)", border: `1px solid ${isOpen ? borderColor : "var(--border)"}`, borderRadius: 7, padding: "11px 14px", cursor: locked ? "not-allowed" : "pointer", opacity: locked ? 0.45 : 1, transition: "all 150ms" }}
             onMouseEnter={(e) => { if (!locked) { e.currentTarget.style.borderColor = borderColor; e.currentTarget.style.background = "var(--bg-elevated)"; } }}
@@ -558,11 +613,11 @@ function ProcessNode({ mod, index, status, isLast, isOpen, onClick, assignmentId
               </div>
               <ChevronRightIcon style={{ width: 14, height: 14, color: "var(--text-tertiary)", flexShrink: 0, transform: isOpen ? "rotate(90deg)" : "none", transition: "transform 200ms" }} />
             </div>
-          </div>
+          </div>}
 
           {/* Mobile — self-contained card: big icon top-left, title+badge, round toggle top-right,
               progress bar below (once loaded). Matches the reference mock. */}
-          <div onClick={() => !locked && onClick()}
+          {show.phone && <div onClick={() => !locked && onClick()}
             className="flex sm:hidden flex-col"
             style={{ background: isOpen ? "var(--bg-elevated)" : "var(--bg-surface)", border: `1.5px solid ${isOpen ? borderColor : "var(--border)"}`, borderRadius: 16, padding: 16, cursor: locked ? "not-allowed" : "pointer", opacity: locked ? 0.45 : 1 }}>
             <div className="flex items-start justify-between gap-3">
@@ -594,7 +649,7 @@ function ProcessNode({ mod, index, status, isLast, isOpen, onClick, assignmentId
                 </div>
               </div>
             )}
-          </div>
+          </div>}
 
           {isOpen && !locked && (
             <div style={{ marginTop: 10 }}>
@@ -616,7 +671,7 @@ function ProcessNode({ mod, index, status, isLast, isOpen, onClick, assignmentId
 
 // ─── Main shared component ─────────────────────────────────────────────────────
 
-export function LearningPathAssignmentProgress({ assignmentId, onAssignmentLoaded, onCompleted }) {
+export function LearningPathAssignmentProgress({ assignmentId, onAssignmentLoaded, onCompleted, onModuleLoaded, mobileOptimized = false }) {
   const navigate = useNavigate();
   const { t } = useLanguage();
   const [assignment, setAssignment] = useState(null);
@@ -657,6 +712,7 @@ export function LearningPathAssignmentProgress({ assignmentId, onAssignmentLoade
       } else if (a.learning_module) {
         const mod = await learningApi.getModule(a.learning_module).catch(() => null);
         setSingleModule(mod);
+        if (mod) onModuleLoaded?.(mod);
       }
     } catch {}
     setLoading(false);
@@ -719,6 +775,7 @@ export function LearningPathAssignmentProgress({ assignmentId, onAssignmentLoade
   }
 
   return (
+    <PhoneOptimizedContext.Provider value={mobileOptimized}>
     <div className="space-y-5">
       {mods.length > 0 && (
         <div className="space-y-1.5">
@@ -766,6 +823,8 @@ export function LearningPathAssignmentProgress({ assignmentId, onAssignmentLoade
               moduleId={assignment.learning_module}
               assignmentId={assignmentId}
               alreadyCompleted={isDone}
+              completeWholeAssignment
+              onComplete={() => load({ silent: true })}
             />
           ) : (
             <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border)", borderRadius: 8, padding: "40px 24px", textAlign: "center" }}>
@@ -782,8 +841,8 @@ export function LearningPathAssignmentProgress({ assignmentId, onAssignmentLoade
           <div className="flex items-center gap-2.5">
             <CheckCircleIcon style={{ width: 18, height: 18, color: "var(--lt-4ade80, #4ade80)", flexShrink: 0 }} />
             <div>
-              <p style={{ color: "var(--lt-4ade80, #4ade80)", fontWeight: 700, fontSize: 13 }}>{t("enterprise.learning.progress.completedTitle")}</p>
-              <p style={{ color: "var(--text-secondary)", fontSize: 12, marginTop: 2 }}>{t("enterprise.learning.progress.completedMessage")}</p>
+              <p style={{ color: "var(--lt-4ade80, #4ade80)", fontWeight: 700, fontSize: 13 }}>{t(assignment.learning_path ? "enterprise.learning.progress.completedTitle" : "enterprise.learning.progress.processCompletedTitle")}</p>
+              <p style={{ color: "var(--text-secondary)", fontSize: 12, marginTop: 2 }}>{t(assignment.learning_path ? "enterprise.learning.progress.completedMessage" : "enterprise.learning.progress.processCompletedMessage")}</p>
             </div>
           </div>
           {assignment.issued_certification_id && (
@@ -795,6 +854,7 @@ export function LearningPathAssignmentProgress({ assignmentId, onAssignmentLoade
         </div>
       )}
     </div>
+    </PhoneOptimizedContext.Provider>
   );
 }
 
