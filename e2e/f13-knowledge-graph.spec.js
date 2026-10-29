@@ -25,15 +25,18 @@ test("F-13: Refresh builds the graph and nodes open their detail", async ({ page
   await expect(page.getByText("No knowledge graph data")).toBeVisible();
   await page.getByRole("button", { name: "Refresh" }).click();
   await expect(page.getByTestId("knowledge-graph")).toBeVisible();
-  await expect(page.locator("[data-testid=knowledge-graph] line")).toHaveCount(2);
+  await expect(page.locator("[data-testid=knowledge-graph] path.kg-link")).toHaveCount(2);
   expect(calls.some((c) => c.method === "POST" && c.path.endsWith("/knowledge-graph/rebuild/"))).toBe(true);
 
-  await page.locator('[data-node-title="Topic 1"] circle').click();
+  await page.locator('[data-node-title="Topic 1"]').click();
   await expect(page.getByText("safety, helmets")).toBeVisible();
 
   // Filters and zoom still work on the built graph.
-  await page.getByLabel("Concept").uncheck();
-  await expect(page.locator("[data-testid=knowledge-graph] line")).toHaveCount(1);
+  await page.getByTestId("type-chip-concept").click();
+  await expect(page.getByTestId("type-chip-concept")).toHaveAttribute("aria-pressed", "false");
+  await expect(page.locator("[data-testid=knowledge-graph] path.kg-link")).toHaveCount(1);
+  const scale = async () => Number((await page.locator("[data-testid=knowledge-graph] > g").getAttribute("transform")).match(/scale\(([\d.]+)\)/)[1]);
+  const before = await scale();
   await page.getByTestId("zoom-in").click();
-  await expect(page.locator("[data-testid=knowledge-graph] > g")).toHaveAttribute("transform", /scale\(1\.25\)/);
+  await expect.poll(scale).toBeCloseTo(before * 1.3, 2);
 });

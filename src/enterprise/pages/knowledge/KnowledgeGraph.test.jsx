@@ -1,6 +1,9 @@
 import React from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render as rtlRender, screen, waitFor } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
+
+const render = (ui) => rtlRender(<MemoryRouter>{ui}</MemoryRouter>);
 
 afterEach(cleanup);
 
@@ -36,11 +39,34 @@ describe("Knowledge Graph (F-13)", () => {
     api.list.mockResolvedValue([{ id: 8, title: "QA-TEST-Claude", status: "pending" }]);
     const { container } = render(<KnowledgeGraph />);
     await screen.findByTestId("knowledge-graph");
-    expect(container.querySelectorAll("line")).toHaveLength(2);
-    expect(screen.getByText(/"nodes":3,"edges":2/)).toBeTruthy();
+    await waitFor(() => expect(container.querySelectorAll("path.kg-link")).toHaveLength(2));
+    expect(container.querySelectorAll("[data-node-title]")).toHaveLength(3);
     fireEvent.click(container.querySelector('[data-node-title="Topic 1"]'));
     expect(screen.getByText("70%")).toBeTruthy();
-    expect(screen.getByRole("option", { name: "QA-TEST-Claude" })).toBeTruthy(); // not only "processed" sources
+    // Every process with nodes is a source option (not only "processed" ones), with its node count.
+    expect(screen.getByRole("option", { name: "QA-TEST-Claude (3)" })).toBeTruthy();
+  });
+
+  it("type chips hide nodes and their edges", async () => {
+    api.getGraph.mockResolvedValue(GRAPH);
+    api.list.mockResolvedValue([]);
+    const { container } = render(<KnowledgeGraph />);
+    await screen.findByTestId("knowledge-graph");
+    await waitFor(() => expect(container.querySelectorAll("path.kg-link")).toHaveLength(2));
+    fireEvent.click(screen.getByTestId("type-chip-concept"));
+    expect(screen.getByTestId("type-chip-concept").getAttribute("aria-pressed")).toBe("false");
+    expect(container.querySelectorAll("[data-node-title]")).toHaveLength(2);
+    expect(container.querySelectorAll("path.kg-link")).toHaveLength(1);
+  });
+
+  it("lays out every node deterministically, one area per process", async () => {
+    const { layoutGraph } = await import("./KnowledgeGraph.jsx");
+    const nodes = [{ id: 1, source_id: 1, node_type: "document" }, { id: 2, source_id: 1, node_type: "concept" }, { id: 3, source_id: 2, node_type: "document" }];
+    const edges = [{ s: 1, t: 2 }];
+    const a = layoutGraph(nodes, edges, { 1: 1, 2: 1, 3: 0 });
+    expect(layoutGraph(nodes, edges, { 1: 1, 2: 1, 3: 0 })).toEqual(a);
+    expect(Object.values(a).every((p) => Number.isFinite(p.x) && Number.isFinite(p.y))).toBe(true);
+    expect(Math.hypot(a[1].x - a[3].x, a[1].y - a[3].y)).toBeGreaterThan(200);
   });
 
   it("Refresh rebuilds for trainers and only reloads for employees", async () => {

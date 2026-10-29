@@ -133,17 +133,25 @@ for (const vp of VIEWPORTS) {
       const box = await svg.boundingBox();
       expect(box.width).toBeGreaterThan(vp.width - 48);
       expect(box.height).toBeGreaterThan(300);
-      await expect(svg.locator("> g")).toHaveAttribute("transform", /scale\(1\)/); // fitted
+      // Fitted: every node inside the canvas.
+      for (const node of await svg.locator("[data-node-title]").all()) {
+        const nb = await node.boundingBox();
+        expect(nb.x).toBeGreaterThanOrEqual(box.x);
+        expect(nb.x + nb.width).toBeLessThanOrEqual(box.x + box.width);
+      }
       await expectTappable(page.getByTestId("graph-filters"));
       await page.getByTestId("graph-filters").click();
       const sheet = page.getByRole("dialog");
-      await expect(sheet.getByLabel("Concept")).toBeVisible();
-      await sheet.getByLabel("Concept").uncheck();
-      await expect(svg.locator("line")).toHaveCount(1);
-      await sheet.getByTestId("zoom-in").click();
-      await expect(svg.locator("> g")).toHaveAttribute("transform", /scale\(1\.25\)/);
+      await expectTappable(sheet.getByTestId("type-chip-concept"));
+      await sheet.getByTestId("type-chip-concept").click();
+      await expect(svg.locator("path.kg-link")).toHaveCount(1);
       await sheet.getByRole("button", { name: "Close" }).click();
-      await page.locator('[data-node-title="EPP"] circle').click();
+      await expectTappable(page.getByTestId("zoom-in"));
+      const scale = async () => Number((await svg.locator("> g").getAttribute("transform")).match(/scale\(([\d.]+)\)/)[1]);
+      const before = await scale();
+      await page.getByTestId("zoom-in").click();
+      await expect.poll(scale).toBeCloseTo(before * 1.3, 2);
+      await page.locator('[data-node-title="EPP"]').click();
       await expect(page.getByRole("dialog").getByText("casco, guantes")).toBeVisible();
       await expectNoHorizontalOverflow(page);
     });
