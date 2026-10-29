@@ -9,6 +9,7 @@ import {
   ArrowPathIcon, CheckIcon, XMarkIcon, RectangleStackIcon,
 } from "@heroicons/react/24/outline";
 import { learningApi, companyApi, teamsApi, knowledgeApi } from "../../api/enterpriseApi";
+import { withModuleNames } from "./assignmentNames";
 import { useEnterprise } from "../../context/enterprise-context";
 import { useLanguage } from "../../../context/language-context";
 
@@ -362,7 +363,7 @@ function AssignmentRow({ a, onClick, variant = "row" }) {
   const dueStr = formatCalendarDate(a.due_date, language);
   const isOverdue = a.is_overdue || a.status === "overdue";
 
-  const pathName = a.learning_path_name || a.path_name || a.name || "—";
+  const pathName = a.learning_path_name || a.learning_module_name || a.path_name || a.name || "—";
   const assignee = a.user_username || a.user
     ? (a.full_name || a.user_username || `ID ${a.user}`)
     : (a.team_name || a.team ? (a.team_name || t("enterprise.learning.assignmentsManager.row.team", { id: a.team })) : null);
@@ -408,7 +409,7 @@ function AssignmentRow({ a, onClick, variant = "row" }) {
         {/* Path */}
         <div style={{ flex: COLUMN_FLEX[0], minWidth: 0 }}>
           <p style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)" }} className="truncate">
-            {a.learning_path_name || a.path_name || a.name || "—"}
+            {a.learning_path_name || a.learning_module_name || a.path_name || a.name || "—"}
           </p>
           {a.assigned_by_username && (
             <p style={{ fontSize: 10, color: "var(--text-tertiary)", marginTop: 1 }}>{t("enterprise.learning.assignmentsManager.row.by", { name: a.assigned_by_username })}</p>
@@ -475,7 +476,11 @@ export function AssignmentsManager() {
     setLoading(true);
     const params = statusFilter ? { status: statusFilter } : {};
     learningApi.getAssignments(params)
-      .then((d) => setAssignments(d.results || d || []))
+      .then(async (d) => {
+        const list = d.results || d || [];
+        setAssignments(list);
+        setAssignments(await withModuleNames(list));
+      })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [activeCompanyId, statusFilter]);

@@ -6,6 +6,7 @@ import {
   PlayIcon, ArrowRightIcon, RectangleStackIcon,
 } from "@heroicons/react/24/outline";
 import { learningApi } from "../../api/enterpriseApi";
+import { withModuleNames } from "./assignmentNames";
 import { useEnterprise } from "../../context/enterprise-context";
 import { useLanguage } from "../../../context/language-context";
 
@@ -61,7 +62,7 @@ function AssignmentCard({ assignment: a, onOpen, onViewCertificate, starting }) 
           </div>
           <div className="min-w-0">
             <p style={{ color: "var(--text-primary)", fontWeight: 700, fontSize: 14, lineHeight: 1.3 }}>
-              {a.learning_path_name || a.path_name || a.name || t("enterprise.learning.myAssignments.learningPath")}
+              {a.learning_path_name || a.learning_module_name || a.path_name || a.name || t("enterprise.learning.myAssignments.learningPath")}
             </p>
             {a.assigned_by_username && (
               <p style={{ color: "var(--text-tertiary)", fontSize: 11, marginTop: 2 }}>{t("enterprise.learning.myAssignments.assignedBy", { name: a.assigned_by_username })}</p>
@@ -123,8 +124,12 @@ export function MyAssignments() {
 
   useEffect(() => {
     setLoading(true);
-    learningApi.getAssignments()
-      .then((d) => setAssignments(d.results || d || []))
+    learningApi.getMyAssignments()
+      .then(async (d) => {
+        const list = d.results || d || [];
+        setAssignments(list);
+        setAssignments(await withModuleNames(list));
+      })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [activeCompanyId]);

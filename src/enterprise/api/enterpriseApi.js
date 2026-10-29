@@ -133,6 +133,8 @@ export const learningApi = {
 
   // Assignments
   getAssignments: (p) => enterpriseApi.get("/enterprise/learning-assignments/", { params: cp(p) }).then((r) => r.data),
+  // Only the current user's assignments (the list above returns the whole company to managers).
+  getMyAssignments: () => enterpriseApi.get("/enterprise/learning-assignments/my-assignments/", { params: cp() }).then((r) => r.data),
   getAssignment: (id) => enterpriseApi.get(`/enterprise/learning-assignments/${id}/`, { params: cp() }).then((r) => r.data),
   startAssignment: (id) => enterpriseApi.post(`/enterprise/learning-assignments/${id}/start/`, {}, { params: cp() }).then((r) => r.data),
   completeModule: (id, data) => enterpriseApi.post(`/enterprise/learning-assignments/${id}/complete-module/`, data, { params: cp() }).then((r) => r.data),
