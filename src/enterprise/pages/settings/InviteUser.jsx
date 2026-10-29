@@ -14,6 +14,7 @@ import { useEnterprise } from "@/enterprise/context/enterprise-context";
 import { useLanguage } from "../../../context/language-context";
 import api from "@/services/api";
 import invitationsService from "@/services/invitationsService";
+import { apiErrorMessage } from "@/utils/apiError";
 
 const AVATAR_COLORS = ["#6366F1","#818CF8","#38BDF8","#A78BFA","#34D399","#F59E0B","#F87171","#FB923C"];
 
@@ -134,8 +135,13 @@ export default function InviteUser() {
       setSentEmail(activeEmail);
       setSent(true);
     } catch (err) {
-      const detail = err?.email?.[0] || err?.detail || t("enterprise.settings.inviteUser.sendFailed");
-      setSendError(detail);
+      // The API answers 400 {email: ["'x' is already a active member of this company."]}
+      // (English only): show it translated; any other error as the API sends it.
+      const emailError = err?.response?.data?.email;
+      const memberStatus = String(Array.isArray(emailError) ? emailError[0] : emailError || "").match(/already an? (\w+) member/)?.[1];
+      setSendError(memberStatus
+        ? t(`enterprise.settings.inviteUser.${memberStatus === "suspended" ? "alreadySuspended" : "alreadyMember"}`, { email: activeEmail })
+        : apiErrorMessage(err, t("enterprise.settings.inviteUser.sendFailed")));
     } finally {
       setSending(false);
     }

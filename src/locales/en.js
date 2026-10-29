@@ -2703,6 +2703,8 @@ export const en = {
                 title: "Invite User",
                 sendingTo: "Sending to",
                 sendFailed: "Failed to send invitation.",
+                alreadyMember: "{email} is already a member of this company.",
+                alreadySuspended: "{email} is already a member of this company, but suspended.",
                 sentTitle: "Invitation Sent!",
                 sentSubtitle: "The invitation email was delivered to",
                 inviteAnother: "Invite Another",

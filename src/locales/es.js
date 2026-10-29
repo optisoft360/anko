@@ -2704,6 +2704,8 @@ export const es = {
                 title: "Invitar Usuario",
                 sendingTo: "Enviando a",
                 sendFailed: "No se pudo enviar la invitación.",
+                alreadyMember: "{email} ya es miembro de esta empresa.",
+                alreadySuspended: "{email} ya es miembro de esta empresa, pero está suspendido.",
                 sentTitle: "¡Invitación Enviada!",
                 sentSubtitle: "El correo de invitación fue enviado a",
                 inviteAnother: "Invitar a Otro",
