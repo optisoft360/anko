@@ -24,6 +24,11 @@ import { EnterpriseProvider } from "@/enterprise/context/enterprise-context";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import "@uppy/dashboard/dist/style.min.css";
 import "./styles/tailwind.css";
+import api from "@/services/api";
+import { installRateLimitRetry } from "@/services/rateLimit";
+
+// GETs answered 429 wait for Retry-After and retry (api.js has no response interceptor of its own).
+installRateLimitRetry(api);
 
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;

@@ -45,6 +45,10 @@ const getLevelStyle = (level) => {
   return                          { Icon: InformationCircleIcon,   ring: "ring-indigo-100",  cls: "text-indigo-500",  dot: "bg-indigo-500"  };
 };
 
+
+const NOTIF_REFRESH_MS = 60_000;
+let notifCache = { userId: null, at: 0, data: [] };
+
 export function DashboardNavbar({ hideMenu = { mobile: false, desktop: false } } = {}) {
   const [controller, dispatch] = useMaterialTailwindController();
   const { fixedNavbar, openSidenav } = controller;
@@ -68,11 +72,18 @@ export function DashboardNavbar({ hideMenu = { mobile: false, desktop: false } }
   const removeToast = (id) => setToasts((prev) => prev.filter((t) => t._toastId !== id));
 
   // ── Notifications ────────────────────────────────────────
-  const fetchNotifications = async () => {
+  const fetchNotifications = async ({ force = true } = {}) => {
+    // Every layout mounts its own navbar: reuse a list fetched less than a minute ago.
+    if (!force && notifCache.userId === user?.id && Date.now() - notifCache.at < NOTIF_REFRESH_MS) {
+      setNotifications(notifCache.data);
+      return;
+    }
     setNotifLoading(true);
     try {
       const res = await api.get("/user-notifications/");
-      setNotifications(res.data?.results || res.data || []);
+      const data = res.data?.results || res.data || [];
+      notifCache = { userId: user?.id, at: Date.now(), data };
+      setNotifications(data);
     } catch (e) {
       console.error("Failed to fetch notifications", e);
     } finally {
@@ -80,11 +91,16 @@ export function DashboardNavbar({ hideMenu = { mobile: false, desktop: false } }
     }
   };
 
-  // Fetch al login para el badge + polling de respaldo cada 30 s
+  // Keep the shared copy current with socket pushes and read/dismiss actions.
+  useEffect(() => {
+    if (user && notifCache.userId === user.id && notifCache.at) notifCache = { ...notifCache, data: notifications };
+  }, [notifications, user]);
+
+  // Fetch al login para el badge + polling de respaldo cada 60 s (el socket entrega las nuevas al momento)
   useEffect(() => {
     if (!user) return;
-    fetchNotifications();
-    const interval = setInterval(fetchNotifications, 30_000);
+    fetchNotifications({ force: false });
+    const interval = setInterval(fetchNotifications, NOTIF_REFRESH_MS);
     return () => clearInterval(interval);
   }, [user]);
 
@@ -129,7 +145,8 @@ export function DashboardNavbar({ hideMenu = { mobile: false, desktop: false } }
   const unreadCount = notifications.filter((n) => !n.is_read).length;
 
   // ── Breadcrumbs ──────────────────────────────────────────
-  const { projects: allProjects } = useProjects();
+  // Project names are only needed for the breadcrumb of a project's own pages.
+  const { projects: allProjects } = useProjects({ passive: !/\/projects\/\d/.test(pathname) });
   const pathParts = pathname.split("/").filter((el) => el !== "");
   const getBreadcrumbName = (part, index) => {
     if (index === 2 && pathParts[1] === "project") {

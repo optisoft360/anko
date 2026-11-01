@@ -491,6 +491,7 @@ export const es = {
         }
     },
     admin: {
+        rateLimited: "Demasiadas peticiones, reintentando…",
         cells: { yes: "Sí", no: "No", copy: "Copiar" },
         table: {
             search: "Buscar…", all: "Todos", clear: "Limpiar filtros", actions: "Acciones", edit: "Editar", delete: "Eliminar",

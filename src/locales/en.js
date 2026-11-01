@@ -491,6 +491,7 @@ export const en = {
         }
     },
     admin: {
+        rateLimited: "Too many requests, retrying…",
         cells: { yes: "Yes", no: "No", copy: "Copy" },
         table: {
             search: "Search…", all: "All", clear: "Clear filters", actions: "Actions", edit: "Edit", delete: "Delete",

@@ -1,5 +1,6 @@
 import { isAuthFailure } from "@/utils/authErrors";
 import axios from "axios";
+import { installRateLimitRetry } from "@/services/rateLimit";
 import { API_BASE } from "@/services/api";
 
 const enterpriseApi = axios.create({
@@ -14,6 +15,9 @@ enterpriseApi.interceptors.request.use((config) => {
   config.headers["Accept-Language"] = "en";
   return config;
 });
+
+// 429 retries first: the interceptor below reshapes errors and drops the status.
+installRateLimitRetry(enterpriseApi);
 
 // 401 with an invalid/missing token → sign-in. Other errors never end the session (C3 / F-07).
 enterpriseApi.interceptors.response.use(

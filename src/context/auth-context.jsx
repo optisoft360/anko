@@ -9,6 +9,22 @@ const AuthContext = createContext(null);
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+// Last good /auth/me/ for the current token, per tab. A transient failure (429, 5xx, network)
+// on reload falls back to it instead of signing the user out; only a 401 ends the session.
+const ME_CACHE_KEY = "auth_me_cache";
+export function cacheMe(token, me) {
+  try { sessionStorage.setItem(ME_CACHE_KEY, JSON.stringify({ token, me })); } catch { /* storage blocked */ }
+}
+export function cachedMe(token) {
+  try {
+    const raw = JSON.parse(sessionStorage.getItem(ME_CACHE_KEY) || "null");
+    return raw && raw.token === token ? raw.me : null;
+  } catch { return null; }
+}
+export function clearCachedMe() {
+  try { sessionStorage.removeItem(ME_CACHE_KEY); } catch { /* storage blocked */ }
+}
+
 // A transient failure (429 throttling, brief network hiccup) on the RBAC/context
 // fetch must not permanently blank the sidebar for the rest of the session — this
 // is on the critical path for basic navigation, so retry a couple of times with a
@@ -94,14 +110,27 @@ export function AuthProvider({ children }) {
             throw err;
           }
         }, { attempts: 3, delayMs: 1000, stopIf: (err) => err?.fatal });
+        cacheMe(token, me);
         if (mounted) await refreshRbacAndContext();
         if (mounted) setUser(me);
       } catch (err) {
         if (isAuthFailure(err)) {
           localStorage.removeItem("token");
           setAuthToken(null);
+          clearCachedMe();
+          if (mounted) setUser(null);
+        } else {
+          // Not an authentication problem: keep the session with the last known user and
+          // refresh in the background once the API recovers.
+          const known = cachedMe(token);
+          if (mounted) setUser(known);
+          if (known) {
+            refreshRbacAndContext().catch(() => {});
+            setTimeout(() => {
+              authService.me().then((fresh) => { cacheMe(token, fresh); if (mounted) setUser(fresh); }).catch(() => {});
+            }, 30_000);
+          }
         }
-        if (mounted) setUser(null);
       } finally {
         if (mounted) setLoading(false);
       }
@@ -137,9 +166,16 @@ export function AuthProvider({ children }) {
     return { ...response, user: u || null };
   };
 
+  // Every sign-in / profile change refreshes the per-tab fallback copy.
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (user && token) cacheMe(token, user);
+  }, [user]);
+
   const logout = () => {
     authService.logout();
     localStorage.removeItem("token");
+    clearCachedMe();
     setUser(null);
     setAllowedRoutes([]);
     setIsAdmin(false);

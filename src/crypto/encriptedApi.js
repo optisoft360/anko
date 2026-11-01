@@ -1,3 +1,4 @@
+import { fetchWithRateLimitRetry } from "@/services/rateLimit";
 // ---------- base64url helpers ----------
 function b64urlToBytes(b64url) {
     const pad = "=".repeat((4 - (b64url.length % 4)) % 4);
@@ -61,7 +62,7 @@ export async function apiFetch(url, { token, ...options } = {}) {
         headers.set("Accept-Language", lang);
     }
 
-    const res = await fetch(url, { ...options, headers });
+    const res = await fetchWithRateLimitRetry(() => fetch(url, { ...options, headers }), options.method);
 
     // si no es json, devuelve normal
     const contentType = res.headers.get("content-type") || "";

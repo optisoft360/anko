@@ -47,13 +47,15 @@ export function ProjectsProvider({ children }) {
     }
   }, [user]);
 
-  // Initial load
+  // Lazy load: nothing is fetched until a page that uses the data mounts (useProjects()).
+  // Loading projects/topics/rules/batteries on every route — admin and enterprise included —
+  // spent the per-minute request quota and triggered 429s.
+  const [wanted, setWanted] = useState(false);
+  const request = useCallback(() => setWanted(true), []);
+
   useEffect(() => {
-    // Only fetch if we have a token? 
-    // Usually api.js handles auth, but we can verify here if needed.
-    // For now, simpler is better.
-    refreshAll();
-  }, [refreshAll]);
+    if (wanted) refreshAll();
+  }, [wanted, refreshAll]);
 
   // ===== PROJECT FUNCTIONS =====
   // These wrappers ensure we update the global state after actions
@@ -92,6 +94,7 @@ export function ProjectsProvider({ children }) {
     loading,
     error,
     refreshAll,
+    request,
     createProject,
     deleteProject,
     // Add other wrappers as needed by components, or let components call service directly + refreshAll
@@ -108,11 +111,19 @@ ProjectsProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
-export const useProjects = () => {
+/**
+ * Pages using the data load it on mount. `{ passive: true }` reads whatever is loaded without
+ * triggering a fetch (the navbar on routes that don't need projects).
+ */
+export const useProjects = ({ passive = false } = {}) => {
   const context = useContext(ProjectsContext);
   if (!context) {
     throw new Error("useProjects must be used within a ProjectsProvider");
   }
+  const { request } = context;
+  useEffect(() => {
+    if (!passive) request();
+  }, [passive, request]);
   return context;
 };
 

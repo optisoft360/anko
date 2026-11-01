@@ -7,6 +7,7 @@ import { PublicFaq } from "@/pages/faq";
 import { Privacidad } from "@/pages/privacidad";
 import { Terminos } from "@/pages/terminos";
 import RequireAuth from "@/components/RequireAuth";
+import RateLimitNotice from "@/components/RateLimitNotice";
 import { ForgotPassword, ResetPassword, EmailVerification } from "@/pages/auth";
 import { AccessAction } from "@/pages/dashboard";
 import { PublicVerification } from "@/enterprise/pages/certifications/PublicVerification";
@@ -16,6 +17,8 @@ import { WaitingPage } from "@/pages/waiting/WaitingPage";
 
 function App() {
   return (
+    <>
+    <RateLimitNotice />
     <Routes>
       <Route path="/" element={<LandingPage />} />
       <Route path="/faq" element={<PublicFaq />} />
@@ -36,6 +39,7 @@ function App() {
       <Route path="/verify" element={<PublicVerification />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
+    </>
   );
 }
 

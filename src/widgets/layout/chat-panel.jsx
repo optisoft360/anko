@@ -93,8 +93,11 @@ export function ChatPanel() {
         }
     };
 
-    // Load Projects on mount
+    // Load projects the first time the panel opens (it is mounted, closed, on every page).
+    const projectsLoaded = useRef(false);
     useEffect(() => {
+        if (!openConfigurator || projectsLoaded.current) return;
+        projectsLoaded.current = true;
         const fetchProjects = async () => {
             try {
                 const data = await projectService.getProjects();
@@ -107,7 +110,7 @@ export function ChatPanel() {
             }
         };
         fetchProjects();
-    }, []);
+    }, [openConfigurator]);
 
     // Load Documents when project changes
     useEffect(() => {
