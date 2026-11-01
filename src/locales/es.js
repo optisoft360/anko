@@ -503,7 +503,8 @@ export const es = {
         pages: {
             companyUsers: { removeTitle: "¿Quitar de la empresa?", remove: "Quitar", removeConsequences: "Pierde el acceso a esta empresa. Su cuenta se mantiene." },
             batteries: {
-                company: "Empresa",
+                company: "Empresa", noProjectShort: "Sin proyecto",
+                companyOwner: "Empresa / propietario", statusDifficulty: "Estado / dificultad", noCompany: "Sin empresa",
                 title: "Baterías", subtitle: "Todas las baterías de la plataforma.", name: "Nombre", project: "Proyecto", owner: "Propietario",
                 status: "Estado", difficulty: "Dificultad", rule: "Regla", noRule: "Sin regla", questions: "Preguntas", created: "Creada",
                 visibility: "Visibilidad", easy: "Fácil", medium: "Media", hard: "Difícil",

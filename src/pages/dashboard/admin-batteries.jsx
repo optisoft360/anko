@@ -29,13 +29,31 @@ export function AdminBatteries() {
         { name: "project", label: k("project"), hidden: true },
       ]}
       columns={[
-        { header: k("name"), sortKey: "name", cell: (b) => <span className="font-medium text-[#0F172A]">{b.name}</span> },
-        { header: k("company"), cell: (b) => <EntityCell detail={b.company_detail} /> },
-        { header: k("project"), cell: (b) => (b.project ? <EntityCell detail={b.project_detail} id={b.project} /> : <span title={t("admin.cells.noProject")}>{DASH}</span>) },
-        { header: k("owner"), cell: (b) => <EntityCell detail={b.owner_detail} /> },
-        { header: k("status"), cell: (b) => <StatusBadge value={b.status} tones={STATUS_TONE} labels={statusLabels} /> },
-        { header: k("difficulty"), cell: (b) => <StatusBadge value={b.difficulty} tones={DIFF_TONE} labels={diffLabels} /> },
-        { header: k("rule"), cell: (b) => (b.rule_detail || b.rule ? <EntityCell detail={b.rule_detail} id={b.rule} /> : <span title={k("noRule")}>{DASH}</span>) },
+        // Combined cells keep the table within 1024-1440px: Name carries project and rule on a grey
+        // second line (like Users' email), Company/Owner and Status/Difficulty share a cell each.
+        { header: k("name"), sortKey: "name", maxWidth: "max-w-[230px]", cell: (b) => (
+          <span className="block min-w-[150px]">
+            <span className="line-clamp-2 font-medium text-[#0F172A]" title={b.name}>{b.name}</span>
+            <span className="mt-0.5 block truncate text-xs text-[#64748B]">
+              {b.project
+                ? <span title={k("project")}>{b.project_detail?.title || `#${b.project}`}</span>
+                : <span title={t("admin.cells.noProject")}>{k("noProjectShort")}</span>}
+              {(b.rule_detail || b.rule) && <span title={k("rule")}> · {b.rule_detail?.name || `#${b.rule}`}</span>}
+            </span>
+          </span>
+        ) },
+        { header: k("companyOwner"), className: "!whitespace-normal", maxWidth: "max-w-[160px]", cell: (b) => (
+          <span className="block min-w-0">
+            <span className="block truncate text-[#334155]">{b.company_detail?.name || <span title={k("noCompany")}>{DASH}</span>}</span>
+            {b.owner_detail && <span className="block truncate text-xs text-[#64748B]" title={b.owner_detail.email}>{b.owner_detail.username}</span>}
+          </span>
+        ) },
+        { header: k("statusDifficulty"), className: "!whitespace-normal w-[110px]", cell: (b) => (
+          <span className="flex flex-col items-start gap-1">
+            <StatusBadge value={b.status} tones={STATUS_TONE} labels={statusLabels} />
+            <StatusBadge value={b.difficulty} tones={DIFF_TONE} labels={diffLabels} />
+          </span>
+        ) },
         { header: k("questions"), sortKey: "question_count", accessor: (b) => b.question_count ?? 0, className: "tabular-nums" },
         { header: k("created"), sortKey: "created_at", cell: (b) => <DateCell value={b.created_at} withTime={false} /> },
       ]}

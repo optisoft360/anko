@@ -503,7 +503,8 @@ export const en = {
         pages: {
             companyUsers: { removeTitle: "Remove from company?", remove: "Remove", removeConsequences: "They lose access to this company. Their account is kept." },
             batteries: {
-                company: "Company",
+                company: "Company", noProjectShort: "No project",
+                companyOwner: "Company / owner", statusDifficulty: "Status / difficulty", noCompany: "Not linked to a company",
                 title: "Batteries", subtitle: "Every battery on the platform.", name: "Name", project: "Project", owner: "Owner",
                 status: "Status", difficulty: "Difficulty", rule: "Rule", noRule: "No rule", questions: "Questions", created: "Created",
                 visibility: "Visibility", easy: "Easy", medium: "Medium", hard: "Hard",
