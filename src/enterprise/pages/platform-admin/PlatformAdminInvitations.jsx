@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
 import {
   EnvelopeIcon, ClockIcon, BuildingOffice2Icon, PlusIcon,
-  PaperAirplaneIcon, CheckCircleIcon, ExclamationTriangleIcon,
+  PaperAirplaneIcon, CheckCircleIcon, ExclamationTriangleIcon, ArrowPathIcon, XMarkIcon,
 } from "@heroicons/react/24/outline";
+import { ConfirmDialog } from "@/widgets/admin/ConfirmDialog";
 import api from "@/services/api";
 import invitationsService from "@/services/invitationsService";
 import { useLanguage } from "../../../context/language-context";
@@ -171,6 +172,36 @@ export default function PlatformAdminInvitations() {
   const [loading, setLoading]     = useState(true);
   const [error, setError]         = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [busyId, setBusyId] = useState(null);
+  const [cancelling, setCancelling] = useState(null);
+  const [notice, setNotice] = useState("");
+
+  const resend = async (inv) => {
+    setBusyId(inv.id); setNotice("");
+    try { await invitationsService.resend(inv.company, inv.id); setNotice(t("enterprise.platformAdmin.invitations.resent", { email: inv.email })); }
+    catch (e) { setNotice(e?.response?.data?.detail || t("admin.toast.error")); }
+    setBusyId(null);
+  };
+  const cancel = async () => {
+    await invitationsService.cancel(cancelling.company, cancelling.id);
+    setCancelling(null);
+    load();
+  };
+  const actionsFor = (inv) => (inv.status === "pending" ? (
+    <div className="flex items-center justify-end gap-1">
+      <button type="button" onClick={() => resend(inv)} disabled={busyId === inv.id}
+        aria-label={t("enterprise.platformAdmin.invitations.resend")} title={t("enterprise.platformAdmin.invitations.resend")}
+        className={`grid h-9 w-9 cursor-pointer place-items-center rounded-lg text-[#64748B] hover:bg-[#F1F5F9] hover:text-[#0F172A] disabled:opacity-40 ${FOCUS}`}>
+        {busyId === inv.id ? <Spinner className="!h-4 !w-4" /> : <ArrowPathIcon className="h-4 w-4" />}
+      </button>
+      <button type="button" onClick={() => setCancelling(inv)}
+        aria-label={t("enterprise.platformAdmin.invitations.cancelInvite")} title={t("enterprise.platformAdmin.invitations.cancelInvite")}
+        className={`grid h-9 w-9 cursor-pointer place-items-center rounded-lg text-[#64748B] hover:bg-[#FFF1F2] hover:text-[#BE123C] ${FOCUS}`}>
+        <XMarkIcon className="h-4 w-4" />
+      </button>
+    </div>
+  ) : <span className="block text-right text-[#94A3B8]">—</span>);
+  const invitedBy = (inv) => inv.invited_by_detail?.username || inv.invited_by_email || "—";
 
   const STATUS_TAB_LABELS = {
     all: t("enterprise.platformAdmin.invitations.statusTabs.all"),
@@ -218,6 +249,7 @@ export default function PlatformAdminInvitations() {
     t("enterprise.platformAdmin.invitations.columns.invitedBy"),
     t("enterprise.platformAdmin.invitations.columns.sent"),
     t("enterprise.platformAdmin.invitations.columns.expires"),
+    t("admin.table.actions"),
   ];
 
   const head = "px-6 py-3 text-left text-xs font-medium uppercase tracking-wide text-[#64748B]";
@@ -228,7 +260,7 @@ export default function PlatformAdminInvitations() {
   );
 
   return (
-    <div className="mx-auto w-full max-w-6xl space-y-5 sm:space-y-6 md:py-2">
+    <div className="mx-auto w-full max-w-7xl space-y-5 sm:space-y-6 md:py-2">
       <PageHeader
         title={t("enterprise.platformAdmin.invitations.title")}
         subtitle={t("enterprise.platformAdmin.invitations.subtitle")}
@@ -272,10 +304,11 @@ export default function PlatformAdminInvitations() {
                     </div>
                   </div>
                   <dl className="grid grid-cols-3 gap-2 text-xs">
-                    <div className="min-w-0"><dt className="text-[#64748B]">{columns[4]}</dt><dd className="truncate text-[#334155]">{inv.invited_by_email || "—"}</dd></div>
+                    <div className="min-w-0"><dt className="text-[#64748B]">{columns[4]}</dt><dd className="truncate text-[#334155]">{invitedBy(inv)}</dd></div>
                     <div><dt className="text-[#64748B]">{columns[5]}</dt><dd className="text-[#334155]">{formatDate(inv.created_at, language)}</dd></div>
                     <div><dt className="text-[#64748B]">{columns[6]}</dt><dd className="text-[#334155]">{formatDate(inv.expires_at, language)}</dd></div>
                   </dl>
+                  {inv.status === "pending" && actionsFor(inv)}
                 </li>
               ))}
             </ul>
@@ -298,11 +331,12 @@ export default function PlatformAdminInvitations() {
                       <td className="px-6 py-4 font-medium text-[#0F172A]">{inv.email}</td>
                       <td className="px-6 py-4"><RoleBadge role={inv.role} /></td>
                       <td className="px-6 py-4"><StatusBadge status={inv.status} /></td>
-                      <td className="px-6 py-4 text-[#64748B]">{inv.invited_by_email || "—"}</td>
+                      <td className="px-6 py-4 text-[#64748B]" title={inv.invited_by_email || undefined}>{invitedBy(inv)}</td>
                       <td className="whitespace-nowrap px-6 py-4 text-[#64748B]">
                         <span className="inline-flex items-center gap-1.5"><ClockIcon className="h-4 w-4 text-[#94A3B8]" />{formatDate(inv.created_at, language)}</span>
                       </td>
                       <td className="whitespace-nowrap px-6 py-4 text-[#64748B]">{formatDate(inv.expires_at, language)}</td>
+                      <td className="px-4 py-3">{actionsFor(inv)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -311,6 +345,14 @@ export default function PlatformAdminInvitations() {
           </>
         )}
       </Card>
+
+      {notice && <p role="status" className="text-sm text-[#334155]">{notice}</p>}
+
+      {cancelling && (
+        <ConfirmDialog title={t("enterprise.platformAdmin.invitations.cancelInvite")} entityName={`${cancelling.email} · ${cancelling.company_name || ""}`}
+          consequences={t("enterprise.platformAdmin.invitations.cancelConsequences")} confirmLabel={t("enterprise.platformAdmin.invitations.cancelInvite")}
+          onConfirm={cancel} onClose={() => setCancelling(null)} />
+      )}
 
       {showModal && (
         <InviteModal

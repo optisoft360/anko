@@ -2957,12 +2957,13 @@ export const en = {
                 }
             },
             invitations: {
+                resend: "Resend", cancelInvite: "Cancel invitation", cancelConsequences: "The link in the email stops working.", resent: "Invitation sent again to {email}.",
                 title: "Invitations",
                 subtitle: "All company invitations across the platform",
                 globalTab: "Global",
                 recentTab: "Recent (7 days)",
                 empty: "No invitations found",
-                loadError: "Could not load invitations. Make sure the server is running and you have staff access.",
+                loadError: "Could not load the invitations. Try again in a moment.",
                 status: {
                     pending: "Pending",
                     accepted: "Accepted",

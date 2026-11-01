@@ -2958,12 +2958,13 @@ export const es = {
                 }
             },
             invitations: {
+                resend: "Reenviar", cancelInvite: "Cancelar invitación", cancelConsequences: "El enlace del email deja de funcionar.", resent: "Invitación reenviada a {email}.",
                 title: "Invitaciones",
                 subtitle: "Todas las invitaciones de empresas en la plataforma",
                 globalTab: "Global",
                 recentTab: "Recientes (7 días)",
                 empty: "No se encontraron invitaciones",
-                loadError: "No se pudieron cargar las invitaciones. Verifica que el servidor esté activo y que tengas acceso de staff.",
+                loadError: "No se pudieron cargar las invitaciones. Inténtalo de nuevo en un momento.",
                 status: {
                     pending: "Pendiente",
                     accepted: "Aceptada",
