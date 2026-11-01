@@ -51,13 +51,14 @@ const LABEL_S = { fontSize: 11, fontWeight: 700, color: "var(--lt-94a3b8, #94A3B
 const MODAL_BACKDROP = { position: "fixed", inset: 0, background: "var(--lt-rgba-0-0-0-0-7, rgba(0,0,0,0.7))", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: 16, backdropFilter: "blur(4px)" };
 const MODAL_CARD = { background: "var(--lt-0f172a, #0F172A)", border: "1px solid var(--lt-rgba-255-255-255-0-1, rgba(255,255,255,0.1))", borderRadius: 20, width: "100%", maxWidth: 440, boxShadow: "0 32px 80px var(--lt-rgba-0-0-0-0-6, rgba(0,0,0,0.6))" };
 
+// Light-palette badges with AA contrast on white (the dark-theme tints were unreadable here).
 const ROLE_STYLES = {
-  owner:    { background: "rgba(168,85,247,0.12)", color: "#C084FC", border: "1px solid rgba(168,85,247,0.25)" },
-  admin:    { background: "rgba(239,68,68,0.1)",   color: "var(--lt-f87171, #F87171)", border: "1px solid rgba(239,68,68,0.22)" },
-  manager:  { background: "rgba(59,130,246,0.1)",  color: "var(--lt-60a5fa, #60A5FA)", border: "1px solid rgba(59,130,246,0.22)" },
-  trainer:  { background: "rgba(34,197,94,0.09)",  color: "var(--lt-4ade80, #4ADE80)", border: "1px solid rgba(34,197,94,0.2)" },
-  employee: { background: "rgba(148,163,184,0.1)", color: "var(--lt-94a3b8, #94A3B8)", border: "1px solid rgba(148,163,184,0.2)" },
-  auditor:  { background: "rgba(251,191,36,0.1)",  color: "#FCD34D", border: "1px solid rgba(251,191,36,0.22)" },
+  owner:    { background: "#F5F3FF", color: "#6D28D9", border: "1px solid #DDD6FE" },
+  admin:    { background: "#FFF1F2", color: "#BE123C", border: "1px solid #FECDD3" },
+  manager:  { background: "#F0F9FF", color: "#0369A1", border: "1px solid #BAE6FD" },
+  trainer:  { background: "#ECFDF5", color: "#047857", border: "1px solid #A7F3D0" },
+  employee: { background: "#F1F5F9", color: "#475569", border: "1px solid #E2E8F0" },
+  auditor:  { background: "#FFFBEB", color: "#B45309", border: "1px solid #FDE68A" },
 };
 
 const STATUS_STYLES = {
@@ -307,7 +308,7 @@ export function PlatformAdminUsers() {
   ];
 
   return (
-    <div style={{ maxWidth: 900 }}>
+    <div style={{ width: "100%" }}>
       {/* Toast */}
       {toast && (
         <div style={{ position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)", zIndex: 60, background: "var(--lt-toast, rgba(15,23,42,0.95))", border: "1px solid var(--lt-rgba-255-255-255-0-1, rgba(255,255,255,0.1))", color: "var(--lt-f1f5f9, #F1F5F9)", fontSize: 13, fontWeight: 600, padding: "12px 22px", borderRadius: 12, backdropFilter: "blur(12px)", boxShadow: "0 8px 32px var(--lt-rgba-0-0-0-0-5, rgba(0,0,0,0.5))", whiteSpace: "nowrap" }}>
@@ -415,9 +416,10 @@ export function PlatformAdminUsers() {
                     <div style={{ position: "relative" }}>
                       <button
                         onClick={() => setMenuOpen(menuOpen === m.id ? null : m.id)}
-                        style={{ width: 30, height: 30, display: "flex", alignItems: "center", justifyContent: "center", background: "none", border: "none", borderRadius: 7, cursor: "pointer", color: "var(--lt-475569, #475569)", transition: "color 0.15s, background 0.15s" }}
-                        onMouseEnter={(e) => { e.currentTarget.style.color = "var(--lt-94a3b8, #94A3B8)"; e.currentTarget.style.background = "var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))"; }}
-                        onMouseLeave={(e) => { e.currentTarget.style.color = "var(--lt-475569, #475569)"; e.currentTarget.style.background = "none"; }}>
+                        aria-label={t("admin.table.actions")} aria-haspopup="menu" aria-expanded={menuOpen === m.id}
+                        style={{ width: 34, height: 34, display: "flex", alignItems: "center", justifyContent: "center", background: "#F8FAFC", border: "1px solid #E2E8F0", borderRadius: 8, cursor: "pointer", color: "#334155", transition: "color 0.15s, background 0.15s" }}
+                        onMouseEnter={(e) => { e.currentTarget.style.color = "#0F172A"; e.currentTarget.style.background = "#F1F5F9"; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.color = "#334155"; e.currentTarget.style.background = "#F8FAFC"; }}>
                         <EllipsisHorizontalIcon style={{ width: 16, height: 16 }} />
                       </button>
                       {menuOpen === m.id && (

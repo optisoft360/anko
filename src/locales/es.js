@@ -26,7 +26,7 @@ export const es = {
         "contact-us": "Contacto",
         resources: "Recursos Globales",
         permissions: "Permisos",
-        roles: "Roles",
+        roles: "Roles y permisos",
         plans: "Planes",
         "plan-limits": "Límites de Plan",
         subscriptions: "Suscripciones",
@@ -84,9 +84,12 @@ export const es = {
         "ent-analytics-health": "Salud Empresa",
         "ent-members": "Miembros",
         "ent-settings": "Configuración",
+        "pa-overview": "Resumen",
+        "admin-batteries": "Baterías",
+        adminSections: { platform: "Plataforma", organizations: "Organizaciones", content: "Contenido", billing: "Facturación", access: "Acceso", advanced: "Avanzado", support: "Soporte", other: "Otros" },
         "admin-area": "Área de Admin",
-        "global-process": "Procesos Globales",
-        "global-learning-path": "Rutas de Aprendizaje",
+        "global-process": "Procesos",
+        "global-learning-path": "Todas las rutas",
         "ent-invitations": "Invitaciones",
         "pa-invitations": "Invitaciones",
         "companies": "Empresas"
@@ -95,6 +98,9 @@ export const es = {
         welcome: "Bienvenido"
     },
     breadcrumbs: {
+        overview: "Resumen",
+        "admin-batteries": "Baterías",
+        "global-learning-paths": "Todas las rutas",
         dashboard: "Panel",
         home: "Inicio",
         profile: "Perfil",
@@ -114,7 +120,7 @@ export const es = {
         permissions: "Permisos",
         roles: "Roles",
         plans: "Planes",
-        "plan-limits": "Límites de Plan",
+        "plan-limits": "Límites de plan",
         subscriptions: "Suscripciones",
         "battery-shares": "Baterías Compartidas",
         "saved-batteries": "Baterías Guardadas",
@@ -124,14 +130,14 @@ export const es = {
         "deck-shares": "Mazos Compartidos",
         "saved-decks": "Mazos Guardados",
         users: "Usuarios",
-        "global-projects": "Proyectos Generales",
+        "global-projects": "Procesos",
         "my-decks": "Mis Mazos",
         "my-batteries": "Mis Baterías",
         "public-decks": "Decks Públicos",
         "public-batteries": "Baterías Públicas",
         orders: "Órdenes",
         "global-sections": "Secciones Globales",
-        "support-requests": "Mensajes de Soporte",
+        "support-requests": "Mensajes de soporte",
         enterprise: "Enterprise",
         learning: "Aprendizaje",
         assignments: "Asignaciones",
@@ -161,7 +167,7 @@ export const es = {
         knowledge: "Fuentes de Conocimiento",
         graph: "Grafo de Conocimiento",
         "change-impact": "Impacto de Cambios",
-        "platform-admin": "Administración de Plataforma",
+        "platform-admin": "Admin de plataforma",
         companies: "Empresas",
         audit: "Reporte de Auditoría"
     },
@@ -491,6 +497,81 @@ export const es = {
         }
     },
     admin: {
+        status: { active: "Activa", archived: "Archivada", draft: "Borrador", ready: "Lista" },
+        visibility: { private: "Privado", shared: "Compartido", public: "Público" },
+        companyRoles: { owner: "Propietario", admin: "Admin", manager: "Manager", trainer: "Formador", employee: "Empleado", auditor: "Auditor" },
+        pages: {
+            batteries: {
+                title: "Baterías", subtitle: "Todas las baterías de la plataforma.", name: "Nombre", project: "Proyecto", owner: "Propietario",
+                status: "Estado", difficulty: "Dificultad", rule: "Regla", noRule: "Sin regla", questions: "Preguntas", created: "Creada",
+                visibility: "Visibilidad", easy: "Fácil", medium: "Media", hard: "Difícil",
+                deleteConsequences: "También se borran sus preguntas y todos sus intentos."
+            },
+            decks: {
+                subtitle: "Todos los mazos de flashcards. Haz clic en una fila para ver sus tarjetas.", title: "Título", cards: "Tarjetas", project: "Proyecto",
+                owner: "Propietario", visibility: "Visibilidad", description: "Descripción", created: "Creado",
+                deleteConsequences: "También se borran sus flashcards."
+            },
+            flashcards: { subtitle: "Todas las flashcards de la plataforma.", search: "Buscar en anverso o reverso…", front: "Anverso", back: "Reverso", deck: "Mazo", created: "Creada" },
+            learningPaths: {
+                title: "Todas las rutas", subtitle: "Rutas de aprendizaje de todas las empresas.", name: "Nombre", company: "Empresa", status: "Estado",
+                modules: "Módulos", assignments: "Asignaciones", description: "Descripción", created: "Creada", untitled: "Sin título"
+            },
+            processes: {
+                title: "Procesos", subtitle: "Proyectos del espacio personal. Los procesos de empresa están en el área Enterprise de cada empresa.",
+                name: "Nombre", owner: "Propietario", documents: "Documentos", archived: "Archivado", description: "Descripción",
+                created: "Creado", updated: "Actualizado", deleteConsequences: "También se borran sus documentos, mazos y baterías."
+            },
+            subscriptions: {
+                subtitle: "Plan de cada usuario.", search: "Buscar usuario o email…", user: "Usuario", plan: "Plan", status: "Estado",
+                provider: "Proveedor", providerId: "Id de suscripción del proveedor", started: "Inicio", periodEnd: "Fin del periodo",
+                status_trialing: "En prueba", status_active: "Activa", status_past_due: "Pago pendiente", status_canceled: "Cancelada", status_expired: "Vencida",
+                deleteConsequences: "El usuario vuelve al plan Free la próxima vez que inicie sesión."
+            },
+            plans: {
+                subtitle: "Precios y cuotas base.", name: "Nombre", tier: "Nivel", price: "Precio", subscribers: "Suscriptores", active: "Activo",
+                description: "Descripción", priceCents: "Precio (céntimos)", priceCentsHint: "999 = 9,99", currency: "Moneda", period: "Periodo de facturación",
+                monthly: "Mensual", yearly: "Anual", maxDocuments: "Máx. documentos", maxBatteries: "Máx. baterías",
+                deleteConsequences: "Un plan con suscriptores no se puede borrar."
+            },
+            planLimits: {
+                subtitle: "Lo que permite cada plan.", view: "Vista", matrix: "Matriz", list: "Lista", limit: "Límite", plan: "Plan", type: "Tipo",
+                value: "Valor", key: "Clave", edit: "Editar", enabled: "Activado", notSet: "No definido para este plan",
+                typeInt: "Número", typeBool: "Sí / No", typeStr: "Texto", intValue: "Valor numérico", boolValue: "Activado", strValue: "Valor de texto"
+            },
+            permissions: { subtitle: "Permisos de ruta (ver / gestionar) que conceden los roles.", search: "Buscar recurso…", resource: "Recurso", action: "Acción",
+                deleteConsequences: "Los roles que lo tengan lo pierden." },
+            support: {
+                subtitle: "Mensajes de los formularios de contacto y de la landing.", search: "Buscar nombre, email o mensaje…",
+                from: "De", message: "Mensaje", source: "Origen", date: "Fecha", status: "Estado", assigned: "Asignado a", unassigned: "Sin asignar",
+                note: "Nota interna", notePlaceholder: "Solo la ven los admins de plataforma", noteHint: "Nunca se muestra a quien escribió.",
+                status_new: "Nuevo", status_in_progress: "En curso", status_done: "Resuelto",
+                deleteConsequences: "El mensaje se borra definitivamente."
+            },
+            users: {
+                subtitle: "Todas las cuentas de la plataforma.", search: "Buscar usuario, email o nombre…", createTitle: "Crear usuario", editTitle: "Editar usuario",
+                user: "Usuario", email: "Email", roles: "Roles", active: "Activo", staff: "Staff", company: "Empresa", platformRole: "Rol de plataforma",
+                username: "Nombre de usuario", firstName: "Nombre", lastName: "Apellidos", password: "Contraseña",
+                staffHint: "Acceso total de admin de plataforma", platformRoles: "Roles de plataforma",
+                platformRolesHint: "admin = admin de plataforma, client = usuario normal. Los roles de empresa se asignan por empresa abajo o con el icono del edificio.",
+                companyHint: "Opcional: añadir el usuario a una empresa ahora.", companyRole: "Rol en la empresa",
+                companyRolesAction: "Roles por empresa", statsAction: "Estadísticas",
+                deleteConsequences: "También se borran su contenido personal y sus membresías de empresa.",
+                memberships: {
+                    title: "Roles por empresa", none: "No pertenece a ninguna empresa.", role: "Rol", company: "Empresa",
+                    confirmRole: "¿Cambiar a {role}?", remove: "Quitar de {company}", add: "Añadir a una empresa", addButton: "Añadir"
+                }
+            },
+            overview: {
+                title: "Resumen", subtitle: "Toda la plataforma de un vistazo.", companies: "Empresas", active: "{n} activas",
+                users: "Usuarios", usersHint: "{active} activos · {staff} admins de plataforma", newUsers: "Usuarios nuevos", last30: "Últimos 30 días",
+                pendingInvites: "Invitaciones pendientes", content: "Contenido", contentHint: "Registros de todas las empresas y espacios personales.",
+                companyProcesses: "Procesos de empresa", personalProcesses: "Procesos personales", learningPaths: "Rutas de aprendizaje",
+                decks: "Mazos", batteries: "Baterías", flashcards: "Flashcards", subscriptions: "Suscripciones por plan",
+                openSupport: "Mensajes de soporte abiertos", jobs: "Generaciones en curso", jobsHint: "{n} fallidas",
+                soon: "Próximamente", soonHint: "Este servidor todavía no tiene el endpoint de estadísticas."
+            }
+        },
         rateLimited: "Demasiadas peticiones, reintentando…",
         cells: { yes: "Sí", no: "No", copy: "Copiar" },
         table: {

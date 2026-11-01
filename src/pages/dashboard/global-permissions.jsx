@@ -1,51 +1,32 @@
 import React from "react";
 import GlobalCrudPage from "@/widgets/GlobalCrudPage";
 import { useLanguage } from "@/context/language-context";
-import projectService from "@/services/projectService";
+import { StatusBadge } from "@/widgets/admin/cells";
 
+// The `code` field is empty for nearly every permission and nothing reads it: no column for it.
 export function GlobalPermissions() {
-    const { t } = useLanguage();
-    const [resourcesMap, setResourcesMap] = React.useState({});
-
-    React.useEffect(() => {
-        projectService.getList('resources').then(data => {
-            const list = Array.isArray(data) ? data : (data.results || []);
-            const map = {};
-            list.forEach(r => map[r.id] = r);
-            setResourcesMap(map);
-        });
-    }, []);
-
-    return (
-        <GlobalCrudPage
-            title={t("global.pages.permissions.title")}
-            resource="permissions"
-            columns={[
-                {
-                    header: t("global.pages.permissions.columns.resource"),
-                    accessor: (perm) => {
-                        const resId = (typeof perm.resource === 'object' && perm.resource !== null) ? perm.resource.id : perm.resource;
-                        const res = resourcesMap[resId];
-                        return res ? (res.name || res.key) : resId;
-                    }
-                },
-                { header: t("global.pages.permissions.columns.action"), accessor: "action" },
-                { header: t("global.pages.permissions.columns.code"), accessor: "code" },
-            ]}
-            fields={[
-                {
-                    name: "resource",
-                    label: t("global.pages.permissions.fields.resource"),
-                    type: "select-resource",
-                    resource: "resources",
-                    labelAccessor: "name", // Muestra el nombre del recurso en el dropdown
-                    valueAccessor: "id"
-                },
-                { name: "action", label: t("global.pages.permissions.fields.action"), type: "text" },
-                { name: "code", label: t("global.pages.permissions.fields.code"), type: "text" },
-            ]}
-        />
-    );
+  const { t } = useLanguage();
+  const k = (key) => t(`admin.pages.permissions.${key}`);
+  const actions = { view: t("admin.roles.actions.view"), manage: t("admin.roles.actions.manage") };
+  return (
+    <GlobalCrudPage
+      title={t("global.pages.permissions.title")}
+      subtitle={k("subtitle")}
+      resource="permissions"
+      searchable
+      searchPlaceholder={k("search")}
+      filters={[{ name: "action", label: k("action"), options: Object.entries(actions).map(([value, label]) => ({ value, label })) }]}
+      columns={[
+        { header: k("resource"), sortKey: "resource__key", cell: (p) => <span className="font-mono text-xs text-[#334155]">{p.resourceKey || `#${p.resource}`}</span> },
+        { header: k("action"), sortKey: "action", cell: (p) => <StatusBadge value={p.action} tones={{ view: "sky", manage: "violet" }} labels={actions} /> },
+      ]}
+      fields={[
+        { name: "resource", label: k("resource"), type: "select-resource", resource: "resources", labelAccessor: "key", valueAccessor: "id", required: true },
+        { name: "action", label: k("action"), type: "select", options: Object.entries(actions).map(([value, label]) => ({ value, label })), required: true },
+      ]}
+      deleteConfirm={(p) => ({ entityName: `${p.resourceKey} · ${p.action}`, consequences: k("deleteConsequences") })}
+    />
+  );
 }
 
 export default GlobalPermissions;

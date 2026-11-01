@@ -53,12 +53,19 @@ function Toast({ toast, onDone }) {
  *  - canDelete(item) → true | "reason why not"; canEdit(item) → same
  *  - disableDelete, disableEdit, onRowClick(item)
  *  - editor: component replacing the generic form — receives { item | null, onClose, onSaved }
+ *  - itemResource: endpoint for edit/delete when it differs from the listing (default: resource)
+ *  - filters[].hidden: read from the URL (e.g. ?deck= from a link) but no select is shown
+ *  - fields[].optionFilter(option): keep only some select-resource options
+ *  - fields[].options for type "select" may come from state (e.g. companies)
+ *  - rowOpensEditor: clicking a row opens the editor (inbox-style pages)
  */
 export function GlobalCrudPage({
   title, resource, columns, fields, extraParams = {}, extraActions = null, editTitle, createTitle, disableCreate = false,
   subtitle, searchable = false, searchPlaceholder, filters = [], deleteConfirm, canDelete, canEdit,
-  disableDelete = false, disableEdit = false, onRowClick, headerActions, editor: Editor,
+  disableDelete = false, disableEdit = false, onRowClick: onRowClickProp, headerActions, editor: Editor, itemResource,
+  rowOpensEditor = false,
 }) {
+  const writeResource = itemResource || resource;
   const { t } = useLanguage();
   const [params, setParams] = useSearchParams();
   const page = Math.max(1, Number(params.get("page")) || 1);
@@ -168,7 +175,7 @@ export function GlobalCrudPage({
         if (f.type === "password" && !form[f.name]) return; // blank = keep
         payload[f.name] = form[f.name];
       });
-      if (isEdit) await projectService.updateItem(resource, editing.item.id, payload);
+      if (isEdit) await projectService.updateItem(writeResource, editing.item.id, payload);
       else await projectService.createItem(resource, payload);
       setEditing(null);
       setToast({ type: "ok", text: isEdit ? t("admin.toast.saved") : t("admin.toast.created") });
@@ -186,7 +193,7 @@ export function GlobalCrudPage({
   const [deleting, setDeleting] = useState(null);
   const doDelete = async () => {
     try {
-      await projectService.deleteItem(resource, deleting.id);
+      await projectService.deleteItem(writeResource, deleting.id);
       setDeleting(null);
       setToast({ type: "ok", text: t("admin.toast.deleted") });
       setReload((n) => n + 1);
@@ -197,6 +204,7 @@ export function GlobalCrudPage({
   };
 
   const dirty = JSON.stringify(form) !== JSON.stringify(initialForm);
+  const onRowClick = onRowClickProp || (rowOpensEditor ? (item) => openForm(item) : undefined);
   const hasFilters = Boolean(query || Object.values(filterValues).some(Boolean));
   const clearFilters = () => { setSearchText(""); update({ search: "", ...Object.fromEntries(filters.map((f) => [f.name, ""])) }); };
 
@@ -251,7 +259,7 @@ export function GlobalCrudPage({
       );
     }
     if (f.type === "select-resource" && f.multiple) {
-      const opts = options[f.name] || [];
+      const opts = (options[f.name] || []).filter(f.optionFilter || (() => true));
       const vals = Array.isArray(form[f.name]) ? form[f.name].map(String) : [];
       control = (
         <div className="max-h-56 overflow-y-auto rounded-lg border border-[#E2E8F0] p-2">
@@ -271,7 +279,7 @@ export function GlobalCrudPage({
       );
     } else if (f.type === "select-resource" || f.type === "select") {
       const opts = f.type === "select" ? (f.options || []).map((o) => ({ value: o.value, label: o.label }))
-        : (options[f.name] || []).map((o) => ({
+        : (options[f.name] || []).filter(f.optionFilter || (() => true)).map((o) => ({
           value: o[f.valueAccessor || "id"],
           label: typeof f.labelAccessor === "function" ? f.labelAccessor(o) : (o[f.labelAccessor || "name"] || o.title || o.email || `#${o.id}`),
         }));
@@ -315,7 +323,7 @@ export function GlobalCrudPage({
         </>} />
 
       <Card>
-        {(searchable || filters.length > 0) && (
+        {(searchable || filters.some((f) => !f.hidden) || hasFilters) && (
           <div className="flex flex-col gap-2 border-b border-[#F1F5F9] p-3 sm:flex-row sm:flex-wrap sm:items-center sm:p-4">
             {searchable && (
               <div className="relative min-w-0 flex-1 sm:max-w-sm">
@@ -324,11 +332,11 @@ export function GlobalCrudPage({
                   placeholder={searchPlaceholder || t("admin.table.search")} aria-label={searchPlaceholder || t("admin.table.search")} className="pl-9" />
               </div>
             )}
-            {filters.map((f) => (
+            {filters.filter((f) => !f.hidden).map((f) => (
               <SelectInput key={f.name} value={filterValues[f.name]} onChange={(e) => update({ [f.name]: e.target.value })}
                 aria-label={f.label} className="sm:w-48">
                 <option value="">{f.label}: {t("admin.table.all")}</option>
-                {f.options.map((o) => <option key={String(o.value)} value={String(o.value)}>{o.label}</option>)}
+                {(f.options || []).map((o) => <option key={String(o.value)} value={String(o.value)}>{o.label}</option>)}
               </SelectInput>
             ))}
             {hasFilters && (

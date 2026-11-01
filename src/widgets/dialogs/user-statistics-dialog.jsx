@@ -74,6 +74,8 @@ function LegacyStudyStats({ userId, language }) {
         attempts: es ? "Intentos" : "Attempts",
         score: es ? "Puntuación" : "Score",
         tags: es ? "Temas" : "Topics",
+        notTracked: es ? "No registrado" : "Not tracked",
+        notTrackedHint: es ? "El tiempo solo se mide en proyectos personales" : "Time is only measured on personal projects",
         inProjects: (n) => es ? `en ${n} ${n === 1 ? "proyecto" : "proyectos"}` : `across ${n} ${n === 1 ? "project" : "projects"}`,
         retry: es ? "Reintentar" : "Retry",
         emptyTitle: es ? "Aún no hay actividad" : "No activity yet",
@@ -100,8 +102,8 @@ function LegacyStudyStats({ userId, language }) {
                         <Kpi icon={TrophyIcon} tone="emerald" label={L.correct} value={q.correct_count || 0}>
                             <Bar label={L.accuracy} value={accuracy} tone="emerald" />
                         </Kpi>
-                        <Kpi icon={ClockIcon} tone="amber" label={L.time} value={formatStudyTime(totalSeconds)}>
-                            <p className="text-xs text-[#64748B]">{L.inProjects(projects.length)}</p>
+                        <Kpi icon={ClockIcon} tone="amber" label={L.time} value={totalSeconds ? formatStudyTime(totalSeconds) : L.notTracked}>
+                            <p className="text-xs text-[#64748B]">{totalSeconds ? L.inProjects(projects.length) : L.notTrackedHint}</p>
                         </Kpi>
                     </div>
                     <Card className="flex items-center gap-4 p-4 lg:flex-col lg:justify-center lg:px-6">
@@ -183,7 +185,7 @@ function LegacyStudyStats({ userId, language }) {
     return body;
 }
 
-export function UserStatisticsDialog({ open, handler, userId }) {
+export function UserStatisticsDialog({ open, handler, userId, userName }) {
     const { language } = useLanguage();
     const es = language === "es";
     const { user } = useAuth();
@@ -197,7 +199,7 @@ export function UserStatisticsDialog({ open, handler, userId }) {
     const companyMode = isSelf && role && activeCompany;
 
     return createPortal(
-        <Modal title={es ? "Estadísticas" : "Statistics"} onClose={handler} width="max-w-5xl"
+        <Modal title={`${es ? "Estadísticas" : "Statistics"}${!companyMode && userName ? ` — ${userName}` : ""}`} onClose={handler} width="max-w-5xl"
             footer={<button type="button" onClick={handler} className={BTN_SECONDARY}>{es ? "Cerrar" : "Close"}</button>}>
             {companyMode
                 ? <EnterpriseStats role={role} companyName={activeCompany.company_name} language={language} />

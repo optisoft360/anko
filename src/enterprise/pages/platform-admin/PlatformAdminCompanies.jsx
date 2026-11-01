@@ -94,6 +94,8 @@ function ActiveCompanyToggle({ active, onClick }) {
       type="button"
       onClick={onClick}
       title={active ? t("enterprise.platformAdmin.companies.activeInDashboard") : t("enterprise.platformAdmin.companies.operateAsCompany")}
+      aria-label={active ? t("enterprise.platformAdmin.companies.activeInDashboard") : t("enterprise.platformAdmin.companies.operateAsCompany")}
+      aria-pressed={active}
       style={{
         width: 20, height: 20, borderRadius: "50%", flexShrink: 0, padding: 0,
         border: `2px solid ${active ? "#818CF8" : "var(--lt-rgba-255-255-255-0-22, rgba(255,255,255,0.22))"}`,
@@ -506,7 +508,7 @@ export function PlatformAdminCompanies() {
 
               {/* Actions */}
               <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
-                <button onClick={() => { switchCompany(company.id); navigate(`/enterprise/dashboard`); }}
+                <button onClick={() => { switchCompany(company.id); navigate(`/enterprise/dashboard?company=${company.id}`); }}
                   style={{ padding: "7px 14px", fontSize: 12, fontWeight: 600, color: "var(--lt-94a3b8, #94A3B8)", background: "var(--lt-rgba-255-255-255-0-05, rgba(255,255,255,0.05))", border: "1px solid var(--lt-rgba-255-255-255-0-1, rgba(255,255,255,0.1))", borderRadius: 8, cursor: "pointer", transition: "all 0.15s" }}
                   onMouseEnter={(e) => { e.currentTarget.style.color = "var(--lt-f1f5f9, #F1F5F9)"; e.currentTarget.style.background = "var(--lt-rgba-255-255-255-0-09, rgba(255,255,255,0.09))"; }}
                   onMouseLeave={(e) => { e.currentTarget.style.color = "var(--lt-94a3b8, #94A3B8)"; e.currentTarget.style.background = "var(--lt-rgba-255-255-255-0-05, rgba(255,255,255,0.05))"; }}>

@@ -1,4 +1,5 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { useEffect } from "react";
+import { Routes, Route, Navigate, useSearchParams } from "react-router-dom";
 import { DashboardNavbar, ChatPanel } from "@/widgets/layout";
 import { EnterpriseSidenav } from "@/widgets/layout/enterprise-sidenav";
 import { useLightTheme } from "@/hooks/useLightTheme";
@@ -54,7 +55,13 @@ import OnboardingInvite from "@/enterprise/pages/onboarding/OnboardingInvite";
 
 export function Enterprise() {
   const { loading, hasCompany, allowedRoutes, isAdmin } = useAuth();
-  const { role, activeCompany } = useEnterprise();
+  const { role, activeCompany, activeCompanyId, switchCompany } = useEnterprise();
+  // ?company=<id> (e.g. "View" in Admin Area > Companies) opens that company's area.
+  const [searchParams] = useSearchParams();
+  const companyParam = searchParams.get("company");
+  useEffect(() => {
+    if (companyParam && /^\d+$/.test(companyParam) && companyParam !== String(activeCompanyId)) switchCompany(companyParam);
+  }, [companyParam, activeCompanyId, switchCompany]);
 
   useLightTheme();
 

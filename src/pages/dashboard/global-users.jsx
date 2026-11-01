@@ -1,231 +1,209 @@
+import React, { useState } from "react";
+import { BuildingOffice2Icon, ChartBarIcon, PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
 import GlobalCrudPage from "@/widgets/GlobalCrudPage";
 import { useLanguage } from "@/context/language-context";
-import { ChartBarIcon, BuildingOffice2Icon, TrashIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import { UserStatisticsDialog } from "@/widgets/dialogs/user-statistics-dialog";
-import { useState } from "react";
 import projectService from "@/services/projectService";
+import { companyApi } from "@/enterprise/api/enterpriseApi";
+import { Avatar, Badge, BTN_PRIMARY, BTN_SECONDARY, FOCUS, ROLE_TONE, SelectInput, Spinner } from "@/enterprise/components/ui/kit";
+import { AdminModal } from "@/widgets/admin/AdminModal";
+import { BooleanBadge, TruncatedText } from "@/widgets/admin/cells";
+import { useCompanyOptions } from "@/widgets/admin/useCompanyOptions";
 
 const COMPANY_ROLES = ["owner", "admin", "manager", "trainer", "employee", "auditor"];
+const PLATFORM_ROLES = ["admin", "client"];
+const ICON_BTN = `grid h-9 w-9 cursor-pointer place-items-center rounded-lg text-[#64748B] transition-colors hover:bg-[#F1F5F9] hover:text-[#0F172A] ${FOCUS}`;
+const roleName = (r) => (typeof r === "object" && r ? r.name : r);
 
-function CompanyMembershipsDialog({ user, onClose }) {
-    const { language } = useLanguage();
-    const [memberships, setMemberships] = useState(user?.company_memberships || []);
-    const [savingId, setSavingId] = useState(null);
-    const [deletingId, setDeletingId] = useState(null);
-    const [confirmDeleteId, setConfirmDeleteId] = useState(null);
+function CompanyMembershipsDialog({ user, onClose, onChanged }) {
+  const { t } = useLanguage();
+  const k = (key, p) => t(`admin.pages.users.memberships.${key}`, p);
+  const companies = useCompanyOptions();
+  const [memberships, setMemberships] = useState(user?.company_memberships || []);
+  const [busy, setBusy] = useState(null);
+  const [pending, setPending] = useState(null); // { id, role } awaiting confirmation
+  const [error, setError] = useState("");
+  const [adding, setAdding] = useState({ company: "", role: "employee" });
 
-    if (!user) return null;
+  const changeRole = async () => {
+    const { id, role } = pending;
+    setBusy(id); setError("");
+    try {
+      await projectService.updateItem("company-memberships", id, { role });
+      setMemberships((prev) => prev.map((m) => (m.id === id ? { ...m, role } : m)));
+      onChanged();
+    } catch { setError(t("admin.toast.error")); }
+    setBusy(null); setPending(null);
+  };
+  const remove = async (id) => {
+    setBusy(id); setError("");
+    try {
+      await projectService.deleteItem("company-memberships", id);
+      setMemberships((prev) => prev.filter((m) => m.id !== id));
+      onChanged();
+    } catch { setError(t("admin.toast.error")); }
+    setBusy(null);
+  };
+  const add = async () => {
+    if (!adding.company) return;
+    setBusy("add"); setError("");
+    try {
+      await companyApi.addUser(adding.company, { email: user.email, role: adding.role });
+      const name = companies.find((c) => String(c.value) === String(adding.company))?.label;
+      setMemberships((prev) => [...prev, { id: `new-${adding.company}`, company_id: Number(adding.company), company_name: name, role: adding.role, status: "active" }]);
+      setAdding({ company: "", role: "employee" });
+      onChanged();
+    } catch (e) { setError(e?.detail || e?.email?.[0] || t("admin.toast.error")); }
+    setBusy(null);
+  };
+  const free = companies.filter((c) => !memberships.some((m) => String(m.company_id) === String(c.value)));
 
-    const handleRoleChange = async (membershipId, role) => {
-        setSavingId(membershipId);
-        try {
-            await projectService.updateItem("company-memberships", membershipId, { role });
-            setMemberships((prev) => prev.map((m) => (m.id === membershipId ? { ...m, role } : m)));
-        } catch (err) {
-            console.error("Failed to update company membership role", err);
-        } finally {
-            setSavingId(null);
-        }
-    };
-
-    const handleDelete = async (membershipId) => {
-        setDeletingId(membershipId);
-        try {
-            await projectService.deleteItem("company-memberships", membershipId);
-            setMemberships((prev) => prev.filter((m) => m.id !== membershipId));
-        } catch (err) {
-            console.error("Failed to delete company membership", err);
-        } finally {
-            setDeletingId(null);
-            setConfirmDeleteId(null);
-        }
-    };
-
-    return (
-        <div style={{ position: "fixed", inset: 0, zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", background: "var(--lt-rgba-0-0-0-0-6, rgba(0,0,0,0.6))" }} onClick={onClose}>
-            <div
-                style={{ width: "100%", maxWidth: 480, background: "var(--lt-0f172a, #0F172A)", border: "1px solid var(--lt-rgba-255-255-255-0-1, rgba(255,255,255,0.1))", borderRadius: 16, overflow: "hidden", boxShadow: "0 20px 60px var(--lt-rgba-0-0-0-0-7, rgba(0,0,0,0.7))" }}
-                onClick={(e) => e.stopPropagation()}
-            >
-                <div style={{ height: 2, background: "linear-gradient(90deg, #6366F1, #818CF8, #A78BFA)" }} />
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 20px", borderBottom: "1px solid var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))" }}>
-                    <div>
-                        <p style={{ fontSize: 13, fontWeight: 800, color: "var(--lt-f1f5f9, #F1F5F9)" }}>
-                            {language === "es" ? "Roles por empresa" : "Company roles"}
-                        </p>
-                        <p style={{ fontSize: 11, color: "#64748B", marginTop: 2 }}>{user.username} — {user.email}</p>
-                    </div>
-                    <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: "#64748B", padding: 4 }}>
-                        <XMarkIcon style={{ width: 18, height: 18 }} />
+  return (
+    <AdminModal title={k("title")} subtitle={`${user.username} · ${user.email}`} onClose={onClose} width="max-w-lg"
+      footer={<button type="button" onClick={onClose} className={BTN_SECONDARY}>{t("admin.modal.close")}</button>}>
+      <div className="space-y-4">
+        {error && <p role="alert" className="rounded-lg border border-[#FECDD3] bg-[#FFF1F2] px-3 py-2 text-sm text-[#BE123C]">{error}</p>}
+        {memberships.length === 0 ? (
+          <p className="text-sm text-[#64748B]">{k("none")}</p>
+        ) : (
+          <ul className="divide-y divide-[#F1F5F9] rounded-lg border border-[#E2E8F0]">
+            {memberships.map((m) => (
+              <li key={m.id} className="flex items-center gap-2 px-3 py-2.5">
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium text-[#0F172A]">{m.company_name}</p>
+                  <p className="text-xs text-[#64748B]">{m.status}</p>
+                </div>
+                {pending?.id === m.id ? (
+                  <span className="flex items-center gap-1.5 text-xs">
+                    <span className="text-[#334155]">{k("confirmRole", { role: t(`admin.companyRoles.${pending.role}`) })}</span>
+                    <button type="button" onClick={changeRole} disabled={busy === m.id} className={`${BTN_PRIMARY} !h-8 !px-2.5 !text-xs`}>{t("admin.modal.save")}</button>
+                    <button type="button" onClick={() => setPending(null)} className={`${BTN_SECONDARY} !h-8 !px-2.5 !text-xs`}>{t("admin.modal.cancel")}</button>
+                  </span>
+                ) : (
+                  <>
+                    <SelectInput aria-label={k("role")} value={m.role} disabled={busy === m.id || String(m.id).startsWith("new-")}
+                      onChange={(e) => setPending({ id: m.id, role: e.target.value })} className="!h-9 w-36">
+                      {COMPANY_ROLES.map((r) => <option key={r} value={r}>{t(`admin.companyRoles.${r}`)}</option>)}
+                    </SelectInput>
+                    <button type="button" onClick={() => remove(m.id)} disabled={busy === m.id || String(m.id).startsWith("new-")}
+                      aria-label={k("remove", { company: m.company_name })} title={k("remove", { company: m.company_name })}
+                      className={`${ICON_BTN} hover:!bg-[#FFF1F2] hover:!text-[#BE123C]`}>
+                      {busy === m.id ? <Spinner className="!h-4 !w-4" /> : <TrashIcon className="h-4 w-4" />}
                     </button>
-                </div>
-
-                <div style={{ padding: "14px 20px 20px", maxHeight: 400, overflowY: "auto" }}>
-                    {memberships.length === 0 && (
-                        <p style={{ fontSize: 12, color: "var(--lt-475569, #475569)", textAlign: "center", padding: "24px 0" }}>
-                            {language === "es" ? "Este usuario no pertenece a ninguna empresa." : "This user doesn't belong to any company."}
-                        </p>
-                    )}
-
-                    {memberships.map((m) => (
-                        <div key={m.id} style={{ display: "flex", alignItems: "center", gap: 8, padding: "9px 0", borderBottom: "1px solid var(--lt-rgba-255-255-255-0-05, rgba(255,255,255,0.05))" }}>
-                            <div style={{ flex: 1, minWidth: 0 }}>
-                                <p style={{ fontSize: 12, fontWeight: 700, color: "var(--lt-e2e8f0, #E2E8F0)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                                    {m.company_name}
-                                </p>
-                                <p style={{ fontSize: 10, color: "var(--lt-475569, #475569)" }}>{m.status}</p>
-                            </div>
-
-                            <select
-                                value={m.role}
-                                disabled={savingId === m.id}
-                                onChange={(e) => handleRoleChange(m.id, e.target.value)}
-                                style={{ background: "var(--lt-rgba-255-255-255-0-05, rgba(255,255,255,0.05))", border: "1px solid var(--lt-rgba-255-255-255-0-12, rgba(255,255,255,0.12))", borderRadius: 8, padding: "6px 8px", fontSize: 12, color: "var(--lt-f1f5f9, #F1F5F9)", outline: "none", cursor: "pointer" }}
-                            >
-                                {COMPANY_ROLES.map((r) => (
-                                    <option key={r} value={r} style={{ background: "var(--lt-0f172a, #0F172A)" }}>{r}</option>
-                                ))}
-                            </select>
-
-                            {confirmDeleteId === m.id ? (
-                                <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                                    <button
-                                        onClick={() => handleDelete(m.id)}
-                                        disabled={deletingId === m.id}
-                                        style={{ fontSize: 11, fontWeight: 700, color: "#fff", background: "#EF4444", border: "none", borderRadius: 6, padding: "6px 8px", cursor: "pointer" }}
-                                    >
-                                        {language === "es" ? "Confirmar" : "Confirm"}
-                                    </button>
-                                    <button
-                                        onClick={() => setConfirmDeleteId(null)}
-                                        style={{ fontSize: 11, color: "var(--lt-94a3b8, #94A3B8)", background: "none", border: "none", cursor: "pointer", padding: "6px 4px" }}
-                                    >
-                                        {language === "es" ? "Cancelar" : "Cancel"}
-                                    </button>
-                                </div>
-                            ) : (
-                                <button
-                                    onClick={() => setConfirmDeleteId(m.id)}
-                                    title={language === "es" ? "Eliminar membresía" : "Remove membership"}
-                                    style={{ width: 28, height: 28, borderRadius: 8, background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#64748B", flexShrink: 0 }}
-                                    onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(239,68,68,0.12)"; e.currentTarget.style.color = "#F87171"; }}
-                                    onMouseLeave={(e) => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "#64748B"; }}
-                                >
-                                    <TrashIcon style={{ width: 13, height: 13 }} />
-                                </button>
-                            )}
-                        </div>
-                    ))}
-                </div>
+                  </>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+        {free.length > 0 && (
+          <div className="rounded-lg border border-dashed border-[#CBD5E1] p-3">
+            <p className="mb-2 text-sm font-medium text-[#334155]">{k("add")}</p>
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <SelectInput aria-label={k("company")} value={adding.company} onChange={(e) => setAdding((a) => ({ ...a, company: e.target.value }))}>
+                <option value="">{k("company")}…</option>
+                {free.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
+              </SelectInput>
+              <SelectInput aria-label={k("role")} value={adding.role} onChange={(e) => setAdding((a) => ({ ...a, role: e.target.value }))} className="sm:w-40">
+                {COMPANY_ROLES.map((r) => <option key={r} value={r}>{t(`admin.companyRoles.${r}`)}</option>)}
+              </SelectInput>
+              <button type="button" onClick={add} disabled={!adding.company || busy === "add"} className={BTN_PRIMARY}>
+                {busy === "add" ? <Spinner className="!h-4 !w-4 border-white/40 border-t-white" /> : <PlusIcon className="h-4 w-4" />} {k("addButton")}
+              </button>
             </div>
-        </div>
-    );
+          </div>
+        )}
+      </div>
+    </AdminModal>
+  );
 }
 
 export function GlobalUsers() {
-    const { t, language } = useLanguage();
-    const [selectedUser, setSelectedUser] = useState(null);
-    const [openStats, setOpenStats] = useState(false);
-    const [membershipsUser, setMembershipsUser] = useState(null);
-    const [refreshKey, setRefreshKey] = useState(0);
+  const { t } = useLanguage();
+  const k = (key) => t(`admin.pages.users.${key}`);
+  const companies = useCompanyOptions();
+  const [statsUser, setStatsUser] = useState(null);
+  const [membershipsUser, setMembershipsUser] = useState(null);
+  const [version, setVersion] = useState(0);
+  const yesNo = [{ value: "true", label: t("admin.cells.yes") }, { value: "false", label: t("admin.cells.no") }];
 
-    return (
-        <>
-            <GlobalCrudPage
-                key={refreshKey}
-                title={t("global.pages.users.title")}
-                editTitle={language === "es" ? "Editar Usuario" : "Edit User"}
-                createTitle={language === "es" ? "Crear Usuario" : "Create User"}
-                resource="users"
-                columns={[
-                    { header: t("global.pages.users.columns.username"), accessor: "username" },
-                    { header: t("global.pages.users.columns.email"), accessor: "email" },
-                    { header: t("global.pages.users.columns.first_name"), accessor: "first_name" },
-                    { header: t("global.pages.users.columns.last_name"), accessor: "last_name" },
-                    {
-                        header: t("global.pages.users.columns.is_active"),
-                        accessor: (item) => item.is_active ? "✅" : "❌"
-                    },
-                    {
-                        header: t("global.pages.users.columns.is_staff"),
-                        accessor: (item) => item.is_staff ? "⭐" : ""
-                    },
-                    {
-                        header: t("global.pages.users.columns.roles"),
-                        accessor: (item) => {
-                            if (Array.isArray(item.roles)) {
-                                return item.roles.map(r => typeof r === 'object' ? r.name : r).join(", ");
-                            }
-                            return "-";
-                        }
-                    },
-                    {
-                        header: language === "es" ? "Roles por empresa" : "Company roles",
-                        accessor: (item) => {
-                            if (Array.isArray(item.company_memberships) && item.company_memberships.length > 0) {
-                                return item.company_memberships
-                                    .map((m) => `${m.company_name}: ${m.role}`)
-                                    .join(", ");
-                            }
-                            return "-";
-                        }
-                    },
-                ]}
-                fields={[
-                    { name: "username", label: t("global.pages.users.fields.username"), type: "text", excludeOnUpdate: true },
-                    { name: "email", label: t("global.pages.users.fields.email"), type: "email" },
-                    { name: "first_name", label: t("global.pages.users.fields.first_name"), type: "text" },
-                    { name: "last_name", label: t("global.pages.users.fields.last_name"), type: "text" },
-                    { name: "is_active", label: t("global.pages.users.fields.is_active"), type: "boolean" },
-                    { name: "is_staff", label: t("global.pages.users.fields.is_staff"), type: "boolean" },
-                    {
-                        name: "roles",
-                        label: t("global.pages.users.fields.roles"),
-                        type: "select-resource",
-                        resource: "roles",
-                        labelAccessor: "name",
-                        valueAccessor: "id",
-                        multiple: true
-                    },
-                    { name: "avatar", label: t("global.pages.users.fields.avatar"), type: "text", excludeOnUpdate: true },
-                    { name: "password", label: t("global.pages.users.fields.password"), type: "password", excludeOnUpdate: true },
-                ]}
-                extraActions={(item) => (
-                    <>
-                        <button
-                            onClick={() => setMembershipsUser(item)}
-                            title={language === "es" ? "Roles por empresa" : "Company roles"}
-                            style={{ width: 30, height: 30, borderRadius: 8, background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#64748B", transition: "all 0.15s" }}
-                            onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(99,102,241,0.15)"; e.currentTarget.style.color = "#818CF8"; }}
-                            onMouseLeave={(e) => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "#64748B"; }}>
-                            <BuildingOffice2Icon style={{ width: 14, height: 14 }} />
-                        </button>
-                        <button
-                            onClick={() => { setSelectedUser(item); setOpenStats(true); }}
-                            title="Statistics"
-                            style={{ width: 30, height: 30, borderRadius: 8, background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#64748B", transition: "all 0.15s" }}
-                            onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(99,102,241,0.15)"; e.currentTarget.style.color = "#818CF8"; }}
-                            onMouseLeave={(e) => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "#64748B"; }}>
-                            <ChartBarIcon style={{ width: 14, height: 14 }} />
-                        </button>
-                    </>
-                )}
-            />
+  return (
+    <>
+      <GlobalCrudPage
+        key={version}
+        title={t("global.pages.users.title")}
+        subtitle={k("subtitle")}
+        resource="users"
+        createTitle={k("createTitle")}
+        editTitle={k("editTitle")}
+        searchable
+        searchPlaceholder={k("search")}
+        filters={[
+          { name: "is_active", label: k("active"), options: yesNo },
+          { name: "is_staff", label: k("staff"), options: yesNo },
+          { name: "company", label: k("company"), options: companies },
+          { name: "role", label: k("platformRole"), options: PLATFORM_ROLES.map((r) => ({ value: r, label: r })) },
+        ]}
+        columns={[
+          { header: k("user"), sortKey: "username", cell: (u) => (
+            <span className="flex min-w-0 items-center gap-2.5">
+              <Avatar name={u.username} size="sm" />
+              <span className="min-w-0">
+                <span className="block truncate font-medium text-[#0F172A]">{u.username}</span>
+                <span className="block truncate text-xs text-[#64748B]">{[u.first_name, u.last_name].filter(Boolean).join(" ") || "—"}</span>
+              </span>
+            </span>
+          ) },
+          { header: k("email"), sortKey: "email", cell: (u) => <TruncatedText value={u.email} max={28} /> },
+          { header: k("roles"), cell: (u) => {
+            const global = (u.roles || []).map(roleName).filter(Boolean);
+            const company = u.company_memberships || [];
+            if (!global.length && !company.length) return <span className="text-[#94A3B8]">—</span>;
+            return (
+              <span className="flex max-w-[260px] flex-wrap gap-1">
+                {global.map((r) => <Badge key={r} tone={r === "admin" ? "rose" : "slate"}>{r}</Badge>)}
+                {company.map((m) => <Badge key={m.id} tone={ROLE_TONE[m.role] || "slate"}><span className="max-w-[110px] truncate">{m.company_name}</span>: {t(`admin.companyRoles.${m.role}`)}</Badge>)}
+              </span>
+            );
+          } },
+          { header: k("active"), cell: (u) => <BooleanBadge value={u.is_active} /> },
+          { header: k("staff"), cell: (u) => <BooleanBadge value={u.is_staff} /> },
+        ]}
+        fields={[
+          { name: "username", label: k("username"), type: "text", required: true, excludeOnUpdate: true },
+          { name: "email", label: k("email"), type: "email", required: true },
+          { name: "first_name", label: k("firstName"), type: "text", required: true },
+          { name: "last_name", label: k("lastName"), type: "text" },
+          { name: "password", label: k("password"), type: "password", requiredOnCreate: true },
+          { name: "is_active", label: k("active"), type: "boolean", defaultValue: true },
+          { name: "is_staff", label: k("staff"), type: "boolean", hint: k("staffHint") },
+          { name: "roles", label: k("platformRoles"), type: "select-resource", resource: "roles", multiple: true,
+            labelAccessor: "name", valueAccessor: "id", hint: k("platformRolesHint"),
+            optionFilter: (r) => PLATFORM_ROLES.includes(r.name) },
+          { name: "company_id", label: k("company"), type: "select", options: companies, onlyOn: "create", hint: k("companyHint") },
+          { name: "company_role", label: k("companyRole"), type: "select", defaultValue: "employee", onlyOn: "create",
+            options: COMPANY_ROLES.map((r) => ({ value: r, label: t(`admin.companyRoles.${r}`) })) },
+        ]}
+        deleteConfirm={(u) => ({ entityName: `${u.username} (${u.email})`, confirmText: u.username, consequences: k("deleteConsequences") })}
+        extraActions={(u) => (
+          <>
+            <button type="button" onClick={(e) => { e.stopPropagation(); setMembershipsUser(u); }} aria-label={k("companyRolesAction")} title={k("companyRolesAction")} className={ICON_BTN}>
+              <BuildingOffice2Icon className="h-4 w-4" />
+            </button>
+            <button type="button" onClick={(e) => { e.stopPropagation(); setStatsUser(u); }} aria-label={k("statsAction")} title={k("statsAction")} className={ICON_BTN}>
+              <ChartBarIcon className="h-4 w-4" />
+            </button>
+          </>
+        )}
+      />
 
-            <UserStatisticsDialog
-                open={openStats}
-                handler={() => setOpenStats(false)}
-                userId={selectedUser?.id}
-            />
+      <UserStatisticsDialog open={Boolean(statsUser)} handler={() => setStatsUser(null)} userId={statsUser?.id} userName={statsUser?.username} />
 
-            {membershipsUser && (
-                <CompanyMembershipsDialog
-                    user={membershipsUser}
-                    onClose={() => { setMembershipsUser(null); setRefreshKey((k) => k + 1); }}
-                />
-            )}
-        </>
-    );
+      {membershipsUser && (
+        <CompanyMembershipsDialog user={membershipsUser} onClose={() => setMembershipsUser(null)} onChanged={() => setVersion((v) => v + 1)} />
+      )}
+    </>
+  );
 }
 
 export default GlobalUsers;

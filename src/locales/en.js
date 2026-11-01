@@ -26,7 +26,7 @@ export const en = {
         "contact-us": "Contact Us",
         resources: "Global Resources",
         permissions: "Permissions",
-        roles: "Roles",
+        roles: "Roles & Permissions",
         plans: "Plans",
         "plan-limits": "Plan Limits",
         subscriptions: "Subscriptions",
@@ -84,9 +84,12 @@ export const en = {
         "ent-analytics-health": "Company Health",
         "ent-members": "Members",
         "ent-settings": "Settings",
+        "pa-overview": "Overview",
+        "admin-batteries": "Batteries",
+        adminSections: { platform: "Platform", organizations: "Organizations", content: "Content", billing: "Billing", access: "Access", advanced: "Advanced", support: "Support", other: "Other" },
         "admin-area": "Admin Area",
-        "global-process": "Global Processes",
-        "global-learning-path": "Learning Paths",
+        "global-process": "Processes",
+        "global-learning-path": "All Learning Paths",
         "ent-invitations": "Invitations",
         "pa-invitations": "Invitations",
         "companies": "Companies"
@@ -95,6 +98,9 @@ export const en = {
         welcome: "Welcome"
     },
     breadcrumbs: {
+        overview: "Overview",
+        "admin-batteries": "Batteries",
+        "global-learning-paths": "All Learning Paths",
         dashboard: "Dashboard",
         home: "Home",
         profile: "Profile",
@@ -124,7 +130,7 @@ export const en = {
         "deck-shares": "Deck Shares",
         "saved-decks": "Saved Decks",
         users: "Users",
-        "global-projects": "Global Projects",
+        "global-projects": "Processes",
         "my-decks": "My Decks",
         "my-batteries": "My Batteries",
         "public-decks": "Public Decks",
@@ -161,7 +167,7 @@ export const en = {
         knowledge: "Knowledge Sources",
         graph: "Knowledge Graph",
         "change-impact": "Change Impact",
-        "platform-admin": "Platform Admin",
+        "platform-admin": "Platform admin",
         companies: "Companies",
         audit: "Audit Report"
     },
@@ -491,6 +497,81 @@ export const en = {
         }
     },
     admin: {
+        status: { active: "Active", archived: "Archived", draft: "Draft", ready: "Ready" },
+        visibility: { private: "Private", shared: "Shared", public: "Public" },
+        companyRoles: { owner: "Owner", admin: "Admin", manager: "Manager", trainer: "Trainer", employee: "Employee", auditor: "Auditor" },
+        pages: {
+            batteries: {
+                title: "Batteries", subtitle: "Every battery on the platform.", name: "Name", project: "Project", owner: "Owner",
+                status: "Status", difficulty: "Difficulty", rule: "Rule", noRule: "No rule", questions: "Questions", created: "Created",
+                visibility: "Visibility", easy: "Easy", medium: "Medium", hard: "Hard",
+                deleteConsequences: "Its questions and every attempt on it are deleted too."
+            },
+            decks: {
+                subtitle: "Every flashcard deck. Click a row to see its cards.", title: "Title", cards: "Cards", project: "Project",
+                owner: "Owner", visibility: "Visibility", description: "Description", created: "Created",
+                deleteConsequences: "Its flashcards are deleted too."
+            },
+            flashcards: { subtitle: "Every flashcard on the platform.", search: "Search front or back…", front: "Front", back: "Back", deck: "Deck", created: "Created" },
+            learningPaths: {
+                title: "All Learning Paths", subtitle: "Learning paths of every company.", name: "Name", company: "Company", status: "Status",
+                modules: "Modules", assignments: "Assignments", description: "Description", created: "Created", untitled: "Untitled"
+            },
+            processes: {
+                title: "Processes", subtitle: "Personal-workspace projects. Company processes live in each company's Enterprise area.",
+                name: "Name", owner: "Owner", documents: "Documents", archived: "Archived", description: "Description",
+                created: "Created", updated: "Updated", deleteConsequences: "Its documents, decks and batteries are deleted too."
+            },
+            subscriptions: {
+                subtitle: "Plan of every user.", search: "Search user or email…", user: "User", plan: "Plan", status: "Status",
+                provider: "Provider", providerId: "Provider subscription id", started: "Started", periodEnd: "Period ends",
+                status_trialing: "Trialing", status_active: "Active", status_past_due: "Past due", status_canceled: "Canceled", status_expired: "Expired",
+                deleteConsequences: "The user goes back to the Free plan the next time they sign in."
+            },
+            plans: {
+                subtitle: "Pricing and base quotas.", name: "Name", tier: "Tier", price: "Price", subscribers: "Subscribers", active: "Active",
+                description: "Description", priceCents: "Price (cents)", priceCentsHint: "999 = 9.99", currency: "Currency", period: "Billing period",
+                monthly: "Monthly", yearly: "Yearly", maxDocuments: "Max documents", maxBatteries: "Max batteries",
+                deleteConsequences: "Plans with subscribers cannot be deleted."
+            },
+            planLimits: {
+                subtitle: "What each plan allows.", view: "View", matrix: "Matrix", list: "List", limit: "Limit", plan: "Plan", type: "Type",
+                value: "Value", key: "Key", edit: "Edit", enabled: "Enabled", notSet: "Not set for this plan",
+                typeInt: "Number", typeBool: "Yes / No", typeStr: "Text", intValue: "Number value", boolValue: "Enabled", strValue: "Text value"
+            },
+            permissions: { subtitle: "Route permissions (view / manage) that roles grant.", search: "Search resource…", resource: "Resource", action: "Action",
+                deleteConsequences: "Roles holding it lose it." },
+            support: {
+                subtitle: "Messages from the contact forms and the landing page.", search: "Search name, email or message…",
+                from: "From", message: "Message", source: "Source", date: "Date", status: "Status", assigned: "Assigned to", unassigned: "Unassigned",
+                note: "Internal note", notePlaceholder: "Only visible to platform admins", noteHint: "Never shown to the sender.",
+                status_new: "New", status_in_progress: "In progress", status_done: "Done",
+                deleteConsequences: "The message is removed for good."
+            },
+            users: {
+                subtitle: "Every account on the platform.", search: "Search username, email or name…", createTitle: "Create user", editTitle: "Edit user",
+                user: "User", email: "Email", roles: "Roles", active: "Active", staff: "Staff", company: "Company", platformRole: "Platform role",
+                username: "Username", firstName: "First name", lastName: "Last name", password: "Password",
+                staffHint: "Full platform admin access", platformRoles: "Platform roles",
+                platformRolesHint: "admin = platform admin, client = regular user. Company roles are set per company below or with the building icon.",
+                companyHint: "Optional: add the user to a company now.", companyRole: "Role in company",
+                companyRolesAction: "Company roles", statsAction: "Statistics",
+                deleteConsequences: "Their personal content and company memberships are deleted too.",
+                memberships: {
+                    title: "Company roles", none: "Not a member of any company.", role: "Role", company: "Company",
+                    confirmRole: "Change to {role}?", remove: "Remove from {company}", add: "Add to a company", addButton: "Add"
+                }
+            },
+            overview: {
+                title: "Overview", subtitle: "The whole platform at a glance.", companies: "Companies", active: "{n} active",
+                users: "Users", usersHint: "{active} active · {staff} platform admins", newUsers: "New users", last30: "Last 30 days",
+                pendingInvites: "Pending invitations", content: "Content", contentHint: "Rows across every company and workspace.",
+                companyProcesses: "Company processes", personalProcesses: "Personal processes", learningPaths: "Learning paths",
+                decks: "Decks", batteries: "Batteries", flashcards: "Flashcards", subscriptions: "Subscriptions by plan",
+                openSupport: "Open support messages", jobs: "Generation jobs running", jobsHint: "{n} failed",
+                soon: "Coming soon", soonHint: "The statistics endpoint is not available on this server yet."
+            }
+        },
         rateLimited: "Too many requests, retrying…",
         cells: { yes: "Yes", no: "No", copy: "Copy" },
         table: {
