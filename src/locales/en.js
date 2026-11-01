@@ -2909,13 +2909,23 @@ export const en = {
                 subtitle: "Your organization at a glance: compliance, retention, certifications and critical gaps.",
                 healthScore: "Health score",
                 breakdownTitle: "What makes up the score",
-                breakdownHint: "Each area adds to the score according to its weight.",
+                breakdownHint: "The score is out of 100 points. Each area's result (0–100%) earns its share of points: compliance up to 40, retention up to 30, certifications up to 20 and critical gaps up to 10.",
                 weight: "{n}% weight",
+                points: "{got} of {max} pts",
+                total: "Total",
                 components: {
                     compliance: "Compliance",
                     retention: "Retention",
                     certifications: "Certifications",
                     noCriticalGaps: "No critical gaps"
+                },
+                details: {
+                    compliance: "{a} of {b} compliance assignments completed and compliant",
+                    complianceNone: "No compliance assignments yet",
+                    retention: "Average knowledge retention of the people who have studied",
+                    certifications: "{a} of {b} active people hold a valid certification",
+                    noCriticalGaps: "{n} open critical gaps (each one subtracts 20%)",
+                    noCriticalGapsNone: "No open critical gaps"
                 },
                 tierNames: {
                     excellent: "Excellent",

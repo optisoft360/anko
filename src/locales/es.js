@@ -2910,13 +2910,23 @@ export const es = {
                 subtitle: "Tu organización de un vistazo: compliance, retención, certificaciones y brechas críticas.",
                 healthScore: "Puntuación de salud",
                 breakdownTitle: "Qué compone la puntuación",
-                breakdownHint: "Cada área suma a la puntuación según su peso.",
+                breakdownHint: "La puntuación es sobre 100 puntos. El resultado de cada área (0–100%) aporta su parte de puntos: compliance hasta 40, retención hasta 30, certificaciones hasta 20 y brechas críticas hasta 10.",
                 weight: "Peso {n}%",
+                points: "{got} de {max} pts",
+                total: "Total",
                 components: {
                     compliance: "Compliance",
                     retention: "Retención",
                     certifications: "Certificaciones",
                     noCriticalGaps: "Sin brechas críticas"
+                },
+                details: {
+                    compliance: "{a} de {b} asignaciones de compliance completadas y cumplidas",
+                    complianceNone: "Aún no hay asignaciones de compliance",
+                    retention: "Retención media del conocimiento de las personas que han estudiado",
+                    certifications: "{a} de {b} personas activas tienen una certificación vigente",
+                    noCriticalGaps: "{n} brechas críticas abiertas (cada una resta 20%)",
+                    noCriticalGapsNone: "No hay brechas críticas abiertas"
                 },
                 tierNames: {
                     excellent: "Excelente",
