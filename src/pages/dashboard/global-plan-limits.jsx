@@ -4,23 +4,30 @@ import { ArrowPathIcon, ExclamationCircleIcon } from "@heroicons/react/24/outlin
 import GlobalCrudPage from "@/widgets/GlobalCrudPage";
 import { useLanguage } from "@/context/language-context";
 import projectService from "@/services/projectService";
-import { BTN_PRIMARY, BTN_SECONDARY, Card, EmptyBlock, FOCUS, PageHeader, Segmented, SkeletonRows, Spinner, TextInput } from "@/enterprise/components/ui/kit";
+import { Badge, BTN_PRIMARY, BTN_SECONDARY, Card, EmptyBlock, FOCUS, PageHeader, Segmented, SkeletonRows, Spinner, TextInput } from "@/enterprise/components/ui/kit";
 import { AdminModal } from "@/widgets/admin/AdminModal";
 import { BooleanBadge, DASH, EntityCell } from "@/widgets/admin/cells";
 import { fetchAll } from "@/widgets/admin/fetchAll";
 import { fieldErrors } from "@/widgets/admin/format";
 
+const UNLIMITED = 99999; // seeded sentinel: anything at or above it means no practical limit
 const humanize = (key) => String(key || "").replace(/_/g, " ").replace(/^\w/, (c) => c.toUpperCase());
 const valueOf = (lim) => (lim.value_type === "bool" ? lim.bool_value : lim.value_type === "str" ? lim.str_value : lim.int_value);
 
 function LimitValue({ lim }) {
+  const { t } = useLanguage();
   if (!lim) return DASH;
   if (lim.value_type === "bool") return <BooleanBadge value={lim.bool_value} />;
   const v = valueOf(lim);
-  return v === null || v === undefined || v === "" ? DASH : <span className="tabular-nums">{String(v)}</span>;
+  if (v === null || v === undefined || v === "") return DASH;
+  if (lim.value_type === "int" && Number(v) >= UNLIMITED) {
+    return <span title={String(v)}><Badge tone="indigo">{t("admin.pages.planLimits.unlimited")}</Badge></span>;
+  }
+  return <span className="tabular-nums">{String(v)}</span>;
 }
 
 function EditLimit({ lim, planName, onClose, onSaved }) {
+  // lim without id = "Add": creates the PlanLimit row for this plan and key.
   const { t } = useLanguage();
   const k = (key) => t(`admin.pages.planLimits.${key}`);
   const [value, setValue] = useState(valueOf(lim) ?? (lim.value_type === "bool" ? false : ""));
@@ -30,7 +37,9 @@ function EditLimit({ lim, planName, onClose, onSaved }) {
   const save = async () => {
     setSaving(true); setError("");
     try {
-      await projectService.updateItem("plan-limits", lim.id, { [field]: lim.value_type === "int" ? (value === "" ? null : Number(value)) : value });
+      const v = lim.value_type === "int" ? (value === "" ? null : Number(value)) : value;
+      if (lim.id) await projectService.updateItem("plan-limits", lim.id, { [field]: v });
+      else await projectService.createItem("plan-limits", { plan: lim.plan, key: lim.key, value_type: lim.value_type, [field]: v });
       onSaved();
     } catch (err) {
       const fe = fieldErrors(err?.response?.data ?? err);
@@ -68,24 +77,48 @@ function LimitsMatrix() {
   const [limits, setLimits] = useState([]);
   const [editing, setEditing] = useState(null);
   const [reload, setReload] = useState(0);
+  const [defaults, setDefaults] = useState(null); // null = older API without /defaults/
 
   useEffect(() => {
     let alive = true;
     setState("loading");
-    Promise.all([fetchAll("plans"), fetchAll("plan-limits")])
-      .then(([p, l]) => { if (!alive) return; setPlans([...p].sort((a, b) => (a.price_cents || 0) - (b.price_cents || 0))); setLimits(l); setState("ready"); })
+    Promise.all([fetchAll("plans"), fetchAll("plan-limits"), projectService.getList("plan-limits/defaults").catch(() => null)])
+      .then(([p, l, d]) => {
+        if (!alive) return;
+        setPlans([...p].sort((a, b) => (a.price_cents || 0) - (b.price_cents || 0)));
+        setLimits(l);
+        setDefaults(d?.keys || null);
+        setState("ready");
+      })
       .catch(() => alive && setState("error"));
     return () => { alive = false; };
   }, [reload]);
 
   const rows = useMemo(() => {
     const byKey = new Map();
+    Object.keys(defaults || {}).forEach((key) => byKey.set(key, {})); // enforced limits even without rows
     limits.forEach((l) => {
       if (!byKey.has(l.key)) byKey.set(l.key, {});
       byKey.get(l.key)[l.plan] = l;
     });
     return [...byKey.entries()].sort(([a], [b]) => a.localeCompare(b));
-  }, [limits]);
+  }, [limits, defaults]);
+
+  const typeOf = (key, byPlan) => defaults?.[key]?.type || Object.values(byPlan)[0]?.value_type || "int";
+  const emptyCell = (key, byPlan, p) => {
+    const enforced = defaults && key in defaults;
+    const def = enforced ? defaults[key].defaults?.[p.tier] : undefined;
+    const label = !defaults ? k("notSet") : enforced ? k("defaultValue", { n: typeof def === "boolean" ? t(def ? "admin.cells.yes" : "admin.cells.no") : (Number(def) >= UNLIMITED ? k("unlimited") : String(def ?? "—")) }) : k("notSet");
+    const tip = !defaults ? k("notSetUnknown") : enforced ? k("defaultTip") : k("notEnforced");
+    return (
+      <span className="inline-flex items-center gap-1.5">
+        <span className="text-xs italic text-[#64748B]" title={tip}>{label}</span>
+        <button type="button" onClick={() => setEditing({ lim: { plan: p.id, key, value_type: typeOf(key, byPlan) }, planName: p.name })}
+          aria-label={`${k("add")} ${humanize(key)} · ${p.name}`} title={k("add")}
+          className={`rounded px-1.5 py-0.5 text-xs font-medium text-[#4338CA] hover:bg-[#EEF2FF] ${FOCUS}`}>+ {k("add")}</button>
+      </span>
+    );
+  };
 
   if (state === "loading") return <Card><SkeletonRows rows={6} height="h-10" /></Card>;
   if (state === "error") return <Card><EmptyBlock icon={ExclamationCircleIcon} title={t("admin.table.errorTitle")} action={<button type="button" onClick={() => setReload((n) => n + 1)} className={BTN_SECONDARY}><ArrowPathIcon className="h-4 w-4" />{t("admin.table.retry")}</button>} /></Card>;
@@ -105,7 +138,10 @@ function LimitsMatrix() {
             {rows.map(([key, byPlan]) => (
               <tr key={key} className="text-[#334155]">
                 <th scope="row" className="px-4 py-2.5 font-medium text-[#0F172A]">
-                  {humanize(key)}
+                  <span className="flex items-center gap-1.5">
+                    {humanize(key)}
+                    {defaults && !(key in defaults) && <span title={k("notEnforced")}><Badge tone="slate">{k("unused")}</Badge></span>}
+                  </span>
                   <span className="block font-mono text-[11px] font-normal text-[#94A3B8]">{key}</span>
                 </th>
                 {plans.map((p) => {
@@ -118,7 +154,7 @@ function LimitsMatrix() {
                           className={`cursor-pointer rounded-md px-2 py-1 hover:bg-[#EEF2FF] ${FOCUS}`}>
                           <LimitValue lim={lim} />
                         </button>
-                      ) : <span title={k("notSet")}>{DASH}</span>}
+                      ) : emptyCell(key, byPlan, p)}
                     </td>
                   );
                 })}
