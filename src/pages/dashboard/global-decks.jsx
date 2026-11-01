@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import GlobalCrudPage from "@/widgets/GlobalCrudPage";
 import { useLanguage } from "@/context/language-context";
-import { DateCell, EntityCell, StatusBadge, TruncatedText } from "@/widgets/admin/cells";
+import { DASH, DateCell, EntityCell, StatusBadge, TruncatedText } from "@/widgets/admin/cells";
 
 export function GlobalDecks() {
   const { t } = useLanguage();
@@ -24,10 +24,10 @@ export function GlobalDecks() {
       columns={[
         { header: k("title"), sortKey: "title", cell: (d) => <span className="font-medium text-[#0F172A]">{d.title}</span> },
         { header: k("cards"), sortKey: "card_count", accessor: (d) => d.cards_count ?? d.cardsCount ?? 0, className: "tabular-nums" },
-        { header: k("project"), cell: (d) => <EntityCell detail={d.project_detail} id={d.project} /> },
+        { header: k("company"), cell: (d) => <EntityCell detail={d.company_detail} /> },
+        { header: k("project"), cell: (d) => (d.project ? <EntityCell detail={d.project_detail} id={d.project} /> : <span title={t("admin.cells.noProject")}>{DASH}</span>) },
         { header: k("owner"), cell: (d) => <EntityCell detail={d.owner_detail} id={d.ownerId} /> },
         { header: k("visibility"), cell: (d) => <StatusBadge value={d.visibility} tones={{ public: "sky", shared: "violet", private: "slate" }} labels={visibility} /> },
-        { header: k("description"), cell: (d) => <TruncatedText value={d.description} max={60} /> },
         { header: k("created"), sortKey: "created_at", cell: (d) => <DateCell value={d.created_at} withTime={false} /> },
       ]}
       fields={[

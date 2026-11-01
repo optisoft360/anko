@@ -502,12 +502,14 @@ export const es = {
         companyRoles: { owner: "Propietario", admin: "Admin", manager: "Manager", trainer: "Formador", employee: "Empleado", auditor: "Auditor" },
         pages: {
             batteries: {
+                company: "Empresa",
                 title: "Baterías", subtitle: "Todas las baterías de la plataforma.", name: "Nombre", project: "Proyecto", owner: "Propietario",
                 status: "Estado", difficulty: "Dificultad", rule: "Regla", noRule: "Sin regla", questions: "Preguntas", created: "Creada",
                 visibility: "Visibilidad", easy: "Fácil", medium: "Media", hard: "Difícil",
                 deleteConsequences: "También se borran sus preguntas y todos sus intentos."
             },
             decks: {
+                company: "Empresa",
                 subtitle: "Todos los mazos de flashcards. Haz clic en una fila para ver sus tarjetas.", title: "Título", cards: "Tarjetas", project: "Proyecto",
                 owner: "Propietario", visibility: "Visibilidad", description: "Descripción", created: "Creado",
                 deleteConsequences: "También se borran sus flashcards."
@@ -574,7 +576,7 @@ export const es = {
             }
         },
         rateLimited: "Demasiadas peticiones, reintentando…",
-        cells: { yes: "Sí", no: "No", copy: "Copiar" },
+        cells: { yes: "Sí", no: "No", copy: "Copiar", noProject: "Sin proyecto (contenido de empresa)" },
         table: {
             search: "Buscar…", all: "Todos", clear: "Limpiar filtros", actions: "Acciones", edit: "Editar", delete: "Eliminar",
             create: "Crear", loading: "Cargando…", empty: "No hay resultados", emptyFiltered: "Nada coincide con la búsqueda o los filtros.",

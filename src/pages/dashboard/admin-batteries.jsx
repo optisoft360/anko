@@ -30,7 +30,8 @@ export function AdminBatteries() {
       ]}
       columns={[
         { header: k("name"), sortKey: "name", cell: (b) => <span className="font-medium text-[#0F172A]">{b.name}</span> },
-        { header: k("project"), cell: (b) => <EntityCell detail={b.project_detail} id={b.project} /> },
+        { header: k("company"), cell: (b) => <EntityCell detail={b.company_detail} /> },
+        { header: k("project"), cell: (b) => (b.project ? <EntityCell detail={b.project_detail} id={b.project} /> : <span title={t("admin.cells.noProject")}>{DASH}</span>) },
         { header: k("owner"), cell: (b) => <EntityCell detail={b.owner_detail} /> },
         { header: k("status"), cell: (b) => <StatusBadge value={b.status} tones={STATUS_TONE} labels={statusLabels} /> },
         { header: k("difficulty"), cell: (b) => <StatusBadge value={b.difficulty} tones={DIFF_TONE} labels={diffLabels} /> },

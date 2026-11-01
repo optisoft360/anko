@@ -502,12 +502,14 @@ export const en = {
         companyRoles: { owner: "Owner", admin: "Admin", manager: "Manager", trainer: "Trainer", employee: "Employee", auditor: "Auditor" },
         pages: {
             batteries: {
+                company: "Company",
                 title: "Batteries", subtitle: "Every battery on the platform.", name: "Name", project: "Project", owner: "Owner",
                 status: "Status", difficulty: "Difficulty", rule: "Rule", noRule: "No rule", questions: "Questions", created: "Created",
                 visibility: "Visibility", easy: "Easy", medium: "Medium", hard: "Hard",
                 deleteConsequences: "Its questions and every attempt on it are deleted too."
             },
             decks: {
+                company: "Company",
                 subtitle: "Every flashcard deck. Click a row to see its cards.", title: "Title", cards: "Cards", project: "Project",
                 owner: "Owner", visibility: "Visibility", description: "Description", created: "Created",
                 deleteConsequences: "Its flashcards are deleted too."
@@ -574,7 +576,7 @@ export const en = {
             }
         },
         rateLimited: "Too many requests, retrying…",
-        cells: { yes: "Yes", no: "No", copy: "Copy" },
+        cells: { yes: "Yes", no: "No", copy: "Copy", noProject: "Not linked to a project (company content)" },
         table: {
             search: "Search…", all: "All", clear: "Clear filters", actions: "Actions", edit: "Edit", delete: "Delete",
             create: "Create", loading: "Loading…", empty: "No results", emptyFiltered: "Nothing matches the search or filters.",
