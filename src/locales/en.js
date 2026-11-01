@@ -497,7 +497,7 @@ export const en = {
         }
     },
     admin: {
-        status: { active: "Active", archived: "Archived", draft: "Draft", ready: "Ready" },
+        status: { active: "Active", archived: "Archived", draft: "Draft", ready: "Ready", published: "Published" },
         visibility: { private: "Private", shared: "Shared", public: "Public" },
         companyRoles: { owner: "Owner", admin: "Admin", manager: "Manager", trainer: "Trainer", employee: "Employee", auditor: "Auditor" },
         pages: {
@@ -514,6 +514,7 @@ export const en = {
             },
             flashcards: { subtitle: "Every flashcard on the platform.", search: "Search front or back…", front: "Front", back: "Back", deck: "Deck", created: "Created" },
             learningPaths: {
+                openInCompany: "Open in the company area", deleteConsequences: "Its modules and every assignment of it are deleted too.", 
                 title: "All Learning Paths", subtitle: "Learning paths of every company.", name: "Name", company: "Company", status: "Status",
                 modules: "Modules", assignments: "Assignments", description: "Description", created: "Created", untitled: "Untitled"
             },

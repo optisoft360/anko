@@ -497,7 +497,7 @@ export const es = {
         }
     },
     admin: {
-        status: { active: "Activa", archived: "Archivada", draft: "Borrador", ready: "Lista" },
+        status: { active: "Activa", archived: "Archivada", draft: "Borrador", ready: "Lista", published: "Publicada" },
         visibility: { private: "Privado", shared: "Compartido", public: "Público" },
         companyRoles: { owner: "Propietario", admin: "Admin", manager: "Manager", trainer: "Formador", employee: "Empleado", auditor: "Auditor" },
         pages: {
@@ -514,6 +514,7 @@ export const es = {
             },
             flashcards: { subtitle: "Todas las flashcards de la plataforma.", search: "Buscar en anverso o reverso…", front: "Anverso", back: "Reverso", deck: "Mazo", created: "Creada" },
             learningPaths: {
+                openInCompany: "Abrir en el área de la empresa", deleteConsequences: "También se borran sus módulos y todas sus asignaciones.", 
                 title: "Todas las rutas", subtitle: "Rutas de aprendizaje de todas las empresas.", name: "Nombre", company: "Empresa", status: "Estado",
                 modules: "Módulos", assignments: "Asignaciones", description: "Descripción", created: "Creada", untitled: "Sin título"
             },
