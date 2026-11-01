@@ -797,6 +797,12 @@ const projectService = {
     return res.data;
   },
 
+  // Replaces a role's whole permission set (admin area). 404/405 on an older API.
+  async putRolePermissions(roleId, permissionIds) {
+    const res = await api.put(`/roles/${roleId}/permissions/`, { permission_ids: permissionIds });
+    return res.data;
+  },
+
   // -------- DECKS --------
   async getProjectDecks(projectId, page = 1, pageSize = 1) {
     try {
