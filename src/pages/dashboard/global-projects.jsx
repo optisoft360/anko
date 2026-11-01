@@ -26,8 +26,8 @@ export function GlobalProjects() {
           </span>
         ) },
         { header: k("owner"), maxWidth: "max-w-[150px]", cell: (p) => <EntityCell detail={p.owner_detail || p.owner} /> },
-        { header: k("documents"), className: "hidden tabular-nums min-[1100px]:table-cell", accessor: (p) => p.documents_count ?? 0 },
-        { header: k("description"), className: "hidden min-[1360px]:table-cell", maxWidth: "max-w-[200px]",
+        { header: k("documents"), className: "hidden tabular-nums xl:table-cell", accessor: (p) => p.documents_count ?? 0 },
+        { header: k("description"), className: "hidden 2xl:table-cell", maxWidth: "max-w-[200px]",
           cell: (p) => <span className="line-clamp-2" title={p.description}>{p.description || "—"}</span> },
         { header: k("created"), sortKey: "created_at", cell: (p) => <DateCell value={p.created_at} withTime={false} /> },
         { header: k("updated"), sortKey: "updated_at", cell: (p) => <DateCell value={p.updated_at} withTime={false} /> },
