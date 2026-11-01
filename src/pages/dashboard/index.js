@@ -7,7 +7,7 @@ export * from "@/pages/dashboard/project-detail";
 export * from "@/pages/dashboard/project-topics";
 export * from "@/pages/dashboard/global-topics";
 export * from "@/pages/dashboard/global-rules";
-export * from "@/pages/dashboard/global-batteries";
+export * from "@/pages/dashboard/batteries-redirect";
 export * from "@/pages/dashboard/global-sections";
 export * from "@/pages/dashboard/billing";
 export * from "@/pages/dashboard/faqs";

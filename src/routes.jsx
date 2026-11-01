@@ -21,7 +21,7 @@ import {
   CircleStackIcon,
 } from "@heroicons/react/24/solid";
 import {
-  Home, Projects, GlobalTopics, GlobalRules, GlobalBatteries, GlobalSections, Billing, Faqs, AboutUs, ContactPage,
+  Home, Projects, GlobalTopics, GlobalRules, BatteriesRedirect, GlobalSections, Billing, Faqs, AboutUs, ContactPage,
   GlobalResources, GlobalPermissions, GlobalRoles, GlobalPlans, GlobalPlanLimits, GlobalSubscriptions,
   GlobalBatteryShares, /* GlobalSavedBatteries: UNUSED-CLEANUP */ GlobalInvites, GlobalDecks, GlobalFlashcards, GlobalDeckShares, /* GlobalSavedDecks: UNUSED-CLEANUP */
   GlobalUsers, GlobalProjects, GlobalSupportRequests, GlobalLearningPaths, MyDecks, MyBatteries, PublicDecks, PublicBatteries,
@@ -44,7 +44,7 @@ export const routes = [
       { name: "public-batteries", path: "/public-batteries",  element: <PublicBatteries />,      hidden: true },
       { name: "topics",           path: "/topics",            element: <GlobalTopics />,         hidden: true },
       { name: "rules",            path: "/rules",             element: <GlobalRules />,          hidden: true },
-      { name: "batteries",        path: "/batteries",         element: <GlobalBatteries />,      hidden: true },
+      { name: "batteries",        path: "/batteries",         element: <BatteriesRedirect />,    hidden: true },
       { name: "sections",         path: "/sections",          element: <GlobalSections />,       hidden: true },
       { name: "billing",          path: "/billing",           element: <Billing />,              hidden: true },
       { name: "faqs",             path: "/faqs",              element: <Faqs />,                 hidden: true },

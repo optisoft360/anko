@@ -52,7 +52,7 @@ const adminCards = (lang) => [
   { name: lang === "es" ? "Límites de Plan" : "Plan Limits",    path: "/dashboard/plan-limits",    icon: ClipboardDocumentCheckIcon, tone: "teal" },
   { name: lang === "es" ? "Suscripciones"  : "Subscriptions",  path: "/dashboard/subscriptions",  icon: TagIcon,                 tone: "amber" },
   { name: lang === "es" ? "Decks"          : "Decks",           path: "/dashboard/decks",          icon: RectangleStackIcon,      tone: "sky" },
-  { name: lang === "es" ? "Baterías"       : "Batteries",       path: "/dashboard/batteries",      icon: BoltIcon,                tone: "indigo" },
+  { name: lang === "es" ? "Baterías"       : "Batteries",       path: "/dashboard/admin-batteries",      icon: BoltIcon,                tone: "indigo" },
   { name: lang === "es" ? "Flashcards"     : "Flashcards",      path: "/dashboard/flashcards",     icon: RectangleStackIcon,      tone: "blue" },
   { name: lang === "es" ? "Soporte"        : "Support",         path: "/dashboard/support-requests", icon: EnvelopeIcon,          tone: "rose" },
   { name: lang === "es" ? "Procesos"       : "Processes",       path: "/dashboard/global-projects", icon: FolderIcon,             tone: "orange" },
@@ -103,7 +103,7 @@ export function Home() {
 
   const content = [
     { num: deckCount ?? "—", label: es ? "Decks totales" : "Total Decks", tone: "sky", path: "/dashboard/decks", icon: RectangleStackIcon },
-    { num: batteries.length, label: es ? "Baterías activas" : "Active Batteries", tone: "indigo", path: "/dashboard/batteries", icon: BoltIcon },
+    { num: batteries.length, label: es ? "Baterías activas" : "Active Batteries", tone: "indigo", path: "/dashboard/admin-batteries", icon: BoltIcon },
     { num: projects.length, label: es ? "Proyectos" : "Projects", tone: "emerald", path: "/dashboard/global-projects", icon: FolderIcon },
     { num: "—", label: "Flashcards", tone: "pink", path: "/dashboard/flashcards", icon: RectangleStackIcon },
   ];
