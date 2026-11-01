@@ -149,6 +149,7 @@ export const learningApi = {
   getOverdueReviews: (p) => enterpriseApi.get("/enterprise/review-schedules/overdue/", { params: cp(p) }).then((r) => r.data),
   completeReview: (id, score) => enterpriseApi.post(`/enterprise/review-schedules/${id}/complete/`, cp({ score })).then((r) => r.data),
   getKnowledgeGaps: (p) => enterpriseApi.get("/enterprise/knowledge-gaps/", { params: cp(p) }).then((r) => r.data),
+  getKnowledgeGapsSummary: () => enterpriseApi.get("/enterprise/knowledge-gaps/summary/", { params: cp() }).then((r) => r.data),
   acknowledgeGap: (id) => enterpriseApi.post(`/enterprise/knowledge-gaps/${id}/acknowledge/`, cp()).then((r) => r.data),
   resolveGap: (id) => enterpriseApi.post(`/enterprise/knowledge-gaps/${id}/resolve/`, cp()).then((r) => r.data),
 };

@@ -1589,6 +1589,10 @@ export const es = {
                 emptyMessage: "¡Genial! No se detectaron brechas.",
                 acknowledge: "Reconocer",
                 resolve: "Resolver",
+                notEnough: "Aún no hay suficientes resultados para detectar brechas",
+                notEnoughMessage: "Las brechas aparecen cuando el equipo termina exámenes (Simulate) de sus procesos.",
+                missed: "{missed} de {total} falladas",
+                loadError: "No se pudieron cargar las brechas.",
                 columns: {
                     severity: "Severidad",
                     topic: "Tema",

@@ -1588,6 +1588,10 @@ export const en = {
                 emptyMessage: "Great! No gaps detected.",
                 acknowledge: "Acknowledge",
                 resolve: "Resolve",
+                notEnough: "Not enough results yet to detect gaps",
+                notEnoughMessage: "Gaps show up once your team finishes Simulate exams of their processes.",
+                missed: "{missed} of {total} missed",
+                loadError: "Could not load the knowledge gaps.",
                 columns: {
                     severity: "Severity",
                     topic: "Topic",
