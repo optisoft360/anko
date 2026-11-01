@@ -47,7 +47,8 @@ function Toast({ toast, onDone }) {
  * Existing props keep their behavior. Optional ones:
  *  - subtitle, searchable, searchPlaceholder
  *  - filters: [{ name, label, options: [{value, label}] }]  → ?<name>=value
- *  - columns[].sortKey (enables ?ordering=), columns[].cell(item) (custom render), columns[].className
+ *  - columns[].sortKey (enables ?ordering=), columns[].cell(item) (custom render), columns[].className,
+ *    columns[].maxWidth (Tailwind max-w-* class for the cell content; default max-w-[280px])
  *  - fields[].required, fields[].requiredOnCreate, fields[].hint, fields[].onlyOn ("create"|"edit")
  *  - deleteConfirm(item) → { entityName, consequences, confirmText }
  *  - canDelete(item) → true | "reason why not"; canEdit(item) → same
@@ -380,7 +381,8 @@ export function GlobalCrudPage({
                   {rows.map((item) => (
                     <tr key={item.id} onClick={onRowClick ? () => onRowClick(item) : undefined}
                       className={`group text-[#334155] hover:bg-[#F8FAFC] ${onRowClick ? "cursor-pointer" : ""}`}>
-                      {columns.map((c, i) => <td key={i} className={`max-w-[280px] px-3 py-3 align-middle ${c.className || ""}`}>{cellOf(item, c)}</td>)}
+                      {/* max-width is ignored on auto-layout <td>: the cap lives on an inner box */}
+                      {columns.map((c, i) => <td key={i} className={`px-3 py-3 align-middle ${c.className || ""}`}><div className={`min-w-0 ${c.maxWidth || "max-w-[280px]"}`}>{cellOf(item, c)}</div></td>)}
                       <td className="sticky right-0 bg-white px-3 py-2 group-hover:bg-[#F8FAFC]">{renderActions(item)}</td>
                     </tr>
                   ))}

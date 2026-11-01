@@ -7,7 +7,7 @@ import projectService from "@/services/projectService";
 import { companyApi } from "@/enterprise/api/enterpriseApi";
 import { Avatar, Badge, BTN_PRIMARY, BTN_SECONDARY, FOCUS, ROLE_TONE, SelectInput, Spinner } from "@/enterprise/components/ui/kit";
 import { AdminModal } from "@/widgets/admin/AdminModal";
-import { BooleanBadge, TruncatedText } from "@/widgets/admin/cells";
+import { BooleanBadge } from "@/widgets/admin/cells";
 import { useCompanyOptions } from "@/widgets/admin/useCompanyOptions";
 
 const COMPANY_ROLES = ["owner", "admin", "manager", "trainer", "employee", "auditor"];
@@ -145,7 +145,8 @@ export function GlobalUsers() {
           { name: "role", label: k("platformRole"), options: PLATFORM_ROLES.map((r) => ({ value: r, label: r })) },
         ]}
         columns={[
-          { header: k("user"), sortKey: "username", cell: (u) => (
+          // Email sits under the username (full name in its tooltip) so the table fits at 1024px.
+          { header: k("user"), sortKey: "username", maxWidth: "max-w-[260px]", cell: (u) => (
             <span className="flex min-w-0 items-center gap-2.5">
               <Avatar name={u.username} size="sm" />
               <span className="min-w-0">
@@ -153,19 +154,18 @@ export function GlobalUsers() {
                   <span className="truncate font-medium text-[#0F172A]">{u.username}</span>
                   {u.is_staff && <Badge tone="violet">{k("staff")}</Badge>}
                 </span>
-                <span className="block truncate text-xs text-[#64748B]">{[u.first_name, u.last_name].filter(Boolean).join(" ") || "—"}</span>
+                <span className="block truncate text-xs text-[#64748B]" title={[[u.first_name, u.last_name].filter(Boolean).join(" "), u.email].filter(Boolean).join(" · ")}>{u.email}</span>
               </span>
             </span>
           ) },
-          { header: k("email"), sortKey: "email", className: "max-w-[190px]", cell: (u) => <TruncatedText value={u.email} max={24} /> },
           { header: k("roles"), cell: (u) => {
             const global = (u.roles || []).map(roleName).filter(Boolean);
             const company = u.company_memberships || [];
             if (!global.length && !company.length) return <span className="text-[#94A3B8]">—</span>;
             return (
-              <span className="flex max-w-[210px] flex-wrap gap-1">
+              <span className="flex max-w-[230px] flex-wrap gap-1">
                 {global.map((r) => <Badge key={r} tone={r === "admin" ? "rose" : "slate"}>{r}</Badge>)}
-                {company.map((m) => <Badge key={m.id} tone={ROLE_TONE[m.role] || "slate"}><span className="max-w-[110px] truncate">{m.company_name}</span>: {t(`admin.companyRoles.${m.role}`)}</Badge>)}
+                {company.map((m) => <Badge key={m.id} tone={ROLE_TONE[m.role] || "slate"}><span className="max-w-[170px] truncate">{`${m.company_name}: ${t(`admin.companyRoles.${m.role}`)}`}</span></Badge>)}
               </span>
             );
           } },
