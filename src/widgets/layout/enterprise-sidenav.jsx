@@ -113,12 +113,42 @@ export function EnterpriseSidenav({ routes, company, role }) {
   const closeOnMobile = () => setOpenSidenav(dispatch, false);
   const companyName = company?.company_name || company?.name || "";
 
+  // Items carrying `section` (Admin Area) render under small sub-headings; "advanced" ones fold away.
+  const renderItems = (items, groupId) => {
+    const link = (i) => <NavItem key={i.to} to={i.to} icon={i.icon} label={i.label} onNavigate={closeOnMobile} />;
+    if (!items.some((i) => i.section)) return items.map(link);
+    const order = [...new Set(items.map((i) => i.section || "other"))];
+    return order.map((section) => {
+      const list = items.filter((i) => (i.section || "other") === section);
+      if (section === "advanced") {
+        const id = `${groupId}-advanced`;
+        const open = q ? true : !!expanded[id] || list.some((i) => location.pathname.startsWith(i.to));
+        return (
+          <div key={section}>
+            <button type="button" onClick={() => toggle(id)} aria-expanded={open}
+              className={`flex w-full cursor-pointer items-center gap-1 rounded-md px-3 pb-0.5 pt-2 text-[10px] font-semibold uppercase tracking-wider text-[#94A3B8] hover:text-[#475569] ${FOCUS}`}>
+              {t(`sidenav.adminSections.${section}`)}
+              <ChevronRightIcon className={`h-3 w-3 transition-transform ${open ? "rotate-90" : ""}`} aria-hidden="true" />
+            </button>
+            {open && list.map(link)}
+          </div>
+        );
+      }
+      return (
+        <div key={section}>
+          <p className="px-3 pb-0.5 pt-2 text-[10px] font-semibold uppercase tracking-wider text-[#CBD5E1]">{t(`sidenav.adminSections.${section}`)}</p>
+          {list.map(link)}
+        </div>
+      );
+    });
+  };
+
   const renderGroup = (g) => {
     const items = g.items.filter(matches);
     if (!items.length) return null;
     return (
       <NavGroup key={g.id} id={g.id} label={g.label} open={q ? true : !!expanded[g.id]} onToggle={toggle}>
-        {items.map((i) => <NavItem key={i.to} to={i.to} icon={i.icon} label={i.label} onNavigate={closeOnMobile} />)}
+        {renderItems(items, g.id)}
       </NavGroup>
     );
   };

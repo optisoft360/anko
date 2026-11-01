@@ -3,7 +3,6 @@ import { DashboardNavbar, ChatPanel } from "@/widgets/layout";
 import { EnterpriseSidenav } from "@/widgets/layout/enterprise-sidenav";
 import { useLightTheme } from "@/hooks/useLightTheme";
 import { ChatFab } from "@/widgets/layout/chat-fab";
-import { MobileTabBar } from "@/widgets/layout/mobile-tab-bar";
 import routes from "@/routes";
 import { useEnterprise } from "@/enterprise/context/enterprise-context";
 import { useAuth } from "@/context/auth-context";
@@ -11,6 +10,7 @@ import { useAuth } from "@/context/auth-context";
 import PlatformAdminCompanies from "@/enterprise/pages/platform-admin/PlatformAdminCompanies";
 import PlatformAdminUsers from "@/enterprise/pages/platform-admin/PlatformAdminUsers";
 import PlatformAdminInvitations from "@/enterprise/pages/platform-admin/PlatformAdminInvitations";
+import PlatformAdminOverview from "@/enterprise/pages/platform-admin/PlatformAdminOverview";
 
 export function PlatformAdmin() {
   const { isPlatformAdmin, initialized, activeCompany, role } = useEnterprise();
@@ -59,13 +59,13 @@ export function PlatformAdmin() {
             <Route path="companies" element={<PlatformAdminCompanies />} />
             <Route path="companies/:id/users" element={<PlatformAdminUsers />} />
             <Route path="invitations" element={<PlatformAdminInvitations />} />
+            <Route path="overview" element={<PlatformAdminOverview />} />
             <Route index element={<Navigate to="companies" replace />} />
             <Route path="*" element={<Navigate to="companies" replace />} />
           </Routes>
         </div>
       </div>
 
-      <MobileTabBar />
     </div>
   );
 }

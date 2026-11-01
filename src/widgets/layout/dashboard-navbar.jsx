@@ -34,6 +34,7 @@ import { useAuth } from "@/context/auth-context";
 import { APP_NAME } from "@/config/app";
 import { useLanguage } from "@/context/language-context";
 import { useProjects } from "@/context/projects-context";
+import { useCompanyOptions } from "@/widgets/admin/useCompanyOptions";
 import { EditProfileDialog } from "@/widgets/dialogs/edit-profile-dialog";
 import { UserStatisticsDialog } from "@/widgets/dialogs/user-statistics-dialog";
 import { useState, useEffect, useRef } from "react";
@@ -148,10 +149,16 @@ export function DashboardNavbar({ hideMenu = { mobile: false, desktop: false } }
   // Project names are only needed for the breadcrumb of a project's own pages.
   const { projects: allProjects } = useProjects({ passive: !/\/projects\/\d/.test(pathname) });
   const pathParts = pathname.split("/").filter((el) => el !== "");
+  // Company name instead of its id in /platform-admin/companies/:id/... (only fetched there).
+  const companyCrumb = pathParts[0] === "platform-admin" && pathParts[1] === "companies" && /^\d+$/.test(pathParts[2] || "");
+  const companyOptions = useCompanyOptions({ enabled: companyCrumb });
   const getBreadcrumbName = (part, index) => {
     if (index === 2 && pathParts[1] === "project") {
       const project = allProjects.find(p => String(p.id) === part);
       return project ? (project.title || project.name) : part;
+    }
+    if (companyCrumb && index === 2) {
+      return companyOptions.find((c) => String(c.value) === part)?.label || part;
     }
     const key = `breadcrumbs.${part}`;
     const translated = t(key);

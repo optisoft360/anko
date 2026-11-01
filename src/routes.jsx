@@ -24,7 +24,8 @@ import {
   Home, Projects, GlobalTopics, GlobalRules, GlobalBatteries, GlobalSections, Billing, Faqs, AboutUs, ContactPage,
   GlobalResources, GlobalPermissions, GlobalRoles, GlobalPlans, GlobalPlanLimits, GlobalSubscriptions,
   GlobalBatteryShares, /* GlobalSavedBatteries: UNUSED-CLEANUP */ GlobalInvites, GlobalDecks, GlobalFlashcards, GlobalDeckShares, /* GlobalSavedDecks: UNUSED-CLEANUP */
-  GlobalUsers, GlobalProjects, GlobalSupportRequests, GlobalLearningPaths, MyDecks, MyBatteries, PublicDecks, PublicBatteries
+  GlobalUsers, GlobalProjects, GlobalSupportRequests, GlobalLearningPaths, MyDecks, MyBatteries, PublicDecks, PublicBatteries,
+  AdminBatteries,
 } from "@/pages/dashboard";
 import { SignIn, SignUp, EmailVerification, ForgotPassword, ResetPassword } from "@/pages/auth";
 
@@ -69,27 +70,30 @@ export const routes = [
       { name: "global-projects",  path: "/global-projects",   element: <GlobalProjects />,       hidden: true },
       { name: "support-requests",    path: "/support-requests",     element: <GlobalSupportRequests />,  hidden: true },
       { name: "global-learning-paths", path: "/global-learning-paths", element: <GlobalLearningPaths />, hidden: true },
+      // Admin Area > Batteries: every battery (the end-user /batteries page is a different screen).
+      { name: "admin-batteries",  path: "/admin-batteries",   element: <AdminBatteries />,       hidden: true },
 
       // ─── ADMIN AREA group (collapsible) ─────────────────────────────────────────
       {
         icon: <ShieldCheckIcon {...icon} />,
         name: "admin-area",
         children: [
-          { icon: <UsersIcon {...icon} />,                  name: "users",                path: "/users" },
-          { icon: <ServerStackIcon {...icon} />,            name: "resources",            path: "/resources" },
-          { icon: <ShieldCheckIcon {...icon} />,            name: "permissions",          path: "/permissions" },
-          { icon: <UserCircleIcon {...icon} />,             name: "roles",                path: "/roles" },
-          { icon: <CreditCardIcon {...icon} />,             name: "plans",                path: "/plans" },
-          { icon: <ClipboardDocumentCheckIcon {...icon} />, name: "plan-limits",          path: "/plan-limits" },
-          { icon: <TagIcon {...icon} />,                    name: "subscriptions",        path: "/subscriptions" },
-          { icon: <RectangleStackIcon {...icon} />,         name: "decks",                path: "/decks" },
-          { icon: <BoltIcon {...icon} />,                   name: "batteries",            path: "/batteries" },
-          { icon: <RectangleStackIcon {...icon} />,         name: "flashcards",           path: "/flashcards" },
-          { icon: <EnvelopeIcon {...icon} />,               name: "support-requests",     path: "/support-requests" },
-          { icon: <FolderIcon {...icon} />,                 name: "global-process",       path: "/global-projects" },
-          { icon: <BookOpenIcon {...icon} />,               name: "global-learning-path", path: "/global-learning-paths" },
-          { icon: <BuildingOffice2Icon {...icon} />,        name: "companies",            href: "/platform-admin/companies" },
-          { icon: <EnvelopeIcon {...icon} />,               name: "pa-invitations",       href: "/platform-admin/invitations" },
+          { icon: <ChartBarIcon {...icon} />,               name: "pa-overview",          href: "/platform-admin/overview",     section: "platform" },
+          { icon: <BuildingOffice2Icon {...icon} />,        name: "companies",            href: "/platform-admin/companies",    section: "organizations" },
+          { icon: <UsersIcon {...icon} />,                  name: "users",                path: "/users",                       section: "organizations" },
+          { icon: <EnvelopeIcon {...icon} />,               name: "pa-invitations",       href: "/platform-admin/invitations",  section: "organizations" },
+          { icon: <FolderIcon {...icon} />,                 name: "global-process",       path: "/global-projects",             section: "content" },
+          { icon: <BookOpenIcon {...icon} />,               name: "global-learning-path", path: "/global-learning-paths",       section: "content" },
+          { icon: <RectangleStackIcon {...icon} />,         name: "decks",                path: "/decks",                       section: "content" },
+          { icon: <BoltIcon {...icon} />,                   name: "admin-batteries",      path: "/admin-batteries",             section: "content" },
+          { icon: <RectangleStackIcon {...icon} />,         name: "flashcards",           path: "/flashcards",                  section: "content" },
+          { icon: <CreditCardIcon {...icon} />,             name: "plans",                path: "/plans",                       section: "billing" },
+          { icon: <ClipboardDocumentCheckIcon {...icon} />, name: "plan-limits",          path: "/plan-limits",                 section: "billing" },
+          { icon: <TagIcon {...icon} />,                    name: "subscriptions",        path: "/subscriptions",               section: "billing" },
+          { icon: <UserCircleIcon {...icon} />,             name: "roles",                path: "/roles",                       section: "access" },
+          { icon: <ServerStackIcon {...icon} />,            name: "resources",            path: "/resources",                   section: "advanced" },
+          { icon: <ShieldCheckIcon {...icon} />,            name: "permissions",          path: "/permissions",                 section: "advanced" },
+          { icon: <EnvelopeIcon {...icon} />,               name: "support-requests",     path: "/support-requests",            section: "support" },
         ],
       },
 

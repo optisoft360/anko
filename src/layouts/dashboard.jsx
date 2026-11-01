@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { ChevronRightIcon } from "@heroicons/react/24/solid";
 import { IconButton } from "@material-tailwind/react";
 import {
@@ -8,6 +8,12 @@ import {
 } from "@/widgets/layout";
 import { MobileTabBar } from "@/widgets/layout/mobile-tab-bar";
 import routes from "@/routes";
+
+// Admin Area pages: the end-user bottom tab bar (Home / Projects / Batteries / Study) is not for them.
+const ADMIN_PATHS = new Set(
+  routes.flatMap((r) => r.pages || []).filter((p) => p.name === "admin-area")
+    .flatMap((p) => p.children || []).filter((c) => c.path).map((c) => `/dashboard${c.path}`)
+);
 import { ProjectDetail, ProjectTopics } from "@/pages/dashboard";
 import { useMaterialTailwindController, setOpenSidenav } from "@/context";
 import { useAuth } from "@/context/auth-context";
@@ -18,6 +24,7 @@ import { ChatFab } from "@/widgets/layout/chat-fab";
 import { useHideNavWithoutCompany } from "@/config/navigation";
 
 export function Dashboard() {
+  const { pathname } = useLocation();
   const [controller, dispatch] = useMaterialTailwindController();
   const { sidenavType, openSidenav } = controller;
   const { isAdmin } = useAuth();
@@ -81,7 +88,7 @@ export function Dashboard() {
 
       </div>
 
-      {!hideNav.mobile && <MobileTabBar />}
+      {!hideNav.mobile && !ADMIN_PATHS.has(pathname.replace(/\/$/, "")) && <MobileTabBar />}
     </div>
   );
 }
