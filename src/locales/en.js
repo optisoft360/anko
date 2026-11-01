@@ -538,7 +538,8 @@ export const en = {
                 deleteConsequences: "Plans with subscribers cannot be deleted."
             },
             planLimits: {
-                unlimited: "Unlimited", add: "Add", unused: "Not used", defaultValue: "Default: {n}", defaultTip: "No value for this plan: the app applies this default.", notEnforced: "Not enforced: the app does not read this limit.", notSetUnknown: "No value for this plan.", 
+                noDefault: "No default", noDefaultTip: "The app reads this limit but has no default for this plan.", 
+                unlimited: "Unlimited", add: "Add", unused: "Not used", defaultValue: "Default: {n}", defaultTip: "No value for this plan: the app applies this default.", notEnforced: "This limit is defined but not enforced anywhere in the code.", notSetUnknown: "No value for this plan.", 
                 subtitle: "What each plan allows.", view: "View", matrix: "Matrix", list: "List", limit: "Limit", plan: "Plan", type: "Type",
                 value: "Value", key: "Key", edit: "Edit", enabled: "Enabled", notSet: "Not set",
                 typeInt: "Number", typeBool: "Yes / No", typeStr: "Text", intValue: "Number value", boolValue: "Enabled", strValue: "Text value"

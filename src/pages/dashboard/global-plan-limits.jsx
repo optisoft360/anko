@@ -12,6 +12,7 @@ import { fieldErrors } from "@/widgets/admin/format";
 
 const UNLIMITED = 99999; // seeded sentinel: anything at or above it means no practical limit
 const humanize = (key) => String(key || "").replace(/_/g, " ").replace(/^\w/, (c) => c.toUpperCase());
+const hasValue = (lim) => { const v = valueOf(lim); return !(v === null || v === undefined || v === ""); };
 const valueOf = (lim) => (lim.value_type === "bool" ? lim.bool_value : lim.value_type === "str" ? lim.str_value : lim.int_value);
 
 function LimitValue({ lim }) {
@@ -19,7 +20,7 @@ function LimitValue({ lim }) {
   if (!lim) return DASH;
   if (lim.value_type === "bool") return <BooleanBadge value={lim.bool_value} />;
   const v = valueOf(lim);
-  if (v === null || v === undefined || v === "") return DASH;
+  if (v === null || v === undefined || v === "") return <span title={t("admin.pages.planLimits.notSetUnknown")}>{DASH}</span>;
   if (lim.value_type === "int" && Number(v) >= UNLIMITED) {
     return <span title={String(v)}><Badge tone="indigo">{t("admin.pages.planLimits.unlimited")}</Badge></span>;
   }
@@ -29,7 +30,7 @@ function LimitValue({ lim }) {
 function EditLimit({ lim, planName, onClose, onSaved }) {
   // lim without id = "Add": creates the PlanLimit row for this plan and key.
   const { t } = useLanguage();
-  const k = (key) => t(`admin.pages.planLimits.${key}`);
+  const k = (key, params) => t(`admin.pages.planLimits.${key}`, params);
   const [value, setValue] = useState(valueOf(lim) ?? (lim.value_type === "bool" ? false : ""));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -71,7 +72,7 @@ function EditLimit({ lim, planName, onClose, onSaved }) {
 
 function LimitsMatrix() {
   const { t } = useLanguage();
-  const k = (key) => t(`admin.pages.planLimits.${key}`);
+  const k = (key, params) => t(`admin.pages.planLimits.${key}`, params);
   const [state, setState] = useState("loading");
   const [plans, setPlans] = useState([]);
   const [limits, setLimits] = useState([]);
@@ -105,14 +106,23 @@ function LimitsMatrix() {
   }, [limits, defaults]);
 
   const typeOf = (key, byPlan) => defaults?.[key]?.type || Object.values(byPlan)[0]?.value_type || "int";
+  // What applies when a plan has no value for a key: the app's default, none, or nothing (unused key).
+  const fallback = (key, p) => {
+    if (!defaults) return { label: k("notSet"), tip: k("notSetUnknown") };
+    if (!(key in defaults)) return { label: k("notSet"), tip: k("notEnforced") };
+    const def = defaults[key].defaults?.[p.tier];
+    if (def === undefined || def === null) return { label: k("noDefault"), tip: k("noDefaultTip") };
+    const shown = typeof def === "boolean" ? t(def ? "admin.cells.yes" : "admin.cells.no") : Number(def) >= UNLIMITED ? k("unlimited") : String(def);
+    return { label: k("defaultValue", { n: shown }), tip: k("defaultTip") };
+  };
+  const Fallback = ({ k: key, p }) => {
+    const f = fallback(key, p);
+    return <span className="text-xs italic text-[#64748B]" title={f.tip}>{f.label}</span>;
+  };
   const emptyCell = (key, byPlan, p) => {
-    const enforced = defaults && key in defaults;
-    const def = enforced ? defaults[key].defaults?.[p.tier] : undefined;
-    const label = !defaults ? k("notSet") : enforced ? k("defaultValue", { n: typeof def === "boolean" ? t(def ? "admin.cells.yes" : "admin.cells.no") : (Number(def) >= UNLIMITED ? k("unlimited") : String(def ?? "—")) }) : k("notSet");
-    const tip = !defaults ? k("notSetUnknown") : enforced ? k("defaultTip") : k("notEnforced");
     return (
       <span className="inline-flex items-center gap-1.5">
-        <span className="text-xs italic text-[#64748B]" title={tip}>{label}</span>
+        <Fallback k={key} p={p} />
         <button type="button" onClick={() => setEditing({ lim: { plan: p.id, key, value_type: typeOf(key, byPlan) }, planName: p.name })}
           aria-label={`${k("add")} ${humanize(key)} · ${p.name}`} title={k("add")}
           className={`rounded px-1.5 py-0.5 text-xs font-medium text-[#4338CA] hover:bg-[#EEF2FF] ${FOCUS}`}>+ {k("add")}</button>
@@ -152,7 +162,7 @@ function LimitsMatrix() {
                         <button type="button" onClick={() => setEditing({ lim, planName: p.name })}
                           aria-label={`${k("edit")} ${humanize(key)} · ${p.name}`}
                           className={`cursor-pointer rounded-md px-2 py-1 hover:bg-[#EEF2FF] ${FOCUS}`}>
-                          <LimitValue lim={lim} />
+                          {hasValue(lim) ? <LimitValue lim={lim} /> : <Fallback k={key} p={p} />}
                         </button>
                       ) : emptyCell(key, byPlan, p)}
                     </td>
@@ -170,7 +180,7 @@ function LimitsMatrix() {
 
 export function GlobalPlanLimits() {
   const { t } = useLanguage();
-  const k = (key) => t(`admin.pages.planLimits.${key}`);
+  const k = (key, params) => t(`admin.pages.planLimits.${key}`, params);
   const [params, setParams] = useSearchParams();
   const view = params.get("view") === "list" ? "list" : "matrix";
   const setView = useCallback((v) => setParams((prev) => { const n = new URLSearchParams(prev); if (v === "list") n.set("view", "list"); else n.delete("view"); return n; }, { replace: true }), [setParams]);

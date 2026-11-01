@@ -538,7 +538,8 @@ export const es = {
                 deleteConsequences: "Un plan con suscriptores no se puede borrar."
             },
             planLimits: {
-                unlimited: "Ilimitado", add: "Añadir", unused: "Sin uso", defaultValue: "Por defecto: {n}", defaultTip: "Sin valor para este plan: la app aplica este valor por defecto.", notEnforced: "No se aplica: la app no lee este límite.", notSetUnknown: "Sin valor para este plan.", 
+                noDefault: "Sin valor por defecto", noDefaultTip: "La app usa este límite pero no tiene valor por defecto para este plan.", 
+                unlimited: "Ilimitado", add: "Añadir", unused: "Sin uso", defaultValue: "Por defecto: {n}", defaultTip: "Sin valor para este plan: la app aplica este valor por defecto.", notEnforced: "Este límite está definido pero ningún código lo aplica.", notSetUnknown: "Sin valor para este plan.", 
                 subtitle: "Lo que permite cada plan.", view: "Vista", matrix: "Matriz", list: "Lista", limit: "Límite", plan: "Plan", type: "Tipo",
                 value: "Valor", key: "Clave", edit: "Editar", enabled: "Activado", notSet: "Sin definir",
                 typeInt: "Número", typeBool: "Sí / No", typeStr: "Texto", intValue: "Valor numérico", boolValue: "Activado", strValue: "Valor de texto"
