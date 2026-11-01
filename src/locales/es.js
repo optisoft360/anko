@@ -490,6 +490,39 @@ export const es = {
             search_placeholder: "Buscar..."
         }
     },
+    admin: {
+        cells: { yes: "Sí", no: "No", copy: "Copiar" },
+        table: {
+            search: "Buscar…", all: "Todos", clear: "Limpiar filtros", actions: "Acciones", edit: "Editar", delete: "Eliminar",
+            create: "Crear", loading: "Cargando…", empty: "No hay resultados", emptyFiltered: "Nada coincide con la búsqueda o los filtros.",
+            errorTitle: "No se pudieron cargar los datos", errorHint: "Revisa tu conexión e inténtalo de nuevo.", retry: "Reintentar"
+        },
+        modal: {
+            close: "Cerrar", cancel: "Cancelar", save: "Guardar", editTitle: "Editar", createTitle: "Crear",
+            discard: "Tienes cambios sin guardar. ¿Descartarlos?"
+        },
+        form: {
+            required: "Este campo es obligatorio.", invalidEmail: "Introduce un email válido.", select: "Selecciona…",
+            passwordKeep: "Déjalo en blanco para mantener la contraseña actual."
+        },
+        confirm: {
+            title: "Confirmar eliminación", delete: "Eliminar", about: "Vas a eliminar",
+            irreversible: "Esta acción no se puede deshacer.", typeToConfirm: "Escribe \"{name}\" para confirmar"
+        },
+        roles: {
+            subtitle: "Roles de plataforma (admin, client) y las plantillas de rol de empresa (enterprise.*).",
+            name: "Nombre", description: "Descripción", permissions: "Permisos", resource: "Recurso",
+            system: "Sistema", systemHint: "Rol de sistema: el nombre no se puede cambiar ni se puede eliminar.",
+            nameLocked: "Los roles de sistema conservan su nombre.", systemNoDelete: "Los roles de sistema no se pueden eliminar.",
+            createTitle: "Nuevo rol", editTitle: "Editar rol", filter: "Filtrar recursos…", selectGroup: "Seleccionar todo",
+            count: "{a} de {b} permisos", waitLoad: "Espera a que carguen todos los permisos.",
+            loadError: "No se pudo cargar la lista de permisos. Guardar está desactivado para no perder ningún permiso.",
+            deleteConsequences: "Los usuarios con este rol perderán los permisos que concede.",
+            actions: { view: "Ver", manage: "Gestionar" },
+            areas: { admin: "Admin de plataforma", enterprise: "Empresa", learning: "Aprendizaje (personal)", auth: "Acceso", other: "Otros" }
+        },
+        toast: { saved: "Cambios guardados", created: "Creado", deleted: "Eliminado", error: "Algo salió mal. No se guardó nada." }
+    },
     global: {
         ai_generated: "✨ Generado por IA",
         summary_not_available: "Resumen no disponible aún.",

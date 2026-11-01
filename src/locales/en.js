@@ -490,6 +490,39 @@ export const en = {
             search_placeholder: "Search..."
         }
     },
+    admin: {
+        cells: { yes: "Yes", no: "No", copy: "Copy" },
+        table: {
+            search: "Search…", all: "All", clear: "Clear filters", actions: "Actions", edit: "Edit", delete: "Delete",
+            create: "Create", loading: "Loading…", empty: "No results", emptyFiltered: "Nothing matches the search or filters.",
+            errorTitle: "Could not load the data", errorHint: "Check your connection and try again.", retry: "Retry"
+        },
+        modal: {
+            close: "Close", cancel: "Cancel", save: "Save", editTitle: "Edit", createTitle: "Create",
+            discard: "You have unsaved changes. Discard them?"
+        },
+        form: {
+            required: "This field is required.", invalidEmail: "Enter a valid email.", select: "Select…",
+            passwordKeep: "Leave blank to keep the current password."
+        },
+        confirm: {
+            title: "Confirm deletion", delete: "Delete", about: "You are about to delete",
+            irreversible: "This cannot be undone.", typeToConfirm: "Type \"{name}\" to confirm"
+        },
+        roles: {
+            subtitle: "Platform roles (admin, client) and the company role templates (enterprise.*).",
+            name: "Name", description: "Description", permissions: "Permissions", resource: "Resource",
+            system: "System", systemHint: "System role: the name cannot change and it cannot be deleted.",
+            nameLocked: "System roles keep their name.", systemNoDelete: "System roles cannot be deleted.",
+            createTitle: "New role", editTitle: "Edit role", filter: "Filter resources…", selectGroup: "Select all",
+            count: "{a} of {b} permissions", waitLoad: "Wait until every permission has loaded.",
+            loadError: "Could not load the permission list. Saving is disabled so no permission is lost.",
+            deleteConsequences: "Users holding this role lose the permissions it grants.",
+            actions: { view: "View", manage: "Manage" },
+            areas: { admin: "Platform admin", enterprise: "Enterprise", learning: "Learning (personal)", auth: "Auth", other: "Other" }
+        },
+        toast: { saved: "Changes saved", created: "Created", deleted: "Deleted", error: "Something went wrong. Nothing was saved." }
+    },
     global: {
         ai_generated: "✨ AI Generated",
         summary_not_available: "Summary not available yet.",

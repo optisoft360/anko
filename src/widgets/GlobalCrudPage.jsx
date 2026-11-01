@@ -1,461 +1,447 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import {
+  ArrowPathIcon, ChevronDownIcon, ChevronUpIcon, ChevronUpDownIcon, ExclamationCircleIcon,
+  MagnifyingGlassIcon, PencilSquareIcon, PlusIcon, TrashIcon, XMarkIcon,
+} from "@heroicons/react/24/outline";
 import { AppPagination } from "@/components/AppPagination";
-import { PlusIcon, PencilIcon, TrashIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import projectService from "@/services/projectService";
 import { useLanguage } from "@/context/language-context";
-import { useMaterialTailwindController } from "@/context";
+import {
+  BTN_PRIMARY, BTN_SECONDARY, Card, EmptyBlock, FOCUS, PageHeader, SelectInput, SkeletonRows, Spinner, TextArea, TextInput,
+} from "@/enterprise/components/ui/kit";
+import { AdminModal } from "@/widgets/admin/AdminModal";
+import { ConfirmDialog } from "@/widgets/admin/ConfirmDialog";
+import { BooleanBadge, DASH, TruncatedText } from "@/widgets/admin/cells";
+import { entityLabel, fieldErrors, normalizeList } from "@/widgets/admin/format";
+import { fetchAll } from "@/widgets/admin/fetchAll";
 
-/* ── Design tokens ── */
-const INPUT = {
-  width: "100%", background: "var(--lt-rgba-255-255-255-0-05, rgba(255,255,255,0.05))", border: "1px solid var(--lt-rgba-255-255-255-0-12, rgba(255,255,255,0.12))",
-  borderRadius: 10, padding: "10px 13px", fontSize: 13, color: "var(--lt-f1f5f9, #F1F5F9)",
-  outline: "none", fontFamily: "inherit", boxSizing: "border-box", transition: "border-color 0.2s, box-shadow 0.2s",
-};
-const TEXTAREA = { ...INPUT, resize: "vertical", minHeight: 80 };
-const SELECT_S = {
-  ...INPUT, appearance: "none", cursor: "pointer",
-  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%2364748B' viewBox='0 0 20 20'%3E%3Cpath fill-rule='evenodd' d='M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z' clip-rule='evenodd'/%3E%3C/svg%3E")`,
-  backgroundRepeat: "no-repeat", backgroundPosition: "right 10px center", backgroundSize: 16, paddingRight: 36,
-};
-const LBL = { fontSize: 11, fontWeight: 700, color: "var(--lt-94a3b8, #94A3B8)", display: "block", marginBottom: 5, letterSpacing: "0.03em" };
-const focusIn  = (e) => { e.target.style.borderColor = "rgba(99,102,241,0.7)"; e.target.style.boxShadow = "0 0 0 3px rgba(99,102,241,0.12)"; };
-const focusOut = (e) => { e.target.style.borderColor = "rgba(255,255,255,0.12)"; e.target.style.boxShadow = "none"; };
+const errBody = (err) => err?.response?.data ?? err;
+const ICON_BTN = `grid h-9 w-9 cursor-pointer place-items-center rounded-lg text-[#64748B] transition-colors hover:bg-[#F1F5F9] hover:text-[#0F172A] disabled:cursor-not-allowed disabled:opacity-40 ${FOCUS}`;
 
-function Spin({ size = 18 }) {
-  return <div style={{ width: size, height: size, borderRadius: "50%", border: "2px solid var(--lt-rgba-255-255-255-0-15, rgba(255,255,255,0.15))", borderTopColor: "#818CF8", flexShrink: 0 }} className="animate-spin" />;
+/** Renders any raw cell value readably: booleans as badges, objects by name, empty as a dash. */
+function renderValue(v) {
+  if (v === null || v === undefined || v === "") return DASH;
+  if (typeof v === "boolean") return <BooleanBadge value={v} />;
+  if (React.isValidElement(v)) return v;
+  if (Array.isArray(v)) return v.length ? v.map((x) => (typeof x === "object" ? entityLabel(x) : x)).join(", ") : DASH;
+  if (typeof v === "object") return entityLabel(v) || DASH;
+  return <TruncatedText value={v} max={90} />;
 }
 
-export function GlobalCrudPage({ title, resource, columns, fields, extraParams = {}, extraActions = null, editTitle, createTitle, disableCreate = false }) {
-  const languageContext = useLanguage();
-  if (!languageContext) return <div style={{ padding: 16, color: "var(--lt-f87171, #F87171)" }}>Error: Language Context is null.</div>;
+function Toast({ toast, onDone }) {
+  useEffect(() => { if (!toast) return undefined; const id = setTimeout(onDone, 3500); return () => clearTimeout(id); }, [toast, onDone]);
+  if (!toast) return null;
+  const ok = toast.type !== "error";
+  return (
+    <div role="status" aria-live="polite"
+      className={`fixed bottom-5 left-1/2 z-[10060] -translate-x-1/2 rounded-lg px-4 py-2.5 text-sm font-medium text-white shadow-lg ${ok ? "bg-[#047857]" : "bg-[#BE123C]"}`}>
+      {toast.text}
+    </div>
+  );
+}
 
-  const { t } = languageContext;
-  const [controller] = useMaterialTailwindController();
-  void controller;
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [openDialog, setOpenDialog] = useState(false);
-  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-  const [currentItem, setCurrentItem] = useState(null);
-  const [formData, setFormData] = useState({});
-  const [selectOptions, setSelectOptions] = useState({});
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-  const [totalCount, setTotalCount] = useState(0);
+/**
+ * Generic admin list + CRUD page.
+ *
+ * Existing props keep their behavior. Optional ones:
+ *  - subtitle, searchable, searchPlaceholder
+ *  - filters: [{ name, label, options: [{value, label}] }]  → ?<name>=value
+ *  - columns[].sortKey (enables ?ordering=), columns[].cell(item) (custom render), columns[].className
+ *  - fields[].required, fields[].requiredOnCreate, fields[].hint, fields[].onlyOn ("create"|"edit")
+ *  - deleteConfirm(item) → { entityName, consequences, confirmText }
+ *  - canDelete(item) → true | "reason why not"; canEdit(item) → same
+ *  - disableDelete, disableEdit, onRowClick(item)
+ *  - editor: component replacing the generic form — receives { item | null, onClose, onSaved }
+ */
+export function GlobalCrudPage({
+  title, resource, columns, fields, extraParams = {}, extraActions = null, editTitle, createTitle, disableCreate = false,
+  subtitle, searchable = false, searchPlaceholder, filters = [], deleteConfirm, canDelete, canEdit,
+  disableDelete = false, disableEdit = false, onRowClick, headerActions, editor: Editor,
+}) {
+  const { t } = useLanguage();
+  const [params, setParams] = useSearchParams();
+  const page = Math.max(1, Number(params.get("page")) || 1);
+  const pageSize = Number(params.get("page_size")) || 10;
+  const ordering = params.get("ordering") || "";
+  const query = params.get("search") || "";
+  // Stable string key: `filters` is a new array on every render of the page.
+  const filterKey = filters.map((f) => `${f.name}=${params.get(f.name) || ""}`).join("&");
+  const filterValues = useMemo(() => Object.fromEntries(filterKey ? filterKey.split("&").map((kv) => kv.split("=")) : []), [filterKey]);
 
-  const fetchItems = useCallback(async () => {
-    setLoading(true);
-    try {
-      const data = await projectService.getList(resource, { ...extraParams, page, page_size: pageSize });
-      if (Array.isArray(data)) {
-        setItems(data); setTotalCount(data.length);
-      } else if (data && Array.isArray(data.results)) {
-        setItems(data.results); setTotalCount(data.count ?? data.results.length);
+  const [rows, setRows] = useState([]);
+  const [count, setCount] = useState(0);
+  const [state, setState] = useState("loading"); // loading | ready | error
+  const [reload, setReload] = useState(0);
+  const [searchText, setSearchText] = useState(query);
+  const [toast, setToast] = useState(null);
+
+  const update = useCallback((patch, resetPage = true) => {
+    setParams((prev) => {
+      const next = new URLSearchParams(prev);
+      Object.entries(patch).forEach(([k, v]) => (v === "" || v == null ? next.delete(k) : next.set(k, String(v))));
+      if (resetPage && !("page" in patch)) next.delete("page");
+      return next;
+    }, { replace: true });
+  }, [setParams]);
+
+  // Debounced search → URL (300 ms).
+  useEffect(() => {
+    if (searchText === query) return undefined;
+    const id = setTimeout(() => update({ search: searchText.trim() }), 300);
+    return () => clearTimeout(id);
+  }, [searchText]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { setSearchText(query); }, [query]);
+
+  const extraKey = JSON.stringify(extraParams);
+  useEffect(() => {
+    let alive = true;
+    setState("loading");
+    const p = { ...extraParams, page, page_size: pageSize };
+    if (query) p.search = query;
+    if (ordering) p.ordering = ordering;
+    Object.entries(filterValues).forEach(([k, v]) => { if (v !== "") p[k] = v; });
+    projectService.getList(resource, p)
+      .then((data) => { if (!alive) return; const n = normalizeList(data); setRows(n.rows); setCount(n.count); setState("ready"); })
+      .catch((err) => { if (alive) { console.error(`Failed to fetch ${resource}`, err); setState("error"); } });
+    return () => { alive = false; };
+  }, [resource, page, pageSize, query, ordering, filterKey, extraKey, reload]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── select-resource options (every page, not just the first) ───────────────
+  const [options, setOptions] = useState({});
+  useEffect(() => {
+    let alive = true;
+    const selects = fields.filter((f) => f.type === "select-resource" && f.resource);
+    Promise.all(selects.map((f) => fetchAll(f.resource).then((list) => [f.name, list]).catch(() => [f.name, []])))
+      .then((pairs) => { if (alive) setOptions(Object.fromEntries(pairs)); });
+    return () => { alive = false; };
+  }, [resource]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── create / edit modal ───────────────────────────────────────────────────
+  const [editing, setEditing] = useState(null); // null | { item }
+  const [form, setForm] = useState({});
+  const [initialForm, setInitialForm] = useState({});
+  const [errors, setErrors] = useState({});
+  const [saving, setSaving] = useState(false);
+  const isEdit = Boolean(editing?.item);
+  const visibleFields = fields.filter((f) => !f.hidden && (!f.onlyOn || f.onlyOn === (isEdit ? "edit" : "create")));
+
+  const openForm = (item = null) => {
+    if (Editor) { setEditing({ item, custom: true }); return; }
+    const data = {};
+    fields.forEach((f) => {
+      if (item) {
+        let v = item[f.name];
+        if (f.type === "select-resource" && f.multiple && Array.isArray(v)) v = v.map((x) => (x && typeof x === "object" ? x[f.valueAccessor || "id"] : x));
+        if (f.type === "select-resource" && !f.multiple && v && typeof v === "object") v = v[f.valueAccessor || "id"];
+        if (f.type === "password") v = "";
+        data[f.name] = v ?? (f.type === "boolean" ? false : f.multiple ? [] : "");
       } else {
-        setItems([]); setTotalCount(0);
+        data[f.name] = f.defaultValue !== undefined ? f.defaultValue : f.type === "boolean" ? false : f.multiple ? [] : "";
       }
-    } catch (error) {
-      console.error(`Failed to fetch ${resource}`, error);
-      setItems([]); setTotalCount(0);
-    } finally {
-      setLoading(false);
-    }
-  }, [resource, page, pageSize]);
-
-  useEffect(() => { fetchItems(); }, [fetchItems]);
-  useEffect(() => { fetchSelectOptions(); }, [resource]);
-
-  const fetchSelectOptions = async () => {
-    const selectFields = fields.filter((f) => f.type === "select-resource");
-    const options = {};
-    await Promise.all(selectFields.map(async (field) => {
-      try {
-        if (field.resource) {
-          const data = await projectService.getList(field.resource);
-          options[field.name] = Array.isArray(data) ? data : (data?.results || []);
-        }
-      } catch { options[field.name] = []; }
-    }));
-    setSelectOptions(options);
+    });
+    setForm(data); setInitialForm(data); setErrors({}); setEditing({ item });
   };
 
-  const handleOpenDialog = (item = null) => {
-    setCurrentItem(item);
-    if (item) {
-      const initialData = { ...item };
-      fields.forEach(f => {
-        if (f.type === "select-resource" && f.multiple && Array.isArray(initialData[f.name])) {
-          initialData[f.name] = initialData[f.name].map(val =>
-            (typeof val === "object" && val !== null) ? val[f.valueAccessor || "id"] : val
-          );
-        }
-      });
-      setFormData(initialData);
-    } else {
-      const initial = {};
+  const validate = () => {
+    const errs = {};
+    visibleFields.forEach((f) => {
+      if (isEdit && f.excludeOnUpdate) return;
+      const needed = f.required || (!isEdit && f.requiredOnCreate);
+      const v = form[f.name];
+      if (needed && (v === "" || v == null || (Array.isArray(v) && !v.length))) errs[f.name] = t("admin.form.required");
+      if (f.type === "email" && v && !/^\S+@\S+\.\S+$/.test(v)) errs[f.name] = t("admin.form.invalidEmail");
+    });
+    return errs;
+  };
+
+  const save = async () => {
+    const errs = validate();
+    setErrors(errs);
+    if (Object.keys(errs).length) return;
+    setSaving(true);
+    try {
+      const payload = {};
       fields.forEach((f) => {
-        if (f.defaultValue !== undefined) initial[f.name] = f.defaultValue;
-        else if (f.type === "boolean") initial[f.name] = false;
-        else if (f.multiple) initial[f.name] = [];
-        else initial[f.name] = "";
+        if (!(f.name in form)) return;
+        if (isEdit && f.excludeOnUpdate) return;
+        if (f.type === "password" && !form[f.name]) return; // blank = keep
+        payload[f.name] = form[f.name];
       });
-      setFormData(initial);
+      if (isEdit) await projectService.updateItem(resource, editing.item.id, payload);
+      else await projectService.createItem(resource, payload);
+      setEditing(null);
+      setToast({ type: "ok", text: isEdit ? t("admin.toast.saved") : t("admin.toast.created") });
+      setReload((n) => n + 1);
+    } catch (err) {
+      const fe = fieldErrors(errBody(err));
+      setErrors(Object.keys(fe).length ? fe : { _: t("admin.toast.error") });
+      setToast({ type: "error", text: t("admin.toast.error") });
+    } finally {
+      setSaving(false);
     }
-    setOpenDialog(true);
   };
 
-  const handleSave = async () => {
+  // ── delete ────────────────────────────────────────────────────────────────
+  const [deleting, setDeleting] = useState(null);
+  const doDelete = async () => {
     try {
-      if (currentItem) {
-        const updatePayload = {};
-        Object.keys(formData).forEach(key => {
-          const fieldConfig = fields.find(f => f.name === key);
-          if (!fieldConfig || !fieldConfig.excludeOnUpdate) updatePayload[key] = formData[key];
-        });
-        await projectService.updateItem(resource, currentItem.id, updatePayload);
-      } else {
-        await projectService.createItem(resource, formData);
-      }
-      setOpenDialog(false);
-      fetchItems();
-    } catch (error) {
-      console.error("Failed to save item", error);
-      let msg = error.detail || error.message || JSON.stringify(error);
-      if (error.response?.data) msg = JSON.stringify(error.response.data);
-      alert(`Error saving item: ${msg}`);
+      await projectService.deleteItem(resource, deleting.id);
+      setDeleting(null);
+      setToast({ type: "ok", text: t("admin.toast.deleted") });
+      setReload((n) => n + 1);
+    } catch (err) {
+      const body = errBody(err);
+      throw { detail: body?.detail || t("admin.toast.error") };
     }
   };
 
-  const handleDelete = async () => {
-    try {
-      if (currentItem) {
-        await projectService.deleteItem(resource, currentItem.id);
-        setOpenDeleteDialog(false);
-        fetchItems();
-      }
-    } catch (error) {
-      console.error("Failed to delete item", error);
-    }
+  const dirty = JSON.stringify(form) !== JSON.stringify(initialForm);
+  const hasFilters = Boolean(query || Object.values(filterValues).some(Boolean));
+  const clearFilters = () => { setSearchText(""); update({ search: "", ...Object.fromEntries(filters.map((f) => [f.name, ""])) }); };
+
+  const sortIcon = (key) => {
+    if (ordering === key) return <ChevronUpIcon className="h-3.5 w-3.5" />;
+    if (ordering === `-${key}`) return <ChevronDownIcon className="h-3.5 w-3.5" />;
+    return <ChevronUpDownIcon className="h-3.5 w-3.5 opacity-40" />;
   };
+  const toggleSort = (key) => update({ ordering: ordering === key ? `-${key}` : ordering === `-${key}` ? "" : key });
+  const cellOf = (item, col) => (col.cell ? col.cell(item) : renderValue(typeof col.accessor === "function" ? col.accessor(item) : item[col.accessor]));
+  const reasonOf = (fn, item) => { if (!fn) return true; const r = fn(item); return r === true || r === undefined ? true : r; };
 
-  const handleChange = (name, value) => setFormData((prev) => ({ ...prev, [name]: value }));
-  const getCellValue = (item, accessor) => typeof accessor === "function" ? accessor(item) : item[accessor];
-
-  const renderField = (field) => {
-    if (field.type === "select-resource") {
-      const opts = selectOptions[field.name] || [];
-      const labelKey = field.labelAccessor || "name";
-      const valueKey = field.valueAccessor || "id";
-
-      if (field.multiple) {
-        return (
-          <div key={field.name} style={{ border: "1px solid var(--lt-rgba-255-255-255-0-08, rgba(255,255,255,0.08))", borderRadius: 10, padding: "10px 12px" }}>
-            <label style={LBL}>{field.label}</label>
-            <div style={{ maxHeight: 160, overflowY: "auto", display: "flex", flexDirection: "column", gap: 6 }}>
-              {opts.map(opt => {
-                const val = opt[valueKey];
-                const currentVals = Array.isArray(formData[field.name]) ? formData[field.name] : [];
-                const isChecked = currentVals.some(v => String(v) === String(val));
-                return (
-                  <label key={val} style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
-                    <input type="checkbox" checked={isChecked}
-                      onChange={(e) => {
-                        const newVals = e.target.checked ? [...currentVals, val] : currentVals.filter(v => String(v) !== String(val));
-                        handleChange(field.name, newVals);
-                      }}
-                      style={{ width: 14, height: 14, accentColor: "#6366F1", cursor: "pointer" }} />
-                    <span style={{ fontSize: 12, color: "var(--lt-94a3b8, #94A3B8)" }}>
-                      {typeof labelKey === "function" ? labelKey(opt) : (opt[labelKey] || opt.title || opt.email || "Unknown")}
-                    </span>
-                  </label>
-                );
-              })}
-            </div>
-          </div>
-        );
-      }
-
-      return (
-        <div key={field.name}>
-          <label style={LBL}>{field.label}</label>
-          <select style={SELECT_S} value={String(formData[field.name] || "")} onChange={(e) => handleChange(field.name, e.target.value)}
-            onFocus={focusIn} onBlur={focusOut}>
-            <option value="" style={{ background: "var(--lt-0f172a, #0F172A)" }}>{t("global.crud.select")} {field.label}</option>
-            {opts.map(opt => (
-              <option key={opt[valueKey]} value={String(opt[valueKey])} style={{ background: "var(--lt-0f172a, #0F172A)", color: "var(--lt-f1f5f9, #F1F5F9)" }}>
-                {typeof labelKey === "function" ? labelKey(opt) : (opt[labelKey] || opt.title || opt.email || "Unknown")}
-              </option>
-            ))}
-          </select>
-        </div>
-      );
-    }
-
-    if (field.type === "select") {
-      return (
-        <div key={field.name}>
-          <label style={LBL}>{field.label}</label>
-          <select style={SELECT_S} value={String(formData[field.name] || "")} onChange={(e) => handleChange(field.name, e.target.value)}
-            onFocus={focusIn} onBlur={focusOut}>
-            <option value="" style={{ background: "var(--lt-0f172a, #0F172A)" }}>{t("global.crud.select")} {field.label}</option>
-            {(field.options || []).map(opt => (
-              <option key={opt.value} value={String(opt.value)} style={{ background: "var(--lt-0f172a, #0F172A)", color: "var(--lt-f1f5f9, #F1F5F9)" }}>{opt.label}</option>
-            ))}
-          </select>
-        </div>
-      );
-    }
-
-    if (field.type === "textarea") {
-      return (
-        <div key={field.name}>
-          <label style={LBL}>{field.label}</label>
-          <textarea style={TEXTAREA} value={formData[field.name] || ""} onChange={(e) => handleChange(field.name, e.target.value)}
-            onFocus={focusIn} onBlur={focusOut} />
-        </div>
-      );
-    }
-
-    if (field.type === "boolean") {
-      return (
-        <label key={field.name} style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}>
-          <input type="checkbox" checked={!!formData[field.name]} onChange={(e) => handleChange(field.name, e.target.checked)}
-            style={{ width: 16, height: 16, accentColor: "#6366F1", cursor: "pointer" }} />
-          <span style={{ fontSize: 13, color: "var(--lt-94a3b8, #94A3B8)", fontWeight: 600 }}>{field.label}</span>
-        </label>
-      );
-    }
-
+  const renderActions = (item) => {
+    const editOk = reasonOf(canEdit, item);
+    const delOk = reasonOf(canDelete, item);
     return (
-      <div key={field.name}>
-        <label style={LBL}>{field.label}</label>
-        <input type={field.type || "text"} style={INPUT} value={formData[field.name] || ""} onChange={(e) => handleChange(field.name, e.target.value)}
-          onFocus={focusIn} onBlur={focusOut} />
+      <div className="flex items-center justify-end gap-1">
+        {extraActions && extraActions(item)}
+        {!disableEdit && (
+          <button type="button" onClick={(e) => { e.stopPropagation(); openForm(item); }} disabled={editOk !== true}
+            aria-label={t("admin.table.edit")} title={editOk === true ? t("admin.table.edit") : editOk} className={ICON_BTN}>
+            <PencilSquareIcon className="h-4 w-4" />
+          </button>
+        )}
+        {!disableDelete && (
+          <button type="button" onClick={(e) => { e.stopPropagation(); setDeleting(item); }} disabled={delOk !== true}
+            aria-label={t("admin.table.delete")} title={delOk === true ? t("admin.table.delete") : delOk}
+            className={`${ICON_BTN} hover:!bg-[#FFF1F2] hover:!text-[#BE123C]`}>
+            <TrashIcon className="h-4 w-4" />
+          </button>
+        )}
       </div>
     );
   };
 
+  const renderField = (f) => {
+    const id = `f-${f.name}`;
+    const err = errors[f.name];
+    const required = f.required || (!isEdit && f.requiredOnCreate);
+    const disabled = isEdit && f.excludeOnUpdate;
+    const set = (v) => { setForm((p) => ({ ...p, [f.name]: v })); if (errors[f.name]) setErrors((p) => ({ ...p, [f.name]: undefined })); };
+    const hint = f.type === "password" && isEdit ? t("admin.form.passwordKeep") : f.hint;
+    let control;
+    if (f.type === "boolean") {
+      return (
+        <label key={f.name} className="flex cursor-pointer items-center gap-3 rounded-lg border border-[#E2E8F0] px-3 py-2.5">
+          <input id={id} type="checkbox" checked={Boolean(form[f.name])} onChange={(e) => set(e.target.checked)} disabled={disabled}
+            className="h-4 w-4 cursor-pointer accent-[#4F46E5]" />
+          <span className="text-sm font-medium text-[#334155]">{f.label}</span>
+          {f.hint && <span className="ml-auto text-xs text-[#64748B]">{f.hint}</span>}
+        </label>
+      );
+    }
+    if (f.type === "select-resource" && f.multiple) {
+      const opts = options[f.name] || [];
+      const vals = Array.isArray(form[f.name]) ? form[f.name].map(String) : [];
+      control = (
+        <div className="max-h-56 overflow-y-auto rounded-lg border border-[#E2E8F0] p-2">
+          {opts.length === 0 && <p className="px-1 py-2 text-sm text-[#64748B]">{t("admin.table.loading")}</p>}
+          {opts.map((o) => {
+            const val = String(o[f.valueAccessor || "id"]);
+            const label = typeof f.labelAccessor === "function" ? f.labelAccessor(o) : (o[f.labelAccessor || "name"] || o.title || o.email || `#${val}`);
+            return (
+              <label key={val} className="flex cursor-pointer items-center gap-2 rounded px-1 py-1.5 text-sm text-[#334155] hover:bg-[#F8FAFC]">
+                <input type="checkbox" className="h-4 w-4 accent-[#4F46E5]" checked={vals.includes(val)}
+                  onChange={(e) => set(e.target.checked ? [...(form[f.name] || []), o[f.valueAccessor || "id"]] : (form[f.name] || []).filter((v) => String(v) !== val))} />
+                <span className="min-w-0 truncate">{label}</span>
+              </label>
+            );
+          })}
+        </div>
+      );
+    } else if (f.type === "select-resource" || f.type === "select") {
+      const opts = f.type === "select" ? (f.options || []).map((o) => ({ value: o.value, label: o.label }))
+        : (options[f.name] || []).map((o) => ({
+          value: o[f.valueAccessor || "id"],
+          label: typeof f.labelAccessor === "function" ? f.labelAccessor(o) : (o[f.labelAccessor || "name"] || o.title || o.email || `#${o.id}`),
+        }));
+      control = (
+        <SelectInput id={id} value={String(form[f.name] ?? "")} onChange={(e) => set(e.target.value)} disabled={disabled} aria-invalid={Boolean(err)}>
+          <option value="">{t("admin.form.select")}</option>
+          {opts.map((o) => <option key={String(o.value)} value={String(o.value)}>{o.label}</option>)}
+        </SelectInput>
+      );
+    } else if (f.type === "textarea") {
+      control = <TextArea id={id} rows={4} value={form[f.name] ?? ""} onChange={(e) => set(e.target.value)} disabled={disabled} placeholder={f.placeholder} aria-invalid={Boolean(err)} />;
+    } else {
+      const type = f.type === "number" ? "number" : f.type === "email" ? "email" : f.type === "password" ? "password" : "text";
+      control = <TextInput id={id} type={type} value={form[f.name] ?? ""} onChange={(e) => set(e.target.value)} disabled={disabled}
+        placeholder={f.placeholder} autoComplete={f.type === "password" ? "new-password" : "off"} aria-invalid={Boolean(err)}
+        className={disabled ? "cursor-not-allowed !bg-[#F8FAFC] !text-[#64748B]" : ""} />;
+    }
+    return (
+      <div key={f.name}>
+        <label htmlFor={id} className="mb-1.5 block text-sm font-medium text-[#334155]">
+          {f.label}{required && <span className="text-[#E11D48]"> *</span>}
+        </label>
+        {control}
+        {err ? <p className="mt-1 text-xs text-[#BE123C]">{err}</p> : hint ? <p className="mt-1 text-xs text-[#64748B]">{hint}</p> : null}
+      </div>
+    );
+  };
+
+  const confirm = deleting ? (deleteConfirm ? deleteConfirm(deleting) : {}) : null;
+
   return (
-    <div className="mt-2 md:mt-12" style={{ display: "flex", flexDirection: "column" }}>
-
-      {/* ── Main Table Card ── */}
-      <div style={{ background: "var(--lt-0f172a, #0F172A)", border: "1px solid var(--lt-rgba-255-255-255-0-08, rgba(255,255,255,0.08))", borderRadius: 20, overflow: "hidden", boxShadow: "0 4px 24px var(--lt-rgba-0-0-0-0-4, rgba(0,0,0,0.4))" }}>
-
-        {/* Accent strip */}
-        <div style={{ height: 3, background: "linear-gradient(90deg, #6366F1, #818CF8, #A78BFA)" }} />
-
-        {/* Header */}
-        <div className="px-4 py-3.5 md:px-6 md:py-[18px]" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, borderBottom: "1px solid var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))" }}>
-          <p style={{ fontSize: 15, fontWeight: 800, color: "var(--lt-f1f5f9, #F1F5F9)", letterSpacing: "-0.01em" }}>{title}</p>
+    <div className="mx-auto w-full max-w-7xl space-y-5 md:py-2">
+      <PageHeader title={title} subtitle={subtitle}
+        actions={<>
+          {headerActions}
           {!disableCreate && (
-            <button onClick={() => handleOpenDialog()}
-              style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "8px 16px", borderRadius: 10, background: "linear-gradient(135deg, #6366F1, #818CF8)", color: "#fff", fontSize: 12, fontWeight: 700, border: "none", cursor: "pointer", boxShadow: "0 2px 12px rgba(99,102,241,0.35), inset 0 1px 0 var(--lt-rgba-255-255-255-0-15, rgba(255,255,255,0.15))", transition: "all 0.15s" }}
-              onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 6px 20px rgba(99,102,241,0.5), inset 0 1px 0 rgba(255,255,255,0.15)"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = "0 2px 12px rgba(99,102,241,0.35), inset 0 1px 0 rgba(255,255,255,0.15)"; }}>
-              <PlusIcon style={{ width: 14, height: 14 }} />
-              {t("global.crud.add_new")}
+            <button type="button" onClick={() => openForm()} className={BTN_PRIMARY}>
+              <PlusIcon className="h-4 w-4" /> {createTitle || t("admin.table.create")}
             </button>
           )}
-        </div>
+        </>} />
 
-        {/* Mobile: one card per record (the table below is for md and up) */}
-        <div className="md:hidden">
-          {loading && (
-            <div style={{ padding: "40px 0", display: "flex", alignItems: "center", justifyContent: "center", gap: 12 }}>
-              <Spin size={20} />
-              <span style={{ fontSize: 12, color: "var(--text-tertiary)" }}>Cargando...</span>
-            </div>
-          )}
-          {!loading && items.length === 0 && (
-            <p style={{ padding: "40px 16px", textAlign: "center", fontSize: 13, color: "var(--text-tertiary)" }}>{t("global.crud.no_items")}</p>
-          )}
-          {!loading && items.length > 0 && (
-            <ul className="divide-y divide-[#F1F5F9]">
-              {items.map((item, key) => {
-                const [first, ...rest] = columns;
-                return (
-                  <li key={item.id || key} className="px-4 py-3.5">
-                    <p className="truncate text-sm font-semibold text-[#0F172A]">{first ? getCellValue(item, first.accessor) : ""}</p>
-                    {rest.length > 0 && (
-                      <dl className="mt-2 grid grid-cols-[auto,1fr] gap-x-3 gap-y-1.5 text-xs">
-                        {rest.map((col) => (
-                          <React.Fragment key={col.header}>
-                            <dt className="whitespace-nowrap font-medium uppercase tracking-wide text-[10px] leading-5 text-[#64748B]">{col.header}</dt>
-                            <dd className="min-w-0 break-words leading-5 text-[#334155]">{getCellValue(item, col.accessor)}</dd>
-                          </React.Fragment>
-                        ))}
-                      </dl>
-                    )}
-                    <div className="mt-3 flex items-center justify-end gap-2">
-                      <button onClick={() => handleOpenDialog(item)} aria-label="Edit"
-                        className="grid h-10 w-10 place-items-center rounded-lg border border-[#E2E8F0] bg-white text-[#475569] active:bg-[#F1F5F9]">
-                        <PencilIcon style={{ width: 16, height: 16 }} />
-                      </button>
-                      {extraActions && extraActions(item)}
-                      <button onClick={() => { setCurrentItem(item); setOpenDeleteDialog(true); }} aria-label="Delete"
-                        className="grid h-10 w-10 place-items-center rounded-lg border border-[#FECACA] bg-white text-[#DC2626] active:bg-[#FEF2F2]">
-                        <TrashIcon style={{ width: 16, height: 16 }} />
-                      </button>
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-        </div>
-
-        {/* Table */}
-        <div className="hidden md:block" style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 640 }}>
-            <thead>
-              <tr style={{ borderBottom: "1px solid var(--lt-rgba-255-255-255-0-06, rgba(255,255,255,0.06))" }}>
-                {columns.map((col) => (
-                  <th key={col.header} style={{ padding: "10px 20px", textAlign: "left", fontSize: 10, fontWeight: 700, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.07em", whiteSpace: "nowrap" }}>
-                    {col.header}
-                  </th>
-                ))}
-                <th style={{ padding: "10px 20px", textAlign: "left", fontSize: 10, fontWeight: 700, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.07em" }}>
-                  {t("global.crud.actions")}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading && (
-                <tr>
-                  <td colSpan={columns.length + 1} style={{ padding: "48px 0", textAlign: "center" }}>
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12 }}>
-                      <Spin size={20} />
-                      <span style={{ fontSize: 12, color: "var(--lt-475569, #475569)" }}>Cargando...</span>
-                    </div>
-                  </td>
-                </tr>
-              )}
-
-              {!loading && items.map((item, key) => (
-                <tr key={item.id || key}
-                  style={{ borderBottom: key < items.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none", transition: "background 0.1s" }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.02)"}
-                  onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}>
-                  {columns.map((col) => (
-                    <td key={col.header} style={{ padding: "12px 20px", fontSize: 12, fontWeight: 600, color: "var(--lt-94a3b8, #94A3B8)", maxWidth: 220, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                      {getCellValue(item, col.accessor)}
-                    </td>
-                  ))}
-                  <td style={{ padding: "12px 20px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                      <button onClick={() => handleOpenDialog(item)}
-                        title="Edit"
-                        style={{ width: 30, height: 30, borderRadius: 8, background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#64748B", transition: "all 0.15s" }}
-                        onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(99,102,241,0.15)"; e.currentTarget.style.color = "#818CF8"; }}
-                        onMouseLeave={(e) => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "#64748B"; }}>
-                        <PencilIcon style={{ width: 14, height: 14 }} />
-                      </button>
-                      {extraActions && extraActions(item)}
-                      <button onClick={() => { setCurrentItem(item); setOpenDeleteDialog(true); }}
-                        title="Delete"
-                        style={{ width: 30, height: 30, borderRadius: 8, background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#64748B", transition: "all 0.15s" }}
-                        onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(239,68,68,0.12)"; e.currentTarget.style.color = "#F87171"; }}
-                        onMouseLeave={(e) => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "#64748B"; }}>
-                        <TrashIcon style={{ width: 14, height: 14 }} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-
-              {!loading && items.length === 0 && (
-                <tr>
-                  <td colSpan={columns.length + 1} style={{ padding: "48px 0", textAlign: "center", fontSize: 13, color: "var(--lt-475569, #475569)" }}>
-                    {t("global.crud.no_items")}
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* ── Pagination ── */}
-      {/* bottom-14 on mobile clears the fixed MobileTabBar (56px, z-[9000]) below
-          md; left-0 there too since the sidebar is off-canvas on mobile. */}
-      <div className="fixed bottom-14 right-0 left-0 md:bottom-0 md:left-[var(--sidebar-w)] px-4 py-2.5 md:pr-[88px] md:pl-8 md:py-2.5"
-        style={{ zIndex: 30, background: "var(--lt-footer, rgba(6,13,26,0.92))", backdropFilter: "blur(12px)", borderTop: "1px solid var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))", transition: "left 0.3s" }}>
-        <AppPagination
-          page={page} pageSize={pageSize} totalCount={totalCount}
-          onPageChange={(p) => setPage(p)}
-          onPageSizeChange={(s) => { setPageSize(Number(s)); setPage(1); }}
-          disabled={loading}
-        />
-      </div>
-
-      {/* ── Edit / Create Modal ── */}
-      {openDialog && (
-        <div style={{ position: "fixed", inset: 0, zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: 16, background: "var(--lt-rgba-0-0-0-0-78, rgba(0,0,0,0.78))", backdropFilter: "blur(5px)" }}
-          onClick={() => setOpenDialog(false)}>
-          <div style={{ background: "var(--lt-0f172a, #0F172A)", border: "1px solid var(--lt-rgba-255-255-255-0-1, rgba(255,255,255,0.1))", borderRadius: 20, width: "100%", maxWidth: 500, boxShadow: "0 40px 100px var(--lt-rgba-0-0-0-0-7, rgba(0,0,0,0.7))", overflow: "hidden", maxHeight: "90vh", display: "flex", flexDirection: "column" }}
-            onClick={(e) => e.stopPropagation()}>
-            <div style={{ height: 3, background: "linear-gradient(90deg, #6366F1, #818CF8, #A78BFA)", flexShrink: 0 }} />
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "18px 22px", borderBottom: "1px solid var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))", flexShrink: 0 }}>
-              <p style={{ fontSize: 14, fontWeight: 800, color: "var(--lt-f1f5f9, #F1F5F9)" }}>
-                {currentItem ? (editTitle || t("global.crud.edit_item")) : (createTitle || t("global.crud.create_item"))}
-              </p>
-              <button onClick={() => setOpenDialog(false)}
-                style={{ background: "none", border: "none", cursor: "pointer", color: "var(--lt-475569, #475569)", padding: 4, borderRadius: 6, display: "flex", transition: "color 0.15s" }}
-                onMouseEnter={(e) => e.currentTarget.style.color = "#94A3B8"}
-                onMouseLeave={(e) => e.currentTarget.style.color = "#475569"}>
-                <XMarkIcon style={{ width: 18, height: 18 }} />
-              </button>
-            </div>
-            <div style={{ flex: 1, overflowY: "auto", padding: "18px 22px", display: "flex", flexDirection: "column", gap: 14 }}>
-              {fields.map(renderField)}
-            </div>
-            <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, padding: "14px 22px", borderTop: "1px solid var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))", flexShrink: 0 }}>
-              <button onClick={() => setOpenDialog(false)}
-                style={{ padding: "9px 18px", borderRadius: 10, background: "var(--lt-rgba-255-255-255-0-04, rgba(255,255,255,0.04))", border: "1px solid var(--lt-rgba-255-255-255-0-08, rgba(255,255,255,0.08))", color: "#64748B", fontSize: 13, fontWeight: 600, cursor: "pointer", transition: "all 0.15s" }}
-                onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.07)"; e.currentTarget.style.color = "#94A3B8"; }}
-                onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.04)"; e.currentTarget.style.color = "#64748B"; }}>
-                {t("global.crud.cancel")}
-              </button>
-              <button onClick={handleSave}
-                style={{ padding: "9px 20px", borderRadius: 10, background: "linear-gradient(135deg, #6366F1, #818CF8)", color: "#fff", fontSize: 13, fontWeight: 700, border: "none", cursor: "pointer", boxShadow: "0 2px 12px rgba(99,102,241,0.35), inset 0 1px 0 var(--lt-rgba-255-255-255-0-15, rgba(255,255,255,0.15))", transition: "all 0.15s" }}
-                onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 6px 20px rgba(99,102,241,0.5)"; }}
-                onMouseLeave={(e) => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = "0 2px 12px rgba(99,102,241,0.35), inset 0 1px 0 rgba(255,255,255,0.15)"; }}>
-                {t("global.crud.save")}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── Delete Confirm Modal ── */}
-      {openDeleteDialog && (
-        <div style={{ position: "fixed", inset: 0, zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: 16, background: "var(--lt-rgba-0-0-0-0-78, rgba(0,0,0,0.78))", backdropFilter: "blur(5px)" }}
-          onClick={() => setOpenDeleteDialog(false)}>
-          <div style={{ background: "var(--lt-0f172a, #0F172A)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 20, width: "100%", maxWidth: 420, boxShadow: "0 40px 100px var(--lt-rgba-0-0-0-0-7, rgba(0,0,0,0.7))", overflow: "hidden" }}
-            onClick={(e) => e.stopPropagation()}>
-            <div style={{ height: 3, background: "linear-gradient(90deg, #EF4444, #F87171)" }} />
-            <div style={{ padding: "22px 24px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14 }}>
-                <div style={{ width: 38, height: 38, borderRadius: 10, background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                  <TrashIcon style={{ width: 18, height: 18, color: "var(--lt-f87171, #F87171)" }} />
-                </div>
-                <p style={{ fontSize: 15, fontWeight: 800, color: "var(--lt-f1f5f9, #F1F5F9)" }}>{t("global.crud.delete_title")}</p>
+      <Card>
+        {(searchable || filters.length > 0) && (
+          <div className="flex flex-col gap-2 border-b border-[#F1F5F9] p-3 sm:flex-row sm:flex-wrap sm:items-center sm:p-4">
+            {searchable && (
+              <div className="relative min-w-0 flex-1 sm:max-w-sm">
+                <MagnifyingGlassIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#94A3B8]" />
+                <TextInput type="search" value={searchText} onChange={(e) => setSearchText(e.target.value)}
+                  placeholder={searchPlaceholder || t("admin.table.search")} aria-label={searchPlaceholder || t("admin.table.search")} className="pl-9" />
               </div>
-              <p style={{ fontSize: 13, color: "var(--lt-94a3b8, #94A3B8)", lineHeight: 1.6 }}>{t("global.crud.delete_message")}</p>
-            </div>
-            <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, padding: "12px 24px 20px", borderTop: "1px solid var(--lt-rgba-255-255-255-0-07, rgba(255,255,255,0.07))" }}>
-              <button onClick={() => setOpenDeleteDialog(false)}
-                style={{ padding: "9px 18px", borderRadius: 10, background: "var(--lt-rgba-255-255-255-0-04, rgba(255,255,255,0.04))", border: "1px solid var(--lt-rgba-255-255-255-0-08, rgba(255,255,255,0.08))", color: "#64748B", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
-                {t("global.crud.cancel")}
+            )}
+            {filters.map((f) => (
+              <SelectInput key={f.name} value={filterValues[f.name]} onChange={(e) => update({ [f.name]: e.target.value })}
+                aria-label={f.label} className="sm:w-48">
+                <option value="">{f.label}: {t("admin.table.all")}</option>
+                {f.options.map((o) => <option key={String(o.value)} value={String(o.value)}>{o.label}</option>)}
+              </SelectInput>
+            ))}
+            {hasFilters && (
+              <button type="button" onClick={clearFilters} className={`${BTN_SECONDARY} !h-10`}>
+                <XMarkIcon className="h-4 w-4" /> {t("admin.table.clear")}
               </button>
-              <button onClick={handleDelete}
-                style={{ padding: "9px 20px", borderRadius: 10, background: "linear-gradient(135deg, #EF4444, #F87171)", color: "#fff", fontSize: 13, fontWeight: 700, border: "none", cursor: "pointer", boxShadow: "0 2px 12px rgba(239,68,68,0.35)" }}>
-                {t("global.crud.delete")}
-              </button>
-            </div>
+            )}
           </div>
-        </div>
+        )}
+
+        {state === "loading" ? (
+          <SkeletonRows rows={Math.min(pageSize, 6)} height="h-11" />
+        ) : state === "error" ? (
+          <EmptyBlock icon={ExclamationCircleIcon} title={t("admin.table.errorTitle")} hint={t("admin.table.errorHint")}
+            action={<button type="button" onClick={() => setReload((n) => n + 1)} className={BTN_SECONDARY}><ArrowPathIcon className="h-4 w-4" /> {t("admin.table.retry")}</button>} />
+        ) : rows.length === 0 ? (
+          <EmptyBlock icon={MagnifyingGlassIcon} title={t("admin.table.empty")} hint={hasFilters ? t("admin.table.emptyFiltered") : undefined}
+            action={hasFilters ? <button type="button" onClick={clearFilters} className={BTN_SECONDARY}>{t("admin.table.clear")}</button> : undefined} />
+        ) : (
+          <>
+            {/* Desktop table */}
+            <div className="hidden overflow-x-auto md:block">
+              <table className="w-full text-left text-sm">
+                <thead>
+                  <tr className="border-b border-[#F1F5F9] text-xs font-medium uppercase tracking-wide text-[#64748B]">
+                    {columns.map((c, i) => (
+                      <th key={i} scope="col" className={`whitespace-nowrap px-4 py-3 ${c.className || ""}`}
+                        aria-sort={c.sortKey ? (ordering === c.sortKey ? "ascending" : ordering === `-${c.sortKey}` ? "descending" : "none") : undefined}>
+                        {c.sortKey ? (
+                          <button type="button" onClick={() => toggleSort(c.sortKey)} className={`inline-flex cursor-pointer items-center gap-1 uppercase hover:text-[#0F172A] ${FOCUS}`}>
+                            {c.header} {sortIcon(c.sortKey)}
+                          </button>
+                        ) : c.header}
+                      </th>
+                    ))}
+                    <th scope="col" className="sticky right-0 bg-white px-4 py-3 text-right">{t("admin.table.actions")}</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#F1F5F9]">
+                  {rows.map((item) => (
+                    <tr key={item.id} onClick={onRowClick ? () => onRowClick(item) : undefined}
+                      className={`group text-[#334155] hover:bg-[#F8FAFC] ${onRowClick ? "cursor-pointer" : ""}`}>
+                      {columns.map((c, i) => <td key={i} className={`max-w-[280px] px-4 py-3 align-middle ${c.className || ""}`}>{cellOf(item, c)}</td>)}
+                      <td className="sticky right-0 bg-white px-3 py-2 group-hover:bg-[#F8FAFC]">{renderActions(item)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Phone cards: only fields with a value */}
+            <ul className="divide-y divide-[#F1F5F9] md:hidden">
+              {rows.map((item) => (
+                <li key={item.id} className="p-4" onClick={onRowClick ? () => onRowClick(item) : undefined}>
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0 font-medium text-[#0F172A]">{cellOf(item, columns[0])}</div>
+                    {renderActions(item)}
+                  </div>
+                  <dl className="mt-2 space-y-1.5 text-sm">
+                    {columns.slice(1).map((c, i) => {
+                      const raw = typeof c.accessor === "function" ? c.accessor(item) : item[c.accessor];
+                      if (!c.cell && (raw === null || raw === undefined || raw === "")) return null;
+                      return (
+                        <div key={i} className="flex justify-between gap-3">
+                          <dt className="shrink-0 text-[#64748B]">{c.header}</dt>
+                          <dd className="min-w-0 truncate text-right text-[#334155]">{cellOf(item, c)}</dd>
+                        </div>
+                      );
+                    })}
+                  </dl>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+
+        {state === "ready" && count > 0 && (
+          <div className="border-t border-[#F1F5F9] px-3 py-3 sm:px-4">
+            <AppPagination page={page} pageSize={pageSize} totalCount={count}
+              onPageChange={(p) => update({ page: p }, false)} onPageSizeChange={(s) => update({ page_size: s })} />
+          </div>
+        )}
+      </Card>
+
+      {editing?.custom && (
+        <Editor item={editing.item} onClose={() => setEditing(null)}
+          onSaved={(text) => { setEditing(null); setToast({ type: "ok", text: text || t("admin.toast.saved") }); setReload((n) => n + 1); }} />
       )}
+
+      {editing && !editing.custom && (
+        <AdminModal title={isEdit ? (editTitle || t("admin.modal.editTitle")) : (createTitle || t("admin.modal.createTitle"))}
+          onClose={() => setEditing(null)} dirty={dirty}
+          footer={<>
+            <button type="button" onClick={() => setEditing(null)} disabled={saving} className={BTN_SECONDARY}>{t("admin.modal.cancel")}</button>
+            <button type="button" onClick={save} disabled={saving} className={BTN_PRIMARY}>
+              {saving && <Spinner className="!h-4 !w-4 border-white/40 border-t-white" />}
+              {t("admin.modal.save")}
+            </button>
+          </>}>
+          <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); save(); }} noValidate>
+            {errors._ && <p role="alert" className="rounded-lg border border-[#FECDD3] bg-[#FFF1F2] px-3 py-2 text-sm text-[#BE123C]">{errors._}</p>}
+            {visibleFields.map(renderField)}
+            <button type="submit" hidden aria-hidden="true" tabIndex={-1} />
+          </form>
+        </AdminModal>
+      )}
+
+      {deleting && (
+        <ConfirmDialog entityName={confirm.entityName || entityLabel(deleting, deleting.id)} consequences={confirm.consequences}
+          confirmText={confirm.confirmText} onConfirm={doDelete} onClose={() => setDeleting(null)} />
+      )}
+
+      <Toast toast={toast} onDone={() => setToast(null)} />
     </div>
   );
 }
