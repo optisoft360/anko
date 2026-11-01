@@ -200,19 +200,21 @@ export function DashboardNavbar({ hideMenu = { mobile: false, desktop: false } }
                   const isLast = index === pathParts.length - 1;
                   const name = getBreadcrumbName(part, index);
                   const layout = pathParts[0];
+                  // Company and project names are shown exactly as stored (the trail is capitalized).
+                  const asStored = index === 2 && (companyCrumb || pathParts[1] === "project") ? " normal-case" : "";
                   if (!isLast) {
                     let path = "/" + pathParts.slice(0, index + 1).join("/");
                     if (part === "project" && index === 1) path = `/${layout}/projects`;
                     return (
                       <Link key={path} to={path}>
-                        <Typography variant="small" className="font-medium text-[var(--text-secondary)] transition-all hover:text-[var(--accent)]">
+                        <Typography variant="small" className={`font-medium text-[var(--text-secondary)] transition-all hover:text-[var(--accent)]${asStored}`}>
                           {name}
                         </Typography>
                       </Link>
                     );
                   }
                   return (
-                    <Typography key={index} variant="small" className="font-semibold text-[var(--text-primary)]">
+                    <Typography key={index} variant="small" className={`font-semibold text-[var(--text-primary)]${asStored}`}>
                       {name}
                     </Typography>
                   );

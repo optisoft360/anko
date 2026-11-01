@@ -2901,7 +2901,7 @@ export const en = {
                 searchPlaceholder: "Search company...",
                 noneFound: "No companies found",
                 noneRegistered: "No companies registered",
-                activeInDashboard: "Active company in the Enterprise Dashboard",
+                activeInDashboard: "Current company context (Enterprise area)",
                 operateAsCompany: "Operate as this company",
                 userCount: { one: "{count} user", other: "{count} users" },
                 activeBadge: "Active",

@@ -2902,7 +2902,7 @@ export const es = {
                 searchPlaceholder: "Buscar empresa...",
                 noneFound: "No se encontraron empresas",
                 noneRegistered: "No hay empresas registradas",
-                activeInDashboard: "Empresa activa en el Dashboard de Enterprise",
+                activeInDashboard: "Contexto de empresa actual (área Enterprise)",
                 operateAsCompany: "Operar como esta empresa",
                 userCount: { one: "{count} usuario", other: "{count} usuarios" },
                 activeBadge: "Activa",
