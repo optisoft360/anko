@@ -128,7 +128,8 @@ function RoleEditor({ item, onClose, onSaved }) {
             <h3 className="text-sm font-semibold text-[#0F172A]">{k("permissions")}</h3>
             <div className="relative sm:w-64">
               <MagnifyingGlassIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#94A3B8]" />
-              <TextInput type="search" value={filter} onChange={(e) => setFilter(e.target.value)} placeholder={k("filter")} aria-label={k("filter")} className="pl-9" />
+              <TextInput type="search" value={filter} onChange={(e) => setFilter(e.target.value)} placeholder={k("filter")} aria-label={k("filter")} className="pl-9"
+                onKeyDown={(e) => { if (e.key === "Escape" && filter) { e.stopPropagation(); e.nativeEvent.stopImmediatePropagation?.(); setFilter(""); } }} />
             </div>
           </div>
 

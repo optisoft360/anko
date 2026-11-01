@@ -18,20 +18,33 @@ export function AdminModal({ title, subtitle, onClose, children, footer, width =
   const panel = useRef(null);
   const restore = useRef(null);
 
+  // Refs so the document listener always sees the current values.
+  const state = useRef({ dirty, onClose });
+  state.current = { dirty, onClose };
   const requestClose = () => {
-    if (dirty && !window.confirm(t("admin.modal.discard"))) return;
-    onClose();
+    if (state.current.dirty && !window.confirm(t("admin.modal.discard"))) return;
+    state.current.onClose();
   };
 
   useEffect(() => {
     restore.current = document.activeElement;
-    const first = panel.current?.querySelector("input, select, textarea") || panel.current?.querySelector(FOCUSABLE);
-    first?.focus();
-    return () => { if (restore.current && restore.current.focus) restore.current.focus(); };
-  }, []);
+    // First *enabled* field: a disabled one (e.g. a system role's name) can't take focus, which left
+    // focus outside the dialog and Escape never reached it.
+    const first = panel.current?.querySelector(
+      "input:not([disabled]):not([type=hidden]), select:not([disabled]), textarea:not([disabled])",
+    ) || panel.current?.querySelector(FOCUSABLE);
+    (first || panel.current)?.focus();
+    // Escape is handled on the document so it works wherever focus is. A field that consumes Escape
+    // (a search box clearing itself) calls stopPropagation and keeps the dialog open.
+    const onDocKey = (e) => { if (e.key === "Escape") requestClose(); };
+    document.addEventListener("keydown", onDocKey);
+    return () => {
+      document.removeEventListener("keydown", onDocKey);
+      if (restore.current && restore.current.focus) restore.current.focus();
+    };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const onKeyDown = (e) => {
-    if (e.key === "Escape") { e.stopPropagation(); requestClose(); return; }
     if (e.key !== "Tab" || !panel.current) return;
     const items = [...panel.current.querySelectorAll(FOCUSABLE)].filter((el) => el.offsetParent !== null);
     if (!items.length) return;
@@ -44,7 +57,7 @@ export function AdminModal({ title, subtitle, onClose, children, footer, width =
   return createPortal(
     <div className="fixed inset-0 z-[10050] flex items-end justify-center bg-[#0F172A]/40 sm:items-center sm:p-6"
       onMouseDown={(e) => { if (e.target === e.currentTarget) requestClose(); }} onKeyDown={onKeyDown}>
-      <div ref={panel} role="dialog" aria-modal="true" aria-labelledby={titleId}
+      <div ref={panel} role="dialog" aria-modal="true" aria-labelledby={titleId} tabIndex={-1}
         className={`flex max-h-[92dvh] w-full ${width} flex-col overflow-hidden rounded-t-2xl bg-white shadow-[0_20px_50px_rgba(15,23,42,0.2)] sm:rounded-xl`}>
         <div className="flex items-start justify-between gap-3 border-b border-[#F1F5F9] px-5 py-4">
           <div className="min-w-0">

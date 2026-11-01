@@ -1,0 +1,52 @@
+import React, { useState } from "react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+
+vi.mock("@/context/language-context", () => ({ useLanguage: () => ({ t: (k) => k, language: "en" }) }));
+const { AdminModal } = await import("./AdminModal.jsx");
+
+function SearchInside({ onClose }) {
+  const [q, setQ] = useState("abc");
+  return (
+    <AdminModal title="Edit role" onClose={onClose}>
+      <input aria-label="name" disabled defaultValue="client" />
+      <input aria-label="filter" value={q} onChange={(e) => setQ(e.target.value)}
+        onKeyDown={(e) => { if (e.key === "Escape" && q) { e.stopPropagation(); setQ(""); } }} />
+    </AdminModal>
+  );
+}
+
+describe("AdminModal", () => {
+  afterEach(cleanup);
+
+  it("closes with Escape even when the first field is disabled (system role)", () => {
+    const onClose = vi.fn();
+    render(<AdminModal title="Edit role" onClose={onClose}><input aria-label="name" disabled /><input aria-label="desc" /></AdminModal>);
+    expect(document.activeElement).toBe(screen.getByLabelText("desc"));
+    fireEvent.keyDown(document.body, { key: "Escape" });
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("asks before closing with unsaved changes", () => {
+    const onClose = vi.fn();
+    const confirm = vi.spyOn(window, "confirm").mockReturnValueOnce(false).mockReturnValueOnce(true);
+    render(<AdminModal title="Edit" onClose={onClose} dirty><input aria-label="x" /></AdminModal>);
+    fireEvent.keyDown(document.body, { key: "Escape" });
+    expect(confirm).toHaveBeenCalledTimes(1);
+    expect(onClose).not.toHaveBeenCalled();
+    fireEvent.keyDown(document.body, { key: "Escape" });
+    expect(onClose).toHaveBeenCalledTimes(1);
+    confirm.mockRestore();
+  });
+
+  it("first Escape in a search box with text clears it, the second closes", () => {
+    const onClose = vi.fn();
+    render(<SearchInside onClose={onClose} />);
+    const filter = screen.getByLabelText("filter");
+    fireEvent.keyDown(filter, { key: "Escape" });
+    expect(filter.value).toBe("");
+    expect(onClose).not.toHaveBeenCalled();
+    fireEvent.keyDown(filter, { key: "Escape" });
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+});
