@@ -4,6 +4,7 @@ import {
   ArrowLeftIcon, UserPlusIcon, EllipsisHorizontalIcon, XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { companyApi } from "../../api/enterpriseApi";
+import { ConfirmDialog } from "@/widgets/admin/ConfirmDialog";
 import { useLanguage } from "../../../context/language-context";
 
 const ROLES = ["owner", "admin", "manager", "trainer", "employee", "auditor"];
@@ -283,8 +284,12 @@ export function PlatformAdminUsers() {
     showToast(t("enterprise.platformAdmin.users.toast.roleUpdated"));
   };
 
-  const handleRemove = async (member) => {
-    if (!window.confirm(t("enterprise.settings.company.members.confirmRemove", { name: member.full_name || member.email }))) return;
+  // Asks through the admin ConfirmDialog (rendered below) instead of the browser's native confirm.
+  const [removing, setRemoving] = useState(null);
+  const handleRemove = (member) => { setMenuOpen(null); setRemoving(member); };
+  const doRemove = async () => {
+    const member = removing;
+    setRemoving(null);
     setActing(true);
     try {
       await companyApi.removeMember(companyId, { membership_id: member.id });
@@ -309,6 +314,11 @@ export function PlatformAdminUsers() {
 
   return (
     <div style={{ width: "100%" }}>
+      {removing && (
+        <ConfirmDialog title={t("admin.pages.companyUsers.removeTitle")} entityName={removing.full_name || removing.email}
+          consequences={t("admin.pages.companyUsers.removeConsequences")} confirmLabel={t("admin.pages.companyUsers.remove")}
+          onConfirm={doRemove} onClose={() => setRemoving(null)} />
+      )}
       {/* Toast */}
       {toast && (
         <div style={{ position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)", zIndex: 60, background: "var(--lt-toast, rgba(15,23,42,0.95))", border: "1px solid var(--lt-rgba-255-255-255-0-1, rgba(255,255,255,0.1))", color: "var(--lt-f1f5f9, #F1F5F9)", fontSize: 13, fontWeight: 600, padding: "12px 22px", borderRadius: 12, backdropFilter: "blur(12px)", boxShadow: "0 8px 32px var(--lt-rgba-0-0-0-0-5, rgba(0,0,0,0.5))", whiteSpace: "nowrap" }}>

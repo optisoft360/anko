@@ -102,10 +102,10 @@ function RoleEditor({ item, onClose, onSaved }) {
 
   return (
     <AdminModal title={isEdit ? k("editTitle") : k("createTitle")} subtitle={isSystem ? k("systemHint") : undefined}
-      onClose={onClose} dirty={dirty} width="max-w-3xl"
+      onClose={onClose} dirty={dirty} width="max-w-3xl" discardMessage={k("discardBody")}
       footer={<>
         <span className="mr-auto self-center text-sm tabular-nums text-[#64748B]">{groups ? k("count", { a: selected.size, b: total }) : ""}</span>
-        <button type="button" onClick={onClose} disabled={saving} className={BTN_SECONDARY}>{t("admin.modal.cancel")}</button>
+        <button type="button" data-modal-cancel onClick={onClose} disabled={saving} className={BTN_SECONDARY}>{t("admin.modal.cancel")}</button>
         <button type="button" onClick={save} disabled={saving || !groups} title={!groups ? k("waitLoad") : undefined} className={BTN_PRIMARY}>
           {saving && <Spinner className="!h-4 !w-4 border-white/40 border-t-white" />}
           {t("admin.modal.save")}

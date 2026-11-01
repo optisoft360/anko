@@ -501,6 +501,7 @@ export const en = {
         visibility: { private: "Private", shared: "Shared", public: "Public" },
         companyRoles: { owner: "Owner", admin: "Admin", manager: "Manager", trainer: "Trainer", employee: "Employee", auditor: "Auditor" },
         pages: {
+            companyUsers: { removeTitle: "Remove from company?", remove: "Remove", removeConsequences: "They lose access to this company. Their account is kept." },
             batteries: {
                 company: "Company",
                 title: "Batteries", subtitle: "Every battery on the platform.", name: "Name", project: "Project", owner: "Owner",
@@ -585,6 +586,7 @@ export const en = {
             errorTitle: "Could not load the data", errorHint: "Check your connection and try again.", retry: "Retry"
         },
         modal: {
+            discardTitle: "Discard changes?", discardBody: "You have unsaved changes.", keepEditing: "Keep editing", discardConfirm: "Discard",
             close: "Close", cancel: "Cancel", save: "Save", editTitle: "Edit", createTitle: "Create",
             discard: "You have unsaved changes. Discard them?"
         },
@@ -597,6 +599,7 @@ export const en = {
             irreversible: "This cannot be undone.", typeToConfirm: "Type \"{name}\" to confirm"
         },
         roles: {
+            discardBody: "You have unsaved changes to this role.",
             subtitle: "Platform roles (admin, client) and the company role templates (enterprise.*).",
             name: "Name", description: "Description", permissions: "Permissions", resource: "Resource",
             system: "System", systemHint: "System role: the name cannot change and it cannot be deleted.",

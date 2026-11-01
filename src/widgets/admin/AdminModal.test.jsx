@@ -27,16 +27,39 @@ describe("AdminModal", () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  it("asks before closing with unsaved changes", () => {
+  it("asks in-app (not window.confirm) before closing with unsaved changes", () => {
     const onClose = vi.fn();
-    const confirm = vi.spyOn(window, "confirm").mockReturnValueOnce(false).mockReturnValueOnce(true);
-    render(<AdminModal title="Edit" onClose={onClose} dirty><input aria-label="x" /></AdminModal>);
+    const native = vi.spyOn(window, "confirm");
+    render(<AdminModal title="Edit role" onClose={onClose} dirty discardMessage="You have unsaved changes to this role."
+      footer={<button type="button" data-modal-cancel onClick={onClose}>Cancel</button>}><input aria-label="x" /></AdminModal>);
+
     fireEvent.keyDown(document.body, { key: "Escape" });
-    expect(confirm).toHaveBeenCalledTimes(1);
+    const ask = screen.getByRole("alertdialog");
+    expect(ask.textContent).toContain("You have unsaved changes to this role.");
+    expect(document.activeElement.textContent).toBe("admin.modal.keepEditing"); // safe button focused
+    fireEvent.click(screen.getByText("admin.modal.keepEditing"));
+    expect(screen.queryByRole("alertdialog")).toBeNull();
     expect(onClose).not.toHaveBeenCalled();
-    fireEvent.keyDown(document.body, { key: "Escape" });
+
+    fireEvent.click(screen.getByText("Cancel"));                 // footer Cancel asks too
+    expect(screen.getByRole("alertdialog")).toBeTruthy();
+    fireEvent.keyDown(document.body, { key: "Escape" });          // Escape on the question = keep editing
+    expect(screen.queryByRole("alertdialog")).toBeNull();
+    expect(onClose).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByLabelText("admin.modal.close"));  // the X asks too
+    fireEvent.click(screen.getByText("admin.modal.discardConfirm"));
     expect(onClose).toHaveBeenCalledTimes(1);
-    confirm.mockRestore();
+    expect(native).not.toHaveBeenCalled();
+    native.mockRestore();
+  });
+
+  it("closes straight away without changes", () => {
+    const onClose = vi.fn();
+    render(<AdminModal title="Edit" onClose={onClose}><input aria-label="x" /></AdminModal>);
+    fireEvent.keyDown(document.body, { key: "Escape" });
+    expect(screen.queryByRole("alertdialog")).toBeNull();
+    expect(onClose).toHaveBeenCalledTimes(1);
   });
 
   it("first Escape in a search box with text clears it, the second closes", () => {

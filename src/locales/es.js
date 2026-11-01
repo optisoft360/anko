@@ -501,6 +501,7 @@ export const es = {
         visibility: { private: "Privado", shared: "Compartido", public: "Público" },
         companyRoles: { owner: "Propietario", admin: "Admin", manager: "Manager", trainer: "Formador", employee: "Empleado", auditor: "Auditor" },
         pages: {
+            companyUsers: { removeTitle: "¿Quitar de la empresa?", remove: "Quitar", removeConsequences: "Pierde el acceso a esta empresa. Su cuenta se mantiene." },
             batteries: {
                 company: "Empresa",
                 title: "Baterías", subtitle: "Todas las baterías de la plataforma.", name: "Nombre", project: "Proyecto", owner: "Propietario",
@@ -585,6 +586,7 @@ export const es = {
             errorTitle: "No se pudieron cargar los datos", errorHint: "Revisa tu conexión e inténtalo de nuevo.", retry: "Reintentar"
         },
         modal: {
+            discardTitle: "¿Descartar cambios?", discardBody: "Tienes cambios sin guardar.", keepEditing: "Seguir editando", discardConfirm: "Descartar",
             close: "Cerrar", cancel: "Cancelar", save: "Guardar", editTitle: "Editar", createTitle: "Crear",
             discard: "Tienes cambios sin guardar. ¿Descartarlos?"
         },
@@ -597,6 +599,7 @@ export const es = {
             irreversible: "Esta acción no se puede deshacer.", typeToConfirm: "Escribe \"{name}\" para confirmar"
         },
         roles: {
+            discardBody: "Tienes cambios sin guardar en este rol.",
             subtitle: "Roles de plataforma (admin, client) y las plantillas de rol de empresa (enterprise.*).",
             name: "Nombre", description: "Descripción", permissions: "Permisos", resource: "Recurso",
             system: "Sistema", systemHint: "Rol de sistema: el nombre no se puede cambiar ni se puede eliminar.",

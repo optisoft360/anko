@@ -433,7 +433,7 @@ export function GlobalCrudPage({
         <AdminModal title={isEdit ? (editTitle || t("admin.modal.editTitle")) : (createTitle || t("admin.modal.createTitle"))}
           onClose={() => setEditing(null)} dirty={dirty}
           footer={<>
-            <button type="button" onClick={() => setEditing(null)} disabled={saving} className={BTN_SECONDARY}>{t("admin.modal.cancel")}</button>
+            <button type="button" data-modal-cancel onClick={() => setEditing(null)} disabled={saving} className={BTN_SECONDARY}>{t("admin.modal.cancel")}</button>
             <button type="button" onClick={save} disabled={saving} className={BTN_PRIMARY}>
               {saving && <Spinner className="!h-4 !w-4 border-white/40 border-t-white" />}
               {t("admin.modal.save")}
