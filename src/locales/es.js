@@ -567,8 +567,8 @@ export const es = {
                 }
             },
             overview: {
-                title: "Resumen", subtitle: "Toda la plataforma de un vistazo.", companies: "Empresas", active: "{n} activas",
-                users: "Usuarios", usersHint: "{active} activos · {staff} admins de plataforma", newUsers: "Usuarios nuevos", last30: "Últimos 30 días",
+                title: "Resumen", subtitle: "Toda la plataforma de un vistazo.", companies: "Empresas", active: { one: "{n} activa", other: "{n} activas" },
+                users: "Usuarios", usersHint: "{active} activos · {admins}", platformAdmins: { one: "{n} admin de plataforma", other: "{n} admins de plataforma" }, newUsers: "Usuarios nuevos", last30: "Últimos 30 días",
                 pendingInvites: "Invitaciones pendientes", content: "Contenido", contentHint: "Registros de todas las empresas y espacios personales.",
                 companyProcesses: "Procesos de empresa", personalProcesses: "Procesos personales", learningPaths: "Rutas de aprendizaje",
                 decks: "Mazos", batteries: "Baterías", flashcards: "Flashcards", subscriptions: "Suscripciones por plan",

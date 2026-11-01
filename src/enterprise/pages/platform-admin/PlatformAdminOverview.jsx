@@ -52,7 +52,7 @@ export default function PlatformAdminOverview() {
         <>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <Stat icon={BuildingOffice2Icon} tone="indigo" label={k("companies")} value={data.companies?.total} hint={k("active", { n: data.companies?.active ?? 0 })} to="/platform-admin/companies" />
-            <Stat icon={UsersIcon} tone="sky" label={k("users")} value={data.users?.total} hint={k("usersHint", { active: data.users?.active ?? 0, staff: data.users?.staff ?? 0 })} to="/dashboard/users" />
+            <Stat icon={UsersIcon} tone="sky" label={k("users")} value={data.users?.total} hint={k("usersHint", { active: data.users?.active ?? 0, admins: k("platformAdmins", { n: data.users?.staff ?? 0 }) })} to="/dashboard/users" />
             <Stat icon={UsersIcon} tone="emerald" label={k("newUsers")} value={data.users?.new_last_30d} hint={k("last30")} />
             <Stat icon={EnvelopeIcon} tone="amber" label={k("pendingInvites")} value={data.invitations?.pending} to="/platform-admin/invitations" />
           </div>

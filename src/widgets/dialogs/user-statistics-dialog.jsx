@@ -28,7 +28,7 @@ const formatStudyTime = (seconds) => {
 };
 
 /** Study statistics of the personal (non-company) product, also used to inspect another user. */
-function LegacyStudyStats({ userId, language }) {
+function LegacyStudyStats({ userId, language, otherUser = false }) {
     const es = language === "es";
     const [stats, setStats] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -79,7 +79,10 @@ function LegacyStudyStats({ userId, language }) {
         inProjects: (n) => es ? `en ${n} ${n === 1 ? "proyecto" : "proyectos"}` : `across ${n} ${n === 1 ? "project" : "projects"}`,
         retry: es ? "Reintentar" : "Retry",
         emptyTitle: es ? "Aún no hay actividad" : "No activity yet",
-        emptyHint: es ? "Responde quizzes o simulacros y aquí verás tu progreso." : "Answer quizzes or practice exams and your progress will show up here.",
+        // Third person when an admin is looking at someone else's statistics.
+        emptyHint: otherUser
+            ? (es ? "Este usuario aún no ha respondido quizzes ni simulacros." : "This user hasn't answered any quizzes or practice exams yet.")
+            : (es ? "Responde quizzes o simulacros y aquí verás tu progreso." : "Answer quizzes or practice exams and your progress will show up here."),
     };
 
     let body;
@@ -203,7 +206,7 @@ export function UserStatisticsDialog({ open, handler, userId, userName }) {
             footer={<button type="button" onClick={handler} className={BTN_SECONDARY}>{es ? "Cerrar" : "Close"}</button>}>
             {companyMode
                 ? <EnterpriseStats role={role} companyName={activeCompany.company_name} language={language} />
-                : <LegacyStudyStats userId={userId} language={language} />}
+                : <LegacyStudyStats userId={userId} language={language} otherUser={!isSelf} />}
         </Modal>,
         document.body,
     );
