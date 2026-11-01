@@ -2959,9 +2959,26 @@ export const es = {
             },
             learningTrends: {
                 title: "Tendencias de Aprendizaje",
-                empty: "No hay datos de tendencia de aprendizaje",
+                subtitle: "Rutas de aprendizaje completadas por tu equipo, semana a semana.",
+                period: "Periodo",
+                empty: "Sin rutas completadas en este periodo",
+                emptyHint: "Cuando alguien complete una ruta de aprendizaje aparecerá aquí. Prueba un periodo más largo.",
+                loadError: "No se pudieron cargar las tendencias de aprendizaje.",
                 seriesName: "Completados",
-                tooltipCompletions: { one: "{n} completado", other: "{n} completados" }
+                tooltipCompletions: { one: "{n} ruta completada", other: "{n} rutas completadas" },
+                weekOf: "Semana del {date}",
+                chartTitle: "Rutas completadas por semana",
+                chartHint: "Cada barra es una semana (de lunes a domingo).",
+                stats: {
+                    total: "Rutas completadas",
+                    totalHint: { one: "En el último día", other: "En los últimos {n} días" },
+                    avg: "Media semanal",
+                    activeWeeks: "{a} de {b} semanas con actividad",
+                    best: "Mejor semana",
+                    noActivity: "Sin actividad",
+                    trend: "Tendencia",
+                    trendHint: "{curr} en la 2.ª mitad vs {prev} en la 1.ª"
+                }
             },
             retentionTrends: {
                 title: "Tendencias de Retención",

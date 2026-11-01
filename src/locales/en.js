@@ -2958,9 +2958,26 @@ export const en = {
             },
             learningTrends: {
                 title: "Learning Trends",
-                empty: "No learning trend data",
+                subtitle: "Learning paths your team completed, week by week.",
+                period: "Period",
+                empty: "No learning paths completed in this period",
+                emptyHint: "Completed learning paths show up here. Try a longer period.",
+                loadError: "Could not load learning trends.",
                 seriesName: "Completions",
-                tooltipCompletions: { one: "{n} completion", other: "{n} completions" }
+                tooltipCompletions: { one: "{n} path completed", other: "{n} paths completed" },
+                weekOf: "Week of {date}",
+                chartTitle: "Paths completed per week",
+                chartHint: "Each bar is one week (Monday to Sunday).",
+                stats: {
+                    total: "Paths completed",
+                    totalHint: { one: "In the last day", other: "In the last {n} days" },
+                    avg: "Weekly average",
+                    activeWeeks: "{a} of {b} weeks with activity",
+                    best: "Best week",
+                    noActivity: "No activity",
+                    trend: "Trend",
+                    trendHint: "{curr} in the 2nd half vs {prev} in the 1st"
+                }
             },
             retentionTrends: {
                 title: "Retention Trends",
