@@ -18,7 +18,8 @@ export function BooleanBadge({ value, yes, no }) {
 export function DateCell({ value, withTime = true }) {
   const { language } = useLanguage();
   const text = formatDate(value, language, { withTime });
-  return text ? <span className="whitespace-nowrap tabular-nums" title={String(value)}>{text}</span> : DASH;
+  // Tooltip: the full local date and time.
+  return text ? <span className="whitespace-nowrap tabular-nums" title={formatDate(value, language, { withTime: true })}>{text}</span> : DASH;
 }
 
 export function MoneyCell({ cents, currency, period }) {

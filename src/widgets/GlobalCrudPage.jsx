@@ -326,7 +326,8 @@ export function GlobalCrudPage({
         {(searchable || filters.some((f) => !f.hidden) || hasFilters) && (
           <div className="flex flex-col gap-2 border-b border-[#F1F5F9] p-3 sm:flex-row sm:flex-wrap sm:items-center sm:p-4">
             {searchable && (
-              <div className="relative min-w-0 flex-1 sm:max-w-sm">
+              // Search keeps at least 240px; filters wrap to the next line when they don't fit.
+              <div className="relative min-w-0 sm:min-w-[240px] sm:flex-[1_1_240px] sm:max-w-md">
                 <MagnifyingGlassIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#94A3B8]" />
                 <TextInput type="search" value={searchText} onChange={(e) => setSearchText(e.target.value)}
                   placeholder={searchPlaceholder || t("admin.table.search")} aria-label={searchPlaceholder || t("admin.table.search")} className="pl-9" />
@@ -334,7 +335,7 @@ export function GlobalCrudPage({
             )}
             {filters.filter((f) => !f.hidden).map((f) => (
               <SelectInput key={f.name} value={filterValues[f.name]} onChange={(e) => update({ [f.name]: e.target.value })}
-                aria-label={f.label} className="sm:w-48">
+                aria-label={f.label} className="sm:w-44 sm:shrink-0">
                 <option value="">{f.label}: {t("admin.table.all")}</option>
                 {(f.options || []).map((o) => <option key={String(o.value)} value={String(o.value)}>{o.label}</option>)}
               </SelectInput>
@@ -363,7 +364,7 @@ export function GlobalCrudPage({
                 <thead>
                   <tr className="border-b border-[#F1F5F9] text-xs font-medium uppercase tracking-wide text-[#64748B]">
                     {columns.map((c, i) => (
-                      <th key={i} scope="col" className={`whitespace-nowrap px-4 py-3 ${c.className || ""}`}
+                      <th key={i} scope="col" className={`whitespace-nowrap px-3 py-3 ${c.className || ""}`}
                         aria-sort={c.sortKey ? (ordering === c.sortKey ? "ascending" : ordering === `-${c.sortKey}` ? "descending" : "none") : undefined}>
                         {c.sortKey ? (
                           <button type="button" onClick={() => toggleSort(c.sortKey)} className={`inline-flex cursor-pointer items-center gap-1 uppercase hover:text-[#0F172A] ${FOCUS}`}>
@@ -379,7 +380,7 @@ export function GlobalCrudPage({
                   {rows.map((item) => (
                     <tr key={item.id} onClick={onRowClick ? () => onRowClick(item) : undefined}
                       className={`group text-[#334155] hover:bg-[#F8FAFC] ${onRowClick ? "cursor-pointer" : ""}`}>
-                      {columns.map((c, i) => <td key={i} className={`max-w-[280px] px-4 py-3 align-middle ${c.className || ""}`}>{cellOf(item, c)}</td>)}
+                      {columns.map((c, i) => <td key={i} className={`max-w-[280px] px-3 py-3 align-middle ${c.className || ""}`}>{cellOf(item, c)}</td>)}
                       <td className="sticky right-0 bg-white px-3 py-2 group-hover:bg-[#F8FAFC]">{renderActions(item)}</td>
                     </tr>
                   ))}
