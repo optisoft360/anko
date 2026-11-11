@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import { Routes, Route, Navigate, useSearchParams } from "react-router-dom";
-import { DashboardNavbar, ChatPanel } from "@/widgets/layout";
+import { DashboardNavbar } from "@/widgets/layout";
 import { EnterpriseSidenav } from "@/widgets/layout/enterprise-sidenav";
 import { useLightTheme } from "@/hooks/useLightTheme";
-import { ChatFab } from "@/widgets/layout/chat-fab";
+import { ChatWidget } from "@/widgets/layout/chat-widget";
 import { EmployeeMobileTabBar } from "@/enterprise/components/EmployeeMobileTabBar";
 import { AdminMobileTabBar } from "@/enterprise/components/AdminMobileTabBar";
 import routes from "@/routes";
@@ -102,9 +102,7 @@ export function Enterprise() {
           <DashboardNavbar />
         </div>
 
-        <ChatPanel />
-
-        <ChatFab />
+        <ChatWidget />
 
         <div className="flex-grow flex flex-col px-4 pt-4 pb-36 md:p-6">
           <Routes>

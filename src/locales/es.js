@@ -1100,7 +1100,7 @@ export const es = {
         context_docs: "Contexto (Documentos)",
         select_docs: "Seleccionar documentos",
         docs_selected: { one: "{count} seleccionado", other: "{count} seleccionados" },
-        no_docs: "No hay documentos",
+        no_docs: "Tu empresa aún no tiene documentos en sus procesos",
         no_docs_placeholder: "Selecciona documentos para comenzar.",
         help_text: "Haz una pregunta sobre los documentos seleccionados.",
         input_placeholder: "Escribe tu pregunta...",
@@ -1109,7 +1109,7 @@ export const es = {
         empty_state: "Selecciona un documento y haz una pregunta.",
         loading: "Pensando...",
         no_name: "Sin nombre",
-        missing_context: "Selecciona un proyecto y documentos para chatear",
+        missing_context: "Selecciona documentos de tu empresa para chatear",
         no_docs_title: "Contexto Requerido",
         select_project_first: "Selecciona un proyecto primero"
     },

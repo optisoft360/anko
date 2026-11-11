@@ -20,14 +20,12 @@ import { useMaterialTailwindController, setOpenConfigurator } from "@/context";
 import { useLanguage } from "@/context/language-context";
 import projectService from "@/services/projectService";
 
-export function ChatPanel() {
+// documents: every document of the active company's processes (from ChatWidget).
+export function ChatPanel({ companyId, documents = [], onOpen }) {
     const [controller, dispatch] = useMaterialTailwindController();
     const { openConfigurator } = controller;
     const { t, language } = useLanguage();
 
-    const [projects, setProjects] = useState([]);
-    const [selectedProject, setSelectedProject] = useState("");
-    const [documents, setDocuments] = useState([]);
     const [selectedDocs, setSelectedDocs] = useState([]);
     const [sessionId, setSessionId] = useState(crypto.randomUUID());
     const [messages, setMessages] = useState([]);
@@ -37,7 +35,7 @@ export function ChatPanel() {
     const [historyLoading, setHistoryLoading] = useState(false);
     const scrollRef = useRef(null);
 
-    const isContextReady = selectedProject && selectedDocs.length > 0;
+    const isContextReady = selectedDocs.length > 0;
 
     const handleNewChat = () => {
         setMessages([]);
@@ -93,50 +91,25 @@ export function ChatPanel() {
         }
     };
 
-    // Load projects the first time the panel opens (it is mounted, closed, on every page).
-    const projectsLoaded = useRef(false);
+    // Refresh the company's documents each time the panel opens (new uploads show up).
     useEffect(() => {
-        if (!openConfigurator || projectsLoaded.current) return;
-        projectsLoaded.current = true;
-        const fetchProjects = async () => {
-            try {
-                const data = await projectService.getProjects();
-                const list = Array.isArray(data) ? data : data?.results || [];
-                setProjects(list);
-                // Don't auto-select if we want to enforce intentional selection
-                // if (list.length > 0) setSelectedProject(list[0].id);
-            } catch (err) {
-                console.error("Error fetching projects:", err);
-            }
-        };
-        fetchProjects();
+        if (openConfigurator) onOpen?.();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [openConfigurator]);
 
-    // Load Documents when project changes
+    // Another company = another set of documents and another conversation.
     useEffect(() => {
-        if (selectedProject) {
-            const fetchDocs = async () => {
-                try {
-                    const data = await projectService.getProjectDocuments(selectedProject);
-                    const list = Array.isArray(data) ? data : data?.results || [];
-                    setDocuments(list);
-                    setSelectedDocs([]); // Reset selection
-                } catch (err) {
-                    console.error("Error fetching documents:", err);
-                }
-            };
-            fetchDocs();
-        } else {
-            setDocuments([]);
-            setSelectedDocs([]);
-        }
-    }, [selectedProject]);
+        setSelectedDocs([]);
+        setMessages([]);
+        setSessionId(crypto.randomUUID());
+        setActiveHistoryIndex(null);
+    }, [companyId]);
 
-    // Debug logging
+    // Drop selected documents that are no longer linked to any process.
     useEffect(() => {
-        console.log("[ChatPanel] Projects List:", projects);
-        console.log("[ChatPanel] Active Selection:", selectedProject);
-    }, [projects, selectedProject]);
+        const ids = new Set(documents.map((d) => String(d.id)));
+        setSelectedDocs((prev) => (prev.every((id) => ids.has(id)) ? prev : prev.filter((id) => ids.has(id))));
+    }, [documents]);
 
     // Scroll to bottom on new messages
     useEffect(() => {
@@ -156,6 +129,7 @@ export function ChatPanel() {
         try {
             const payload = {
                 question: input,
+                company_id: companyId,
                 context: selectedDocs,
                 session_id: sessionId || "chat-panel-session",
             };
@@ -252,62 +226,18 @@ export function ChatPanel() {
             <div className="p-3 md:p-5 space-y-3 md:space-y-4 border-b border-zinc-100 bg-zinc-50/50 flex-none">
                 <div className="space-y-1">
                     <p style={{ fontSize: "10px", fontWeight: 700, color: "#1a1a2e", textTransform: "uppercase", letterSpacing: "0.06em", marginLeft: "2px" }}>
-                        {t("chat.select_project")}
-                    </p>
-                    <Menu>
-                        <MenuHandler>
-                            <Button
-                                variant="outlined"
-                                className={`flex items-center gap-2 w-full justify-between px-3 h-9 md:px-4 md:h-11 font-medium normal-case rounded-xl transition-all border text-xs ${selectedProject ? "border-indigo-200 bg-indigo-50/30 text-indigo-700" : "border-zinc-200 bg-white text-zinc-500"}`}
-                            >
-                                <span className="truncate">
-                                    {selectedProject
-                                        ? (projects.find(p => String(p.id) === String(selectedProject))?.title || projects.find(p => String(p.id) === String(selectedProject))?.name || "Proyecto Seleccionado")
-                                        : (language === "es" ? "Seleccionar proyecto..." : "Select project...")}
-                                </span>
-                                <ChevronDownIcon className="h-3.5 w-3.5 opacity-50 shrink-0" />
-                            </Button>
-                        </MenuHandler>
-                        <MenuList className="max-h-60 overflow-y-auto rounded-xl border-zinc-100 shadow-2xl p-2 w-[calc(100vw-2rem)] md:min-w-[350px] md:w-auto z-[99999]">
-                            {projects.length === 0 ? (
-                                <div className="p-3 text-center text-xs text-zinc-500 italic">
-                                    {language === "es" ? "Cargando proyectos..." : "Loading projects..."}
-                                </div>
-                            ) : (
-                                projects.map((p) => (
-                                    <MenuItem
-                                        key={String(p.id)}
-                                        className={`rounded-lg mb-1 flex items-center justify-between p-3 ${String(selectedProject) === String(p.id) ? "bg-indigo-50 text-indigo-700 font-bold" : "text-zinc-700 hover:bg-zinc-50"}`}
-                                        onClick={() => setSelectedProject(String(p.id))}
-                                    >
-                                        <p className="text-xs font-bold truncate">{p.title || p.name}</p>
-                                        {String(selectedProject) === String(p.id) && (
-                                            <div className="h-2 w-2 rounded-full shrink-0" style={{ background: "#3949AB" }} />
-                                        )}
-                                    </MenuItem>
-                                ))
-                            )}
-                        </MenuList>
-                    </Menu>
-                </div>
-
-                <div className="space-y-1">
-                    <p style={{ fontSize: "10px", fontWeight: 700, color: "#1a1a2e", textTransform: "uppercase", letterSpacing: "0.06em", marginLeft: "2px" }}>
                         {t("chat.context_docs")}
                     </p>
                     <Menu dismiss={{ itemPress: false }}>
                         <MenuHandler>
                             <Button
                                 variant="outlined"
-                                disabled={!selectedProject}
                                 className={`flex items-center gap-2 w-full justify-between px-3 h-9 md:px-4 md:h-11 font-medium normal-case rounded-xl transition-all border text-xs ${selectedDocs.length > 0 ? "border-indigo-200 bg-indigo-50/30 text-indigo-700" : "border-zinc-200 bg-white text-zinc-500"}`}
                             >
                                 <span className="truncate">
-                                    {!selectedProject
-                                        ? t("chat.select_project_first")
-                                        : (selectedDocs.length === 0
-                                            ? t("chat.select_docs")
-                                            : t("chat.docs_selected").replace("{count}", selectedDocs.length))}
+                                    {selectedDocs.length === 0
+                                        ? t("chat.select_docs")
+                                        : t("chat.docs_selected", { count: selectedDocs.length })}
                                 </span>
                                 <ChevronDownIcon className="h-3.5 w-3.5 opacity-50 shrink-0" />
                             </Button>
@@ -335,9 +265,16 @@ export function ChatPanel() {
                                                     );
                                                 }}
                                             />
-                                            <p className="text-xs font-medium text-zinc-700 truncate">
-                                                {d.name || d.title || d.filename || t("chat.no_name")}
-                                            </p>
+                                            <div className="min-w-0">
+                                                <p className="text-xs font-medium text-zinc-700 truncate">
+                                                    {d.filename || t("chat.no_name")}
+                                                </p>
+                                                {d.processes?.length > 0 && (
+                                                    <p className="text-[10px] text-zinc-400 truncate">
+                                                        {d.processes.map((p) => p.title).join(" · ")}
+                                                    </p>
+                                                )}
+                                            </div>
                                         </label>
                                     </MenuItem>
                                 ))
@@ -355,7 +292,7 @@ export function ChatPanel() {
                             return (
                                 <Chip
                                     key={docId}
-                                    value={doc.name || doc.title || doc.filename || t("chat.no_name")}
+                                    value={doc.filename || t("chat.no_name")}
                                     size="sm"
                                     variant="ghost"
                                     color="indigo"
@@ -443,7 +380,7 @@ export function ChatPanel() {
                 <form onSubmit={(e) => { e.preventDefault(); handleSend(); }} className="relative flex w-full">
                     <input
                         type="text"
-                        placeholder={!isContextReady ? (language === "es" ? "Selecciona un proyecto y documentos primero..." : "Select a project and documents first...") : t("chat.input_placeholder")}
+                        placeholder={!isContextReady ? (language === "es" ? "Selecciona documentos primero..." : "Select documents first...") : t("chat.input_placeholder")}
                         disabled={loading}
                         style={{ width: "100%", background: "#f9f9fb", border: "1px solid #e5e7eb", borderRadius: "14px", padding: "12px 50px 12px 16px", fontSize: "13px", color: "#1a1a2e", outline: "none" }}
                         value={input}

@@ -1130,6 +1130,13 @@ const projectService = {
     }
   },
 
+  // Documents of every process of the company the chat can query. 403 = this member may not use
+  // the chat (employees/auditors take the courses, they don't query the documents).
+  async getChatDocuments(companyId) {
+    const res = await api.get(`${BASE}chat/documents/`, { params: { company_id: companyId } });
+    return res.data?.results || [];
+  },
+
   async getChatSessionMessages(index = 1) {
     try {
       const token = localStorage.getItem("token");

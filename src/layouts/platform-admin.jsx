@@ -1,8 +1,8 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import { DashboardNavbar, ChatPanel } from "@/widgets/layout";
+import { DashboardNavbar } from "@/widgets/layout";
 import { EnterpriseSidenav } from "@/widgets/layout/enterprise-sidenav";
 import { useLightTheme } from "@/hooks/useLightTheme";
-import { ChatFab } from "@/widgets/layout/chat-fab";
+import { ChatWidget } from "@/widgets/layout/chat-widget";
 import routes from "@/routes";
 import { useEnterprise } from "@/enterprise/context/enterprise-context";
 import { useAuth } from "@/context/auth-context";
@@ -50,9 +50,7 @@ export function PlatformAdmin() {
           <DashboardNavbar />
         </div>
 
-        <ChatPanel />
-
-        <ChatFab />
+        <ChatWidget />
 
         <div className="flex-grow flex flex-col px-4 pt-4 pb-36 md:p-6">
           <Routes>

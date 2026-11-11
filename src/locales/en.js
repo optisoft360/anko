@@ -1099,7 +1099,7 @@ export const en = {
         context_docs: "Context (Documents)",
         select_docs: "Select documents",
         docs_selected: "{count} selected",
-        no_docs: "No documents available",
+        no_docs: "Your company has no documents in its processes yet",
         no_docs_placeholder: "Select documents to start.",
         help_text: "Ask a question about the selected documents.",
         input_placeholder: "Type your question...",
@@ -1108,7 +1108,7 @@ export const en = {
         empty_state: "Select a document and ask a question.",
         loading: "Thinking...",
         no_name: "No name",
-        missing_context: "Select a project and documents to start chatting",
+        missing_context: "Select your company's documents to start chatting",
         no_docs_title: "Context Required",
         select_project_first: "Select a project first"
     },

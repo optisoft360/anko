@@ -3,7 +3,6 @@ import { ChevronRightIcon } from "@heroicons/react/24/solid";
 import { IconButton } from "@material-tailwind/react";
 import {
   DashboardNavbar,
-  ChatPanel,
   Footer,
 } from "@/widgets/layout";
 import { MobileTabBar } from "@/widgets/layout/mobile-tab-bar";
@@ -20,7 +19,7 @@ import { useAuth } from "@/context/auth-context";
 import { useEnterprise } from "@/enterprise/context/enterprise-context";
 import { EnterpriseSidenav } from "@/widgets/layout/enterprise-sidenav";
 import { useLightTheme } from "@/hooks/useLightTheme";
-import { ChatFab } from "@/widgets/layout/chat-fab";
+import { ChatWidget } from "@/widgets/layout/chat-widget";
 import { useHideNavWithoutCompany } from "@/config/navigation";
 
 export function Dashboard() {
@@ -57,9 +56,7 @@ export function Dashboard() {
           <DashboardNavbar hideMenu={hideNav} />
         </div>
 
-        <ChatPanel />
-
-        <ChatFab />
+        <ChatWidget />
 
         <div className="flex-grow flex flex-col px-4 pt-4 pb-36 md:p-6">
           <Routes>
